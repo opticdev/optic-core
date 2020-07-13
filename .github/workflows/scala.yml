@@ -1,0 +1,66 @@
+name: Scala CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: "checkout source"
+      uses: actions/checkout@v2
+    - name: "Set up JDK 1.8"
+      uses: actions/setup-java@v1
+      with:
+        java-version: 1.8
+        
+    - name: pwd
+      run: pwd
+    - name: "where is the code"
+      run: echo $GITHUB_WORKSPACE
+    - name: ls
+      run: ls -la $GITHUB_WORKSPACE
+
+    - name: "list sbt projects"
+      run: cd "$GITHUB_WORKSPACE/core" && sbt projects
+    - name: "build domain.js artifact"
+      run: cd "$GITHUB_WORKSPACE/core" && sbt fullOptJS
+      env:
+        SBT_OPTS: "-Xmx2G -XX:+UseConcMarkSweepGC -XX:+CMSClassUnloadingEnabled -XX:MaxPermSize=2G -Xss2M -Duser.timezone=GMT"
+    - name: "check artifact"
+      run: ls -la "$GITHUB_WORKSPACE/core/optic/js/target/scala-2.12/optic-core-opt.js"
+    - name: "copy artifact"
+      run: cp "$GITHUB_WORKSPACE/core/optic/js/target/scala-2.12/optic-core-opt.js" "$GITHUB_WORKSPACE/workspace/packages/domain/src/domain.js"
+      
+    - name: "build typescript artifact"
+      run: cd "$GITHUB_WORKSPACE/core" && sbt "opticJVM/generateTypescript"
+
+    - name: "build avro artifact"
+      run: cd "$GITHUB_WORKSPACE/core" && sbt "opticJVM/runMain com.useoptic.types.AvroMappings"
+  
+    - name: "check artifact"
+      run: ls -la "$GITHUB_WORKSPACE/core/build"
+
+    - name: "copy artifact"
+      run: cp -r "$GITHUB_WORKSPACE/core/build/" "$GITHUB_WORKSPACE/workspace/packages/domain-types/src"
+      
+    - name: "set up node.js"
+      uses: actions/setup-node@v1
+      with:
+        node-version: "12.x"
+    - name: "install dependencies"
+      run: cd "$GITHUB_WORKSPACE/workspace" && yarn install
+    - name: "build workspaces"
+      run: cd "$GITHUB_WORKSPACE/workspace" && yarn wsrun --stages --report --fast-exit ws:build
+    - name: "check domain src directory"
+      run: ls -laR "$GITHUB_WORKSPACE/workspace/packages/domain/src"
+    - name: "check domain build directory"
+      run: ls -laR "$GITHUB_WORKSPACE/workspace/packages/domain/build"
+    - name: "check domain-types src directory"
+      run: ls -laR "$GITHUB_WORKSPACE/workspace/packages/domain-types/src"
+    - name: "check domain-types build directory"
+      run: ls -laR "$GITHUB_WORKSPACE/workspace/packages/domain-types/build"
