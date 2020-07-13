@@ -1,0 +1,10 @@
+target/
+project/target
+.idea/
+optic/js/target/
+optic/shared/target/
+optic/jvm/target/
+optic/target
+.bloop
+.metals
+.vscode
