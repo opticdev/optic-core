@@ -1,0 +1,21 @@
+{
+  "name": "@useoptic/domain",
+  "version": "8.2.1",
+  "scripts": {
+    "ws:test": "echo domain",
+    "ws:build": "yarn run tsc -b --verbose && yarn run ws:copy-files",
+    "ws:copy-files": "cp ./src/domain.js ./build/domain.js",
+    "ws:clean": "rm -rf build/*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "ssh://git@github.com/useoptic/optic-package.git",
+    "directory": "workspace/packages/domain"
+  },
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
+  "dependencies": {},
+  "files": [
+    "/build"
+  ]
+}

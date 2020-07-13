@@ -1,0 +1,23 @@
+{
+  "name": "@useoptic/domain-utilities",
+  "version": "8.2.1",
+  "scripts": {
+    "ws:clean": "rm -rf build/*",
+    "ws:build": "yarn run tsc -b --verbose",
+    "ws:test": "echo domain-utilities"
+  },
+  "repository": {
+    "type": "git",
+    "url": "ssh://git@github.com/useoptic/optic-package.git",
+    "directory": "workspace/packages/domain-utilities"
+  },
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
+  "dependencies": {
+    "@useoptic/domain": "8.2.1"
+  },
+  "devDependencies": {},
+  "files": [
+    "/build"
+  ]
+}

@@ -1,0 +1,5 @@
+build
+node_modules
+
+src/avro-schemas
+src/optic-types.ts

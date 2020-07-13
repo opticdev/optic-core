@@ -1,0 +1,22 @@
+{
+  "name": "@useoptic/domain-types",
+  "version": "8.2.1",
+  "scripts": {
+    "ws:clean": "rm -rf build/*",
+    "ws:build": "yarn run tsc -b --verbose && yarn run ws:copy-files",
+    "ws:copy-files": "cp -R ./src/avro-schemas/ ./build/avro-schemas",
+    "ws:test": "echo domain-types"
+  },
+  "repository": {
+    "type": "git",
+    "url": "ssh://git@github.com/useoptic/optic-package.git",
+    "directory": "workspace/packages/domain-types"
+  },
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
+  "dependencies": {},
+  "devDependencies": {},
+  "files": [
+    "/build"
+  ]
+}
