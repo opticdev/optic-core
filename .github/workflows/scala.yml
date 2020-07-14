@@ -56,6 +56,14 @@ jobs:
     runs-on: ubuntu-latest
     needs: build_scala
     steps:
+    - name: "checkout source"
+      uses: actions/checkout@v2
+    - name: pwd
+      run: pwd
+    - name: "where is the code"
+      run: echo $GITHUB_WORKSPACE
+    - name: ls
+      run: ls -la $GITHUB_WORKSPACE
     - name: "download domain.js artifact"
       uses: actions/download-artifact@v2
       with:
