@@ -7,7 +7,7 @@ on:
     branches: [ master ]
 
 jobs:
-  build:
+  build_scala:
     runs-on: ubuntu-latest
 
     steps:
@@ -31,26 +31,56 @@ jobs:
       run: cd "$GITHUB_WORKSPACE/core" && sbt fullOptJS
       env:
         SBT_OPTS: "-Xmx2G -XX:+UseConcMarkSweepGC -XX:+CMSClassUnloadingEnabled -XX:MaxPermSize=2G -Xss2M -Duser.timezone=GMT"
-    - name: "check artifact"
+    - name: "check domain.js artifact"
       run: ls -la "$GITHUB_WORKSPACE/core/optic/js/target/scala-2.12/optic-core-opt.js"
-    - name: "copy artifact"
-      run: cp "$GITHUB_WORKSPACE/core/optic/js/target/scala-2.12/optic-core-opt.js" "$GITHUB_WORKSPACE/workspace/packages/domain/src/domain.js"
-
-    - name: "check domain src directory"
-      run: ls -laR "$GITHUB_WORKSPACE/workspace/packages/domain/src"
-      
+    - name: "name domain.js artifact"
+      run: cp "$GITHUB_WORKSPACE/core/optic/js/target/scala-2.12/optic-core-opt.js" "$GITHUB_WORKSPACE/core/optic/js/target/scala-2.12/domain.js"
+    - name: "save domain.js artifact"
+      uses: actions/upload-artifact@v2
+      with:
+        name: domain-js
+        path: "core/optic/js/target/scala-2.12/domain.js"
+        
+    
     - name: "build avro artifact"
       run: cd "$GITHUB_WORKSPACE/core" && sbt "opticJVM/runMain com.useoptic.types.AvroMappings"
       
     - name: "build typescript artifact"
       run: cd "$GITHUB_WORKSPACE/core" && sbt "opticJVM/generateTypescript"
-  
-    - name: "check artifact"
-      run: ls -la "$GITHUB_WORKSPACE/core/build"
+    
+    - name: "save avro and typescript artifacts"
+      uses: actions/upload-artifact@v2
+      with:
+        name: domain-avro-ts
+        path: "core/build"
 
-    - name: "copy artifact"
-      run: cp -r "$GITHUB_WORKSPACE/core/build/" "$GITHUB_WORKSPACE/workspace/packages/domain-types/src"
-      
+  build_js:
+    runs-on: ubuntu-latest
+    needs: build_scala
+    steps:
+    - name: "checkout source"
+      uses: actions/checkout@v2
+    - name: pwd
+      run: pwd
+    - name: "where is the code"
+      run: echo $GITHUB_WORKSPACE
+    - name: ls
+      run: ls -la $GITHUB_WORKSPACE
+    - name: "download domain.js artifact"
+      uses: actions/download-artifact@v2
+      with:
+        name: domain-js
+        path: "workspace/packages/domain/src"
+          
+    - name: "check domain src directory"
+      run: ls -laR "$GITHUB_WORKSPACE/workspace/packages/domain/src"
+
+    - name: "download avro and typescript artifacts"
+      uses: actions/download-artifact@v2
+      with:
+        name: domain-avro-ts
+        path: "workspace/packages/domain-types/src"
+        
     - name: "check domain-types src directory"
       run: ls -laR "$GITHUB_WORKSPACE/workspace/packages/domain-types/src"
       
