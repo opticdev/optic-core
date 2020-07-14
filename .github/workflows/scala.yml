@@ -34,10 +34,10 @@ jobs:
     - name: "check domain.js artifact"
       run: ls -la "$GITHUB_WORKSPACE/core/optic/js/target/scala-2.12/optic-core-opt.js"
     - name: "save domain.js artifact"
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v2
       with:
         name: domain-js
-        path: "$GITHUB_WORKSPACE/core/optic/js/target/scala-2.12/optic-core-opt.js"
+        path: "core/optic/js/target/scala-2.12/optic-core-opt.js"
         
     
     - name: "build avro artifact"
@@ -47,17 +47,17 @@ jobs:
       run: cd "$GITHUB_WORKSPACE/core" && sbt "opticJVM/generateTypescript"
     
     - name: "save avro and typescript artifacts"
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v2
       with:
         name: domain-avro-ts
-        path: "$GITHUB_WORKSPACE/core/build"
+        path: "core/build"
 
   build_js:
     runs-on: ubuntu-latest
     needs: build_scala
     steps:
     - name: "download domain.js artifact"
-      uses: actions/download-artifact@v1
+      uses: actions/download-artifact@v2
       with:
         name: domain-js
         path: "$GITHUB_WORKSPACE/workspace/packages/domain/src/domain.js"
@@ -66,7 +66,7 @@ jobs:
       run: ls -laR "$GITHUB_WORKSPACE/workspace/packages/domain/src"
 
     - name: "download avro and typescript artifacts"
-      uses: actions/download-artifact@v1
+      uses: actions/download-artifact@v2
       with:
         name: domain-avro-ts
         path: "$GITHUB_WORKSPACE/workspace/packages/domain-types/src"
