@@ -100,7 +100,7 @@ jobs:
 
     - name: "prepare to publish to npm"
       run: echo "//registry.npmjs.org/:_authToken=${{ secrets.PUBLISH_NPM_OPTIC_BOT }}" > ~/.npmrc
-    - run: cd "$GITHUB_WORKSPACE/workspace/domain-types" && npm publish --access public
-    - run: cd "$GITHUB_WORKSPACE/workspace/domain" && npm publish --access public
-    - run: cd "$GITHUB_WORKSPACE/workspace/domain-utilities" && npm publish --access public
+    - run: cd "$GITHUB_WORKSPACE/workspace/packages/domain-types" && npm publish --access public
+    - run: cd "$GITHUB_WORKSPACE/workspace/packages/domain" && npm publish --access public
+    - run: cd "$GITHUB_WORKSPACE/workspace/packages/domain-utilities" && npm publish --access public
 
