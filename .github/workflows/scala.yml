@@ -33,11 +33,13 @@ jobs:
         SBT_OPTS: "-Xmx2G -XX:+UseConcMarkSweepGC -XX:+CMSClassUnloadingEnabled -XX:MaxPermSize=2G -Xss2M -Duser.timezone=GMT"
     - name: "check domain.js artifact"
       run: ls -la "$GITHUB_WORKSPACE/core/optic/js/target/scala-2.12/optic-core-opt.js"
+    - name: "name domain.js artifact"
+      run: cp "$GITHUB_WORKSPACE/core/optic/js/target/scala-2.12/optic-core-opt.js" "$GITHUB_WORKSPACE/core/optic/js/target/scala-2.12/domain.js"
     - name: "save domain.js artifact"
       uses: actions/upload-artifact@v2
       with:
         name: domain-js
-        path: "core/optic/js/target/scala-2.12/optic-core-opt.js"
+        path: "core/optic/js/target/scala-2.12/domain.js"
         
     
     - name: "build avro artifact"
@@ -68,7 +70,7 @@ jobs:
       uses: actions/download-artifact@v2
       with:
         name: domain-js
-        path: "workspace/packages/domain/src/domain.js"
+        path: "workspace/packages/domain/src"
           
     - name: "check domain src directory"
       run: ls -laR "$GITHUB_WORKSPACE/workspace/packages/domain/src"
