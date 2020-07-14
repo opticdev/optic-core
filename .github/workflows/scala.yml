@@ -36,6 +36,9 @@ jobs:
     - name: "copy artifact"
       run: cp "$GITHUB_WORKSPACE/core/optic/js/target/scala-2.12/optic-core-opt.js" "$GITHUB_WORKSPACE/workspace/packages/domain/src/domain.js"
 
+    - name: "check domain src directory"
+      run: ls -laR "$GITHUB_WORKSPACE/workspace/packages/domain/src"
+      
     - name: "build avro artifact"
       run: cd "$GITHUB_WORKSPACE/core" && sbt "opticJVM/runMain com.useoptic.types.AvroMappings"
       
@@ -48,6 +51,9 @@ jobs:
     - name: "copy artifact"
       run: cp -r "$GITHUB_WORKSPACE/core/build/" "$GITHUB_WORKSPACE/workspace/packages/domain-types/src"
       
+    - name: "check domain-types src directory"
+      run: ls -laR "$GITHUB_WORKSPACE/workspace/packages/domain-types/src"
+      
     - name: "set up node.js"
       uses: actions/setup-node@v1
       with:
@@ -56,11 +62,8 @@ jobs:
       run: cd "$GITHUB_WORKSPACE/workspace" && yarn install
     - name: "build workspaces"
       run: cd "$GITHUB_WORKSPACE/workspace" && yarn wsrun --stages --report --fast-exit ws:build
-    - name: "check domain src directory"
-      run: ls -laR "$GITHUB_WORKSPACE/workspace/packages/domain/src"
+
     - name: "check domain build directory"
       run: ls -laR "$GITHUB_WORKSPACE/workspace/packages/domain/build"
-    - name: "check domain-types src directory"
-      run: ls -laR "$GITHUB_WORKSPACE/workspace/packages/domain-types/src"
     - name: "check domain-types build directory"
       run: ls -laR "$GITHUB_WORKSPACE/workspace/packages/domain-types/build"
