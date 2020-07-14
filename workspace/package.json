@@ -8,6 +8,7 @@
     "packages/domain-utilities"
   ],
   "devDependencies": {
+    "@types/node": "^12",
     "typescript": "^3.9.6",
     "wsrun": "^5.2.1"
   },
