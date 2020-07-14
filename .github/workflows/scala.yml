@@ -60,7 +60,7 @@ jobs:
       uses: actions/download-artifact@v2
       with:
         name: domain-js
-        path: "$GITHUB_WORKSPACE/workspace/packages/domain/src/domain.js"
+        path: "workspace/packages/domain/src/domain.js"
           
     - name: "check domain src directory"
       run: ls -laR "$GITHUB_WORKSPACE/workspace/packages/domain/src"
@@ -69,7 +69,7 @@ jobs:
       uses: actions/download-artifact@v2
       with:
         name: domain-avro-ts
-        path: "$GITHUB_WORKSPACE/workspace/packages/domain-types/src"
+        path: "workspace/packages/domain-types/src"
         
     - name: "check domain-types src directory"
       run: ls -laR "$GITHUB_WORKSPACE/workspace/packages/domain-types/src"
