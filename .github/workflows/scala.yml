@@ -35,12 +35,12 @@ jobs:
       run: ls -la "$GITHUB_WORKSPACE/core/optic/js/target/scala-2.12/optic-core-opt.js"
     - name: "copy artifact"
       run: cp "$GITHUB_WORKSPACE/core/optic/js/target/scala-2.12/optic-core-opt.js" "$GITHUB_WORKSPACE/workspace/packages/domain/src/domain.js"
-      
-    - name: "build typescript artifact"
-      run: cd "$GITHUB_WORKSPACE/core" && sbt "opticJVM/generateTypescript"
 
     - name: "build avro artifact"
       run: cd "$GITHUB_WORKSPACE/core" && sbt "opticJVM/runMain com.useoptic.types.AvroMappings"
+      
+    - name: "build typescript artifact"
+      run: cd "$GITHUB_WORKSPACE/core" && sbt "opticJVM/generateTypescript"
   
     - name: "check artifact"
       run: ls -la "$GITHUB_WORKSPACE/core/build"
