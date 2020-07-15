@@ -76,7 +76,7 @@ abstract class SnapShotDriverFixture[InputJson, OutputJson](folderSlug: String, 
 
           s"match snapshot" in {
             if (output.isSuccess) {
-              if (!knownIssues.contains(file.nameWithoutExtension)) {
+              if (knownIssues.contains(file.nameWithoutExtension)) {
                 println("THIS IS A KNOWN ISSUE:")
               }
               val dir = snapshotOutputDirectory
