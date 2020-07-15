@@ -37,9 +37,6 @@ class DiffPreviewer(resolvers: ShapesResolvers, spec: RfcState) {
       case diff: ShapeDiffResult if diffs.contains(diff) => diff -> allDiffs.filter(_.shapeTrail == diff.shapeTrail).map(_.jsonTrail).toSet
     }.toMap
 
-    println("xxxx SHOWING RELATED DIFFS at JSON trails "+ relatedDiffs.values.flatten.mkString("\n"))
-
-
     val shapeRenderVisitor = new ShapeRenderVisitor(resolvers, spec, diffs)
     //first traverse the example
     val exampleRenderVisitor = new ExampleRenderVisitorNew(resolvers, spec, diffs, relatedDiffs)
@@ -415,12 +412,11 @@ class ShapeRenderVisitor(resolvers: ShapesResolvers, spec: RfcState, diffs: Set[
 
       val baseItem = resolvers.resolveToBaseShape(itemShape.shapeId)
 
-
       pushShape(
         SpecArray(
           listShape.shapeId,
           itemShape.shapeId,
-          RenderName(Seq(NameComponent("List of ", ListKind.color, inner = Some(baseItem.shapeId), link = Some(baseItem.shapeId)))),
+          PrettyShapeName.list(Some(baseItem.shapeId), Some(baseItem.shapeId)),
           diffsByTrail(shapeTrail.withChild(ListItemTrail(listShape.shapeId, itemShape.shapeId)))
         )
       )
@@ -436,10 +432,11 @@ class ShapeRenderVisitor(resolvers: ShapesResolvers, spec: RfcState, diffs: Set[
 
       val name = {
         objectResolved.coreShapeKind match {
-          case ShapesHelper.AnyKind => RenderName(Seq(NameComponent(AnyKind.name, AnyKind.color)))
-          case ShapesHelper.StringKind => RenderName(Seq(NameComponent(StringKind.name, StringKind.color)))
-          case ShapesHelper.NumberKind => RenderName(Seq(NameComponent(NumberKind.name, NumberKind.color)))
-          case ShapesHelper.BooleanKind => RenderName(Seq(NameComponent(BooleanKind.name, BooleanKind.color)))
+          case ShapesHelper.AnyKind => PrettyShapeName.any
+          case ShapesHelper.StringKind => PrettyShapeName.string
+          case ShapesHelper.NumberKind => PrettyShapeName.number
+          case ShapesHelper.BooleanKind => PrettyShapeName.boolean
+          case ShapesHelper.UnknownKind => PrettyShapeName.unknown
           case _ => RenderName(Seq.empty)
         }
       }
@@ -454,14 +451,9 @@ class ShapeRenderVisitor(resolvers: ShapesResolvers, spec: RfcState, diffs: Set[
   }
   override val oneOfVisitor: OneOfVisitor = new OneOfVisitor {
     override def begin(shapeTrail: ShapeTrail, oneOfShape: ShapeEntity, branches: Seq[ShapeId]): Unit = {
-
-      val nameComponents = branches.map(branch => {
-        NameComponent(if (branches.lastOption.contains(branch) && branches.size > 1) "or " else "", "modifier", endText = if (branches.lastOption.contains(branch)) "" else ", ", inner = Some(branch), link = Some(branch))
-      })
-
       pushShape(SpecOneOf(
         oneOfShape.shapeId,
-        RenderName(nameComponents),
+        PrettyShapeName.oneOf(branches),
         branches,
         diffs = diffsByTrail(shapeTrail),
       ))
@@ -479,7 +471,7 @@ class ShapeRenderVisitor(resolvers: ShapesResolvers, spec: RfcState, diffs: Set[
         WrappedType(
           shape.shapeId,
           OptionalKind.baseShapeId,
-          RenderName(Seq(NameComponent("", "modifier", " (optional)", innerShape.map(_.shapeId)))),
+          PrettyShapeName.optional(innerShape.map(_.shapeId)),
           innerShape.get.shapeId,
           diffs = diffsByTrail(shapeTrail)
         )
@@ -492,7 +484,7 @@ class ShapeRenderVisitor(resolvers: ShapesResolvers, spec: RfcState, diffs: Set[
         WrappedType(
           shape.shapeId,
           NullableKind.baseShapeId,
-          RenderName(Seq(NameComponent("", "modifier", " (nullable)", innerShape.map(_.shapeId)))),
+          PrettyShapeName.nullable(innerShape.map(_.shapeId)),
           innerShape.get.shapeId,
           diffs = diffsByTrail(shapeTrail)
         )
