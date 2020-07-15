@@ -8,7 +8,7 @@ version := "1.0.0-SNAPSHOT"
 
 scalaVersion := "2.12.10"
 
-val circeVersion = "0.10.0"
+val circeVersion = "0.13.0"
 
 lazy val optic =
 // select supported platforms
@@ -23,7 +23,8 @@ lazy val optic =
         "io.circe" %%% "circe-core" % circeVersion,
         "io.circe" %%% "circe-generic" % circeVersion,
         "io.circe" %%% "circe-parser" % circeVersion,
-        "io.circe" %%% "circe-literal" % circeVersion,
+        "io.circe" %%% "circe-literal" % circeVersion % "test",
+        "org.typelevel" %% "jawn-parser" % "1.0.0" % "test",
         "org.scalactic" %% "scalactic" % "3.1.0",
         "org.scalatest" %% "scalatest" % "3.1.0" % "test",
         "org.scala-js" %% "scalajs-stubs" % scalaJSVersion % "provided",
