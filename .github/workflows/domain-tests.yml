@@ -27,7 +27,7 @@ jobs:
     - name: "list sbt projects"
       run: cd "$GITHUB_WORKSPACE/core" && sbt projects
     - name: "load dependencies"
-      run: cd "$GITHUB_WORKSPACE/core" && sbt realod
+      run: cd "$GITHUB_WORKSPACE/core" && sbt reload
     - name: "run domain tests"
       run: cd "$GITHUB_WORKSPACE/core" && sbt "project core" test
       env:
