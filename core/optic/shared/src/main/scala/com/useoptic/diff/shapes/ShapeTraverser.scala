@@ -79,7 +79,7 @@ class ShapeTraverser(resolvers: ShapesResolvers, spec: RfcState, visitors: Shape
             .map(i => resolvers.resolveToBaseShape(i.shapeId))
 
           visitors.optionalVisitor.begin(shapeTrail, optionalShape, innerShapeOption)
-          innerShapeOption.foreach(innerShape => traverse(innerShape.shapeId, shapeTrail.withChild(OptionalItemTrail(innerShape.shapeId))))
+          innerShapeOption.foreach(innerShape => traverse(innerShape.shapeId, shapeTrail.withChild(OptionalItemTrail(resolved.shapeEntity.shapeId, innerShape.shapeId))))
         }
         case NullableKind.baseShapeId => {
           val nullableShape = resolved.shapeEntity
@@ -87,7 +87,7 @@ class ShapeTraverser(resolvers: ShapesResolvers, spec: RfcState, visitors: Shape
             .map(i => resolvers.resolveToBaseShape(i.shapeId))
 
           visitors.nullableVisitor.begin(shapeTrail, nullableShape, innerShapeOption)
-          innerShapeOption.foreach(innerShape => traverse(innerShape.shapeId, shapeTrail.withChild(NullableItemTrail(innerShape.shapeId))))
+          innerShapeOption.foreach(innerShape => traverse(innerShape.shapeId, shapeTrail.withChild(NullableItemTrail(resolved.shapeEntity.shapeId, innerShape.shapeId))))
         }
         case _ => {
           visitors.primitiveVisitor.visit(resolved, shapeTrail)

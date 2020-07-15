@@ -62,8 +62,7 @@ class UnspecifiedShapeDiffInterpreter(
       choice.coreShapeKind match {
         case ObjectKind => true
         case ListKind   => true
-        case NullableKind =>
-          false //@TODO: support going from Nullable<Unknown> to Nullable<T>
+        case NullableKind => true
         case _ => false
       }
     })
@@ -123,7 +122,36 @@ class UnspecifiedShapeDiffInterpreter(
                 s"Set the list item shape",
                 s"Set the list item shape",
                 commands,
-                ChangeType.Addition
+                ChangeType.Update
+              )
+            )
+
+          }
+          case NullableKind => {
+            val json = JsonLikeResolvers.tryResolveJsonLike(
+              interactionTrail,
+              shapeDiff.jsonTrail,
+              interaction
+            )
+            val (inlineShapeId, newCommands, name) =
+              DistributionAwareShapeBuilder.toCommandsWithName(Vector(json.get))
+
+            val commands = newCommands.flatten ++ Seq(
+              SetParameterShape(
+                ProviderInShape(
+                  c.shapeId,
+                  ShapeProvider(inlineShapeId),
+                  NullableKind.innerParam
+                )
+              )
+            )
+
+            Seq(
+              InteractiveDiffInterpretation(
+                s"Set the shape for the nullable as ${name}",
+                s"Set the shape for the nullable as ${name}",
+                commands,
+                ChangeType.Update
               )
             )
 

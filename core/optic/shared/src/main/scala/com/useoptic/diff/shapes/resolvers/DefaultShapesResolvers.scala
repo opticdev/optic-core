@@ -45,13 +45,13 @@ class DefaultShapesResolvers(spec: RfcState) extends ShapesResolvers {
       }
       case NullableKind => {
         val itemShape = resolveParameterToShape(resolved.shapeEntity.shapeId, NullableKind.innerParam, resolved.bindings).get
-        Seq(ChoiceOutput(trail, Seq(NullableTrail()), resolved.shapeEntity.shapeId, resolved.coreShapeKind, resolved.bindings)) ++ flattenChoice(trail, Seq(NullableTrail(), NullableItemTrail(itemShape.shapeId)), bindings)
+        Seq(ChoiceOutput(trail, Seq(NullableTrail(resolved.shapeEntity.shapeId)), resolved.shapeEntity.shapeId, resolved.coreShapeKind, resolved.bindings)) ++ flattenChoice(trail, Seq(NullableTrail(resolved.shapeEntity.shapeId), NullableItemTrail(resolved.shapeEntity.shapeId, itemShape.shapeId)), bindings)
       }
       case OptionalKind => {
         val itemShape = resolveParameterToShape(resolved.shapeEntity.shapeId, OptionalKind.innerParam, resolved.bindings).get
         Seq(
-          ChoiceOutput(trail, Seq(OptionalTrail()), resolved.shapeEntity.shapeId, resolved.coreShapeKind, resolved.bindings),
-        ) ++ flattenChoice(trail, Seq(OptionalTrail(), OptionalItemTrail(itemShape.shapeId)), bindings)
+          ChoiceOutput(trail, Seq(OptionalTrail(resolved.shapeEntity.shapeId)), resolved.shapeEntity.shapeId, resolved.coreShapeKind, resolved.bindings),
+        ) ++ flattenChoice(trail, Seq(OptionalTrail(resolved.shapeEntity.shapeId), OptionalItemTrail(resolved.shapeEntity.shapeId, itemShape.shapeId)), bindings)
       }
       case OneOfKind => {
         val shapeParameterIds = resolved.shapeEntity.descriptor.parameters match {

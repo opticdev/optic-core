@@ -58,11 +58,53 @@ class MissingValueInterpreter(rfcState: RfcState)(implicit ids: OpticDomainIds) 
           WrapWithNullable(interactionTrail, requestsTrail, jsonTrail, shapeTrail, interaction),
         )
       } else {
+        shapeTrail.path.lastOption match {
+          case Some(t: NullableTrail) => {
+            SetNullableInnerShape(interactionTrail, requestsTrail, jsonTrail, shapeTrail, interaction) ++
+              Seq(basicInterpretations.ChangeShape(interactionTrail, requestsTrail, shapeTrail, jsonTrail, interaction))
+          }
+          case _ => {
+            Seq(
+              WrapWithOneOf(interactionTrail, requestsTrail, jsonTrail, shapeTrail, interaction),
+              basicInterpretations.ChangeShape(interactionTrail, requestsTrail, shapeTrail, jsonTrail, interaction),
+            )
+          }
+        }
+      }
+    }
+  }
+
+  def SetNullableInnerShape(interactionTrail: InteractionTrail, requestsTrail: RequestSpecTrail, jsonTrail: JsonTrail, shapeTrail: ShapeTrail, interaction: HttpInteraction): Seq[InteractiveDiffInterpretation] = {
+    shapeTrail.path.lastOption match {
+      case Some(t: NullableTrail) => {
+        val json = JsonLikeResolvers.tryResolveJsonLike(
+          interactionTrail,
+          jsonTrail,
+          interaction
+        )
+        val (inlineShapeId, newCommands, name) =
+          DistributionAwareShapeBuilder.toCommandsWithName(Vector(json.get))
+
+        val commands = newCommands.flatten ++ Seq(
+          SetParameterShape(
+            ProviderInShape(
+              t.shapeId,
+              ShapeProvider(inlineShapeId),
+              NullableKind.innerParam
+            )
+          )
+        )
+
         Seq(
-          WrapWithOneOf(interactionTrail, requestsTrail, jsonTrail, shapeTrail, interaction),
-          basicInterpretations.ChangeShape(interactionTrail, requestsTrail, shapeTrail, jsonTrail, interaction),
+          InteractiveDiffInterpretation(
+            s"Set the shape for the nullable as ${name}",
+            s"Set the shape for the nullable as ${name}",
+            commands,
+            ChangeType.Update
+          )
         )
       }
+      case _ => Seq.empty
     }
   }
 
@@ -207,6 +249,8 @@ class MissingValueInterpreter(rfcState: RfcState)(implicit ids: OpticDomainIds) 
       AddShapeParameter(p2, wrapperShapeId, ""),
       SetParameterShape(ProviderInShape(wrapperShapeId, ShapeProvider(inlineShapeId), p2))
     )
+
+
     val additionalCommands = shapeTrail.path.lastOption match {
       case Some(pc: ObjectFieldTrail) => {
         Seq(

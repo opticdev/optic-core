@@ -16,13 +16,13 @@ case class OneOfTrail(shapeId: ShapeId) extends ShapeTrailPathComponent
 
 case class OneOfItemTrail(oneOfId: ShapeId, parameterId: ShapeParameterId, itemShapeId: ShapeId) extends ShapeTrailPathComponent
 
-case class OptionalTrail() extends ShapeTrailPathComponent
+case class OptionalTrail(shapeId: ShapeId) extends ShapeTrailPathComponent
 
-case class OptionalItemTrail(innerShapeId: ShapeId) extends ShapeTrailPathComponent
+case class OptionalItemTrail(shapeId: ShapeId, innerShapeId: ShapeId) extends ShapeTrailPathComponent
 
-case class NullableTrail() extends ShapeTrailPathComponent
+case class NullableTrail(shapeId: ShapeId) extends ShapeTrailPathComponent
 
-case class NullableItemTrail(innerShapeId: ShapeId) extends ShapeTrailPathComponent
+case class NullableItemTrail(shapeId: ShapeId, innerShapeId: ShapeId) extends ShapeTrailPathComponent
 
 case class UnknownTrail() extends ShapeTrailPathComponent
 

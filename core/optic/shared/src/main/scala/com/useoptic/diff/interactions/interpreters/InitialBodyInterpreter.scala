@@ -132,7 +132,7 @@ class InitialBodyInterpreter(rfcState: RfcState)(implicit ids: OpticDomainIds) {
         val actuallyHasBody = jsonBody.isDefined
         if (actuallyHasBody) {
 
-          val commands = baseCommands ++ shapeCommands.flatten ++ Seq(
+          val commands = baseCommands ++ shapeCommands ++ Seq(
             RequestsCommands.SetResponseBodyShape(responseId, ShapedBodyDescriptor(contentType, rootShapeId, isRemoved = false))
           )
 

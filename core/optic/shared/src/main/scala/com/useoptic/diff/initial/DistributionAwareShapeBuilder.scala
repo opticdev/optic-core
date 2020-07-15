@@ -1,6 +1,6 @@
 package com.useoptic.diff.initial
 
-import com.useoptic.contexts.rfc.RfcState
+import com.useoptic.contexts.rfc.{RfcCommandContext, RfcService, RfcServiceJSFacade, RfcState}
 import com.useoptic.contexts.shapes.Commands._
 import com.useoptic.contexts.shapes.ShapesHelper._
 import com.useoptic.diff.initial.DistributionAwareShapeBuilder.{buildCommandsFor, toShapes}
@@ -9,6 +9,7 @@ import com.useoptic.diff.shapes._
 import com.useoptic.diff.{ImmutableCommandStream, MutableCommandStream}
 import com.useoptic.dsa.{OpticDomainIds, SequentialIdGenerator}
 import com.useoptic.types.capture.JsonLike
+import com.useoptic.ux.{ColoredName, ShapeNameRenderer}
 
 import scala.util.Random
 
@@ -26,6 +27,21 @@ object DistributionAwareShapeBuilder {
     buildCommandsFor(rootShape, None)
 
     (rootShape.id, commands.toImmutable)
+  }
+
+  def toCommandsWithName(bodies: Vector[JsonLike])(implicit ids: OpticDomainIds, shapeBuildingStrategy: ShapeBuildingStrategy): (ShapeId, ImmutableCommandStream, Seq[ColoredName]) = {
+    val (rootShape, commands) = toCommands(bodies)
+
+    val eventStore = RfcServiceJSFacade.makeEventStore()
+    val simulatedId = "simulated-id"
+    val rfcService = new RfcService(eventStore)
+    rfcService.handleCommandSequence(simulatedId, commands.flatten, RfcCommandContext("", "", ""))
+
+    val currentState = rfcService.currentState(simulatedId)
+
+    val namer = new ShapeNameRenderer(currentState)
+
+    (rootShape, commands, namer.nameForShapeId(rootShape).get)
   }
 
   def buildCommandsFor(shape: ShapesToMake, parent: Option[ShapesToMake])(implicit commands: MutableCommandStream, ids: OpticDomainIds): Unit = {
