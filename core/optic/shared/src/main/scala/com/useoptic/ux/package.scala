@@ -111,11 +111,22 @@ package object ux {
 
   @JSExportAll
   case class RenderName(nameComponents: Seq[NameComponent]) {
-    def flatten(implicit specShapes: Map[SpecShapeId, SpecShape]): Seq[NameComponent] = {
-      nameComponents.flatMap(_.flatten)
+    def flattenWithSpecShapes(implicit specShapes: Map[SpecShapeId, SpecShape]): Seq[NameComponent] = {
+      nameComponents.flatMap(_.flattenWithSpecShapes(specShapes))
+    }
+    def flatten(implicit names: Map[String, RenderName]): Seq[NameComponent] = {
+      nameComponents.flatMap(_.flatten(names))
     }
 
-    def asColoredString(implicit specShapes: Map[SpecShapeId, SpecShape]): Seq[ColoredName] = flatten.map(i => ColoredName(i.startText, i.color, {
+    def asColoredString(implicit specShapes: Map[SpecShapeId, SpecShape]): Seq[ColoredName] = flattenWithSpecShapes.map(i => ColoredName(i.startText, i.color, {
+      //no links to primitives
+      if (i.link.isEmpty || ShapesHelper.allCoreShapes.exists(s => i.link.contains(s))) {
+        None
+      } else {
+        i.link
+      }
+    }))
+    def asColoredStringFromNames(implicit names: Map[String, RenderName]): Seq[ColoredName] = flatten.map(i => ColoredName(i.startText, i.color, {
       //no links to primitives
       if (i.link.isEmpty || ShapesHelper.allCoreShapes.exists(s => i.link.contains(s))) {
         None
@@ -127,11 +138,24 @@ package object ux {
 
   @JSExportAll
   case class NameComponent(startText: String, color: String, endText: String = "", inner: Option[ShapeId] = None, link: Option[ShapeId] = None) {
-    def flatten(implicit specShapes: Map[SpecShapeId, SpecShape]): Seq[NameComponent] = {
+
+    def flattenWithSpecShapes(implicit specShapes: Map[SpecShapeId, SpecShape]): Seq[NameComponent] = {
       if (inner.isDefined) {
         Seq(
           Seq(NameComponent(startText, color)),
-          inner.map(i => specShapes(i).name.flatten).getOrElse(Seq.empty),
+          inner.map(i => specShapes(i).name.flattenWithSpecShapes(specShapes)).getOrElse(Seq.empty),
+          Seq(NameComponent(startText = endText, color))
+        ).flatten
+      } else {
+        Seq(this)
+      }
+    }
+
+    def flatten(implicit names: Map[String, RenderName]): Seq[NameComponent] = {
+      if (inner.isDefined) {
+        Seq(
+          Seq(NameComponent(startText, color)),
+          inner.map(i => names(i).flatten(names)).getOrElse(Seq.empty),
           Seq(NameComponent(startText = endText, color))
         ).flatten
       } else {

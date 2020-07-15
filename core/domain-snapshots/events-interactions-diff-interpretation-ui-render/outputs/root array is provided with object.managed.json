@@ -146,7 +146,7 @@
         "Vector((List(),ExampleObject(List(),None,List(),List(),List(List(JsonObjectKey(foo))),Set())))",
         "Vector((List(JsonObjectKey(foo)),UnexpectedExampleField(List(JsonObjectKey(foo)),foo,\"bar\",Set())))",
         "Vector()",
-        "Vector((shape_2,SpecPrimitive(shape_2,$unknown,RenderName(List()),Set())), (shape_3,SpecArray(shape_3,shape_2,RenderName(List(NameComponent(List of ,ListColor,,Some(shape_2),Some(shape_2)))),Set())))"
+        "Vector((shape_2,SpecPrimitive(shape_2,$unknown,RenderName(List(NameComponent(Unknown,UnknownColor,,None,None))),Set())), (shape_3,SpecArray(shape_3,shape_2,RenderName(List(NameComponent(List of ,ListColor,,Some(shape_2),Some(shape_2)))),Set())))"
       ]
     }
   ]
