@@ -26,7 +26,7 @@ optic_core_build() {
   (
     set -o errexit
     cd "$OPTIC_CORE_ROOT"
-    sbt fastOptJS
+    sbt fullOptJS
     sbt "opticJVM/runMain com.useoptic.types.AvroMappings"
     sbt "opticJVM/generateTypescript"
     cp "optic/js/target/scala-2.12/optic-core-fastopt.js" "../workspace/packages/domain/src/domain.js"
@@ -37,7 +37,7 @@ optic_core_build() {
 optic_build_and_publish_locally() {
   (
     set -o errexit
-    optic_build
+    optic_core_build
     cd "$OPTIC_SRC_DIR"
     cd workspace && OPTIC_PUBLISH_SCOPE=private node ./scripts/publish.js
   )

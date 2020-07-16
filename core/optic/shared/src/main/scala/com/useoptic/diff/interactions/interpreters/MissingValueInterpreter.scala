@@ -263,6 +263,8 @@ class MissingValueInterpreter(rfcState: RfcState)(implicit ids: OpticDomainIds) 
       case Some(pc: UnknownTrail) => "Unknown"
       case Some(a: ShapeTrailPathComponent) => {
         namer.nameForShapeId(a.namedShape).get.map(_.text).mkString(" ")
+      } case None => {
+        namer.nameForShapeId(shapeTrail.rootShapeId).get.map(_.text).mkString(" ")
       }
     }
 
