@@ -34,6 +34,15 @@ optic_core_build() {
   )
 }
 
+optic_build_and_publish_locally() {
+  (
+    set -o errexit
+    optic_build
+    cd "$OPTIC_SRC_DIR"
+    cd workspace && OPTIC_PUBLISH_SCOPE=private node ./scripts/publish.js
+  )
+}
+
 optic_build() {
   (
     set -o errexit
