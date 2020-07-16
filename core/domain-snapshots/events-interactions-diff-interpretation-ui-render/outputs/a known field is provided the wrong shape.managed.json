@@ -47,7 +47,7 @@
       "title" : "'age' in the 200 Response body was not a number",
       "suggestions" : [
         {
-          "title" : "Allow field 'age' to be either a number or String",
+          "title" : "Allow 'field 'age'' to be either a 'Number' or 'String'",
           "commandsJson" : [
             {
               "AddShape" : {
@@ -120,7 +120,7 @@
           ]
         },
         {
-          "title" : "Change shape to String",
+          "title" : "Change shape to  'String'",
           "commandsJson" : [
             {
               "AddShape" : {

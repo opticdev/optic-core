@@ -47,7 +47,7 @@
       "title" : "'stats' in the 200 Response body was not a Object",
       "suggestions" : [
         {
-          "title" : "Allow field 'stats' to be either a Object or List",
+          "title" : "Allow 'field 'stats'' to be either a 'Object (1 field)' or 'List of  Number'",
           "commandsJson" : [
             {
               "AddShape" : {
@@ -142,7 +142,7 @@
           ]
         },
         {
-          "title" : "Change shape to List",
+          "title" : "Change shape to  'List of  Number'",
           "commandsJson" : [
             {
               "AddShape" : {

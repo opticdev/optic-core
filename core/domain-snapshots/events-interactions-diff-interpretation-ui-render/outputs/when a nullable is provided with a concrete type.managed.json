@@ -63,7 +63,7 @@
       "title" : "'price' in the 200 Response body was not a nullable shape?",
       "suggestions" : [
         {
-          "title" : "Set the shape for the nullable as List(ColoredName(Number,NumberColor,None))",
+          "title" : "Replace 'Unknown (nullable)'  with  'Number (nullable)'",
           "commandsJson" : [
             {
               "AddShape" : {
@@ -90,7 +90,7 @@
           ]
         },
         {
-          "title" : "Change shape to Number",
+          "title" : "Change shape to  'Number'",
           "commandsJson" : [
             {
               "AddShape" : {
@@ -172,7 +172,7 @@
       "title" : "'price' in the 200 Response body was not a nullable shape?",
       "suggestions" : [
         {
-          "title" : "Set the shape for the nullable as List(ColoredName(Number,NumberColor,None))",
+          "title" : "Replace 'Unknown (nullable)'  with  'Number (nullable)'",
           "commandsJson" : [
             {
               "AddShape" : {
@@ -199,7 +199,7 @@
           ]
         },
         {
-          "title" : "Change shape to Number",
+          "title" : "Change shape to  'Number'",
           "commandsJson" : [
             {
               "AddShape" : {
