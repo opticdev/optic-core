@@ -260,16 +260,9 @@ class MissingValueInterpreter(rfcState: RfcState)(implicit ids: OpticDomainIds) 
     val identifier = descriptionInterpreters.jsonTrailDetailedDescription(jsonTrail)
 
     val t1Name = shapeTrail.path.lastOption match {
-      case Some(pc: ObjectFieldTrail) => {
-        namer.nameForShapeId(pc.fieldShapeId).get.map(_.text).mkString(" ")
-      }
-      case Some(pc: ListItemTrail) => {
-        namer.nameForShapeId(pc.itemShapeId).get.map(_.text).mkString(" ")
-      }
-      case x => {
-        //@TODO: support nested OneOfItemTrail
-        Logger.log(x)
-        ""
+      case Some(pc: UnknownTrail) => "Unknown"
+      case Some(a: ShapeTrailPathComponent) => {
+        namer.nameForShapeId(a.namedShape).get.map(_.text).mkString(" ")
       }
     }
 
