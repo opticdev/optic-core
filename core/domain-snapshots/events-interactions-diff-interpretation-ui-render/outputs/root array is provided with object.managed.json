@@ -33,7 +33,7 @@
           }
         }
       },
-      "title" : "shape in the 200 Response body was not a List",
+      "title" : "shape in the 200 Response body was not a List of  Unknown ",
       "suggestions" : [
         {
           "title" : "Allow 'shape' to be either a 'List of  Unknown ' or 'Object (1 field)'",

@@ -44,7 +44,7 @@
           }
         }
       },
-      "title" : "'age' in the 200 Response body was not a number",
+      "title" : "'age' in the 200 Response body was not a Number",
       "suggestions" : [
         {
           "title" : "Allow 'field 'age'' to be either a 'Number' or 'String'",

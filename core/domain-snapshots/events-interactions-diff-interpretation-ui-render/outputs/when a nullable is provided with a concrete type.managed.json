@@ -60,7 +60,7 @@
           }
         }
       },
-      "title" : "'price' in the 200 Response body was not a nullable shape?",
+      "title" : "'price' in the 200 Response body was not a  Unknown  (nullable)",
       "suggestions" : [
         {
           "title" : "Replace 'Unknown (nullable)'  with  'Number (nullable)'",
@@ -169,7 +169,7 @@
           }
         }
       },
-      "title" : "'price' in the 200 Response body was not a nullable shape?",
+      "title" : "'price' in the 200 Response body was not a  Unknown  (nullable)",
       "suggestions" : [
         {
           "title" : "Replace 'Unknown (nullable)'  with  'Number (nullable)'",

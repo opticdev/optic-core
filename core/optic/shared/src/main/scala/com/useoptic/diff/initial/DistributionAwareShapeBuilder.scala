@@ -58,22 +58,14 @@ object DistributionAwareShapeBuilder {
       case s: OptionalShape => {
         buildCommandsFor(s.shape, Some(s))
         commands.appendDescribe(SetParameterShape(
-          if (inField) {
-            ProviderInField(parent.get.asInstanceOf[FieldWithShape].id, ShapeProvider(s.shape.id), OptionalKind.innerParam)
-          } else {
-            ProviderInShape(s.id, ShapeProvider(s.shape.id), OptionalKind.innerParam)
-          }
+          ProviderInShape(s.id, ShapeProvider(s.shape.id), OptionalKind.innerParam)
         ))
         commands.appendInit(AddShape(s.id, OptionalKind.baseShapeId, ""))
       }
       case s: NullableShape => {
         buildCommandsFor(s.shape, Some(s))
         commands.appendDescribe(SetParameterShape(
-          if (inField) {
-            ProviderInField(parent.get.asInstanceOf[FieldWithShape].id, ShapeProvider(s.shape.id), NullableKind.innerParam)
-          } else {
-            ProviderInShape(s.id, ShapeProvider(s.shape.id), NullableKind.innerParam)
-          }
+          ProviderInShape(s.id, ShapeProvider(s.shape.id), NullableKind.innerParam)
         ))
         commands.appendInit(AddShape(s.id, NullableKind.baseShapeId, ""))
       }
@@ -91,11 +83,7 @@ object DistributionAwareShapeBuilder {
           val paramId = ids.newShapeParameterId
           commands.appendDescribe(AddShapeParameter(paramId, s.id, ""))
           commands.appendDescribe(SetParameterShape(
-            if (inField) {
-              ProviderInField(parent.get.asInstanceOf[FieldWithShape].id, ShapeProvider(branch.id), paramId)
-            } else {
-              ProviderInShape(s.id, ShapeProvider(branch.id), paramId)
-            }
+            ProviderInShape(s.id, ShapeProvider(branch.id), paramId)
           ))
         })
 
@@ -105,11 +93,7 @@ object DistributionAwareShapeBuilder {
         buildCommandsFor(s.shape, Some(s))
         commands.appendInit(AddShape(s.id, ListKind.baseShapeId, ""))
         commands.appendDescribe(SetParameterShape(
-          if (inField) {
-            ProviderInShape(s.id, ShapeProvider(s.shape.id), ListKind.innerParam)
-          } else {
-            ProviderInShape(s.id, ShapeProvider(s.shape.id), ListKind.innerParam)
-          }
+          ProviderInShape(s.id, ShapeProvider(s.shape.id), ListKind.innerParam)
         ))
       }
       case s: Unknown => {

@@ -116,7 +116,7 @@ class DiffUseCasesSpec extends EndEndDiffTask with JsonFileFixture {
     }))
   }))
 
-  whenOnly("a primitive type is provided to an optional object", () => EndEndDiffTask.Input(baselineCityEvents._1, {
+  when("a primitive type is provided to an optional object", () => EndEndDiffTask.Input(baselineCityEvents._1, {
     Vector(firstCityInteraction.forkResponseBody(j => {
       json"""{ "location": { "principality": { "city": "San Fransisco", "population": 830000, "coordinates": "N/A" } } }"""
     }))

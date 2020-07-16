@@ -71,14 +71,10 @@
           }
         }
       },
-      "title" : "'coordinates' in the 200 Response body was not a ",
+      "title" : "'coordinates' in the 200 Response body was not a  Object (2 fields)  (optional)",
       "suggestions" : [
         {
-          "title" : "Allow 'field 'coordinates'' to be either a '' or 'String'",
-      "title" : "'coordinates' in the 200 Response body was not a ",
-      "suggestions" : [
-        {
-          "title" : "Allow 'field 'coordinates'' to be either a '' or 'String'",
+          "title" : "Allow 'field 'coordinates'' to be either a ' Object (2 fields)  (optional)' or 'String'",
           "commandsJson" : [
             {
               "AddShape" : {

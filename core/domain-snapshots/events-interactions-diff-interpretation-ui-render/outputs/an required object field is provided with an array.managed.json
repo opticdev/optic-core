@@ -44,7 +44,7 @@
           }
         }
       },
-      "title" : "'stats' in the 200 Response body was not a Object",
+      "title" : "'stats' in the 200 Response body was not a Object (1 field)",
       "suggestions" : [
         {
           "title" : "Allow 'field 'stats'' to be either a 'Object (1 field)' or 'List of  Number'",

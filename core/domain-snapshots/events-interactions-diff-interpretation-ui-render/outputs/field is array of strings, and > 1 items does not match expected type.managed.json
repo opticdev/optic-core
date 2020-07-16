@@ -55,7 +55,7 @@
           }
         }
       },
-      "title" : "shape at index 1 in the 200 Response body was not a string",
+      "title" : "shape at index 1 in the 200 Response body was not a String",
       "suggestions" : [
         {
           "title" : "Allow 'shape at index 1' to be either a 'String' or 'Number'",
@@ -225,7 +225,7 @@
           }
         }
       },
-      "title" : "shape at index 3 in the 200 Response body was not a string",
+      "title" : "shape at index 3 in the 200 Response body was not a String",
       "suggestions" : [
         {
           "title" : "Allow 'shape at index 3' to be either a 'String' or 'Number'",
