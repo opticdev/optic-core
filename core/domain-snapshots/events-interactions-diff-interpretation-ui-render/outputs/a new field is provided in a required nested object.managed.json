@@ -63,7 +63,7 @@
       "title" : "'motto' observed in the 200 Response body",
       "suggestions" : [
         {
-          "title" : "Add motto",
+          "title" : "Add field 'motto' as 'String'",
           "commandsJson" : [
             {
               "AddShape" : {

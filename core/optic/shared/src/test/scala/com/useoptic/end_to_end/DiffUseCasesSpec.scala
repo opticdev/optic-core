@@ -279,6 +279,24 @@ class DiffUseCasesSpec extends EndEndDiffTask with JsonFileFixture {
     EndEndDiffTask.Input(events, Vector(raceResults))
   })
 
+  // Nullables
+
+  ///Nullables
+  val listOfHomes = newInteraction("GET", "/homes", 200,
+    responseBody = json"""[{"address": "123", "price": null}, {"address": "456", "price": null}]""")
+  val baselineHomeEvents = {
+    implicit val ids = OpticIds.newPrefixedDeterministicIdGenerator("baseline")
+    new TestDataHelper("arrayroot").learnBaselineEvents(
+      path = Vector("homes"),
+      interactions = Vector(listOfHomes))
+  }
+
+  when("when a nullable is provided with a concrete type", () => EndEndDiffTask.Input(baselineHomeEvents._1, {
+    Vector(
+      listOfHomes.forkResponseBody(_ => json"""[{"address": "123", "price": 657}, {"address": "456", "price": 322}]""")
+    )
+  }))
+
 
   // todo! Nullables, Unknown conversions
 

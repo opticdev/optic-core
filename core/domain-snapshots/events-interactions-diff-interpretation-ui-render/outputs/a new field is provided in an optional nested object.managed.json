@@ -74,7 +74,7 @@
       "title" : "'format' observed in the 200 Response body",
       "suggestions" : [
         {
-          "title" : "Add format",
+          "title" : "Add field 'format' as 'String'",
           "commandsJson" : [
             {
               "AddShape" : {

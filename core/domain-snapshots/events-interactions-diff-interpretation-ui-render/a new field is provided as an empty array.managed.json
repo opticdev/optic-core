@@ -428,8 +428,8 @@
     {
       "ShapeParameterShapeSet" : {
         "shapeDescriptor" : {
-          "ProviderInField" : {
-            "fieldId" : "field_4",
+          "ProviderInShape" : {
+            "shapeId" : "shape_6",
             "providerDescriptor" : {
               "ShapeProvider" : {
                 "shapeId" : "shape_5"

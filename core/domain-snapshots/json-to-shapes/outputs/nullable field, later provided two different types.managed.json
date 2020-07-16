@@ -38,8 +38,8 @@
     {
       "SetParameterShape" : {
         "shapeDescriptor" : {
-          "ProviderInField" : {
-            "fieldId" : "field_1",
+          "ProviderInShape" : {
+            "shapeId" : "shape_2",
             "providerDescriptor" : {
               "ShapeProvider" : {
                 "shapeId" : "shape_1"

@@ -63,7 +63,7 @@
       "title" : "'array' observed in the 200 Response body",
       "suggestions" : [
         {
-          "title" : "Add array",
+          "title" : "Add field 'array' as 'List of  Unknown'",
           "commandsJson" : [
             {
               "AddShape" : {

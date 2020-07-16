@@ -33,10 +33,10 @@
           }
         }
       },
-      "title" : "shape in the 200 Response body was not a List",
+      "title" : "shape in the 200 Response body was not a List of  Unknown ",
       "suggestions" : [
         {
-          "title" : "Allow shape to be either a  or Object",
+          "title" : "Allow 'shape' to be either a 'List of  Unknown ' or 'Object (1 field)'",
           "commandsJson" : [
             {
               "AddShape" : {
@@ -104,7 +104,7 @@
           ]
         },
         {
-          "title" : "Change shape to Object",
+          "title" : "Change shape to  'Object (1 field)'",
           "commandsJson" : [
             {
               "AddShape" : {

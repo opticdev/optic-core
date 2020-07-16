@@ -44,10 +44,10 @@
           }
         }
       },
-      "title" : "shape at index 0 in the 200 Response body was not a Object",
+      "title" : "shape at index 0 in the 200 Response body was not a Object (3 fields)",
       "suggestions" : [
         {
-          "title" : "Allow shape at index 0 to be either a Object or List",
+          "title" : "Allow 'shape at index 0' to be either a 'Object (3 fields)' or 'List of  Unknown'",
           "commandsJson" : [
             {
               "AddShape" : {
@@ -147,7 +147,7 @@
           ]
         },
         {
-          "title" : "Change shape to List",
+          "title" : "Change shape to  'List of  Unknown'",
           "commandsJson" : [
             {
               "AddShape" : {

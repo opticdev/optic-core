@@ -2,29 +2,31 @@ package com.useoptic.diff.shapes
 
 import com.useoptic.contexts.shapes.Commands.{FieldId, ShapeId, ShapeParameterId}
 
-sealed trait ShapeTrailPathComponent
+sealed trait ShapeTrailPathComponent {
+  def namedShape: ShapeId
+}
 
-case class ObjectTrail(shapeId: ShapeId) extends ShapeTrailPathComponent
+case class ObjectTrail(shapeId: ShapeId) extends ShapeTrailPathComponent {def namedShape = shapeId}
 
-case class ObjectFieldTrail(fieldId: FieldId, fieldShapeId: ShapeId) extends ShapeTrailPathComponent
+case class ObjectFieldTrail(fieldId: FieldId, fieldShapeId: ShapeId) extends ShapeTrailPathComponent {def namedShape = fieldShapeId}
 
-case class ListTrail(shapeId: ShapeId) extends ShapeTrailPathComponent
+case class ListTrail(shapeId: ShapeId) extends ShapeTrailPathComponent {def namedShape = shapeId}
 
-case class ListItemTrail(listShapeId: ShapeId, itemShapeId: ShapeId) extends ShapeTrailPathComponent
+case class ListItemTrail(listShapeId: ShapeId, itemShapeId: ShapeId) extends ShapeTrailPathComponent {def namedShape = itemShapeId}
 
-case class OneOfTrail(shapeId: ShapeId) extends ShapeTrailPathComponent
+case class OneOfTrail(shapeId: ShapeId) extends ShapeTrailPathComponent  {def namedShape = shapeId}
 
-case class OneOfItemTrail(oneOfId: ShapeId, parameterId: ShapeParameterId, itemShapeId: ShapeId) extends ShapeTrailPathComponent
+case class OneOfItemTrail(oneOfId: ShapeId, parameterId: ShapeParameterId, itemShapeId: ShapeId) extends ShapeTrailPathComponent {def namedShape = itemShapeId}
 
-case class OptionalTrail() extends ShapeTrailPathComponent
+case class OptionalTrail(shapeId: ShapeId) extends ShapeTrailPathComponent {def namedShape = shapeId}
 
-case class OptionalItemTrail(innerShapeId: ShapeId) extends ShapeTrailPathComponent
+case class OptionalItemTrail(shapeId: ShapeId, innerShapeId: ShapeId) extends ShapeTrailPathComponent {def namedShape = innerShapeId}
 
-case class NullableTrail() extends ShapeTrailPathComponent
+case class NullableTrail(shapeId: ShapeId) extends ShapeTrailPathComponent {def namedShape = shapeId}
 
-case class NullableItemTrail(innerShapeId: ShapeId) extends ShapeTrailPathComponent
+case class NullableItemTrail(shapeId: ShapeId, innerShapeId: ShapeId) extends ShapeTrailPathComponent {def namedShape = innerShapeId}
 
-case class UnknownTrail() extends ShapeTrailPathComponent
+case class UnknownTrail() extends ShapeTrailPathComponent {def namedShape = ""}
 
 case class ShapeTrail(rootShapeId: ShapeId, path: Seq[ShapeTrailPathComponent]) {
 

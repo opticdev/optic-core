@@ -1,0 +1,222 @@
+{
+  "diffs" : [
+    {
+      "diff" : {
+        "UnmatchedResponseBodyShape" : {
+          "interactionTrail" : {
+            "path" : [
+              {
+                "ResponseBody" : {
+                  "contentType" : "application/json",
+                  "statusCode" : 200
+                }
+              }
+            ]
+          },
+          "requestsTrail" : {
+            "SpecResponseBody" : {
+              "responseId" : "baseline-response_1"
+            }
+          },
+          "shapeDiffResult" : {
+            "UnmatchedShape" : {
+              "jsonTrail" : {
+                "path" : [
+                  {
+                    "JsonArrayItem" : {
+                      "index" : 0
+                    }
+                  },
+                  {
+                    "JsonObjectKey" : {
+                      "key" : "price"
+                    }
+                  }
+                ]
+              },
+              "shapeTrail" : {
+                "rootShapeId" : "baseline-shape_9",
+                "path" : [
+                  {
+                    "ListItemTrail" : {
+                      "listShapeId" : "baseline-shape_9",
+                      "itemShapeId" : "baseline-shape_8"
+                    }
+                  },
+                  {
+                    "ObjectFieldTrail" : {
+                      "fieldId" : "baseline-field_4",
+                      "fieldShapeId" : "baseline-shape_7"
+                    }
+                  },
+                  {
+                    "NullableTrail" : {
+                      "shapeId" : "baseline-shape_7"
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      },
+      "title" : "'price' in the 200 Response body was not a  Unknown  (nullable)",
+      "suggestions" : [
+        {
+          "title" : "Replace 'Unknown (nullable)'  with  'Number (nullable)'",
+          "commandsJson" : [
+            {
+              "AddShape" : {
+                "shapeId" : "testing-shape_1",
+                "baseShapeId" : "$number",
+                "name" : ""
+              }
+            },
+            {
+              "SetParameterShape" : {
+                "shapeDescriptor" : {
+                  "ProviderInShape" : {
+                    "shapeId" : "baseline-shape_7",
+                    "providerDescriptor" : {
+                      "ShapeProvider" : {
+                        "shapeId" : "testing-shape_1"
+                      }
+                    },
+                    "consumingParameterId" : "$nullableInner"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "title" : "Change shape to  'Number'",
+          "commandsJson" : [
+            {
+              "AddShape" : {
+                "shapeId" : "testing-shape_2",
+                "baseShapeId" : "$number",
+                "name" : ""
+              }
+            }
+          ]
+        }
+      ],
+      "preview" : [
+        "Vector((List(),ExampleArray(List(),Some(baseline-shape_9),Some(baseline-shape_8),Vector(List(JsonArrayItem(0)), List(JsonArrayItem(1))),Set())), (List(JsonArrayItem(0)),ExampleObject(List(JsonArrayItem(0)),Some(baseline-shape_8),List(List(JsonArrayItem(0), JsonObjectKey(address)), List(JsonArrayItem(0), JsonObjectKey(price))),List(),List(),Set())), (List(JsonArrayItem(0), JsonObjectKey(address)),ExamplePrimitive(List(JsonArrayItem(0), JsonObjectKey(address)),$string,Some(baseline-shape_5),\"123\",Set())), (List(JsonArrayItem(0), JsonObjectKey(price)),ExamplePrimitive(List(JsonArrayItem(0), JsonObjectKey(price)),$number,None,657,Set(UnmatchedShape(List(JsonArrayItem(0), JsonObjectKey(price)),ShapeTrail(baseline-shape_9,List(ListItemTrail(baseline-shape_9,baseline-shape_8), ObjectFieldTrail(baseline-field_4,baseline-shape_7), NullableTrail(baseline-shape_7))))))), (List(JsonArrayItem(1)),ExampleObject(List(JsonArrayItem(1)),Some(baseline-shape_8),List(List(JsonArrayItem(1), JsonObjectKey(address)), List(JsonArrayItem(1), JsonObjectKey(price))),List(),List(),Set())), (List(JsonArrayItem(1), JsonObjectKey(address)),ExamplePrimitive(List(JsonArrayItem(1), JsonObjectKey(address)),$string,Some(baseline-shape_5),\"456\",Set())), (List(JsonArrayItem(1), JsonObjectKey(price)),ExamplePrimitive(List(JsonArrayItem(1), JsonObjectKey(price)),$number,None,322,Set())))",
+        "Vector((List(JsonArrayItem(0), JsonObjectKey(address)),KnownExampleField(List(JsonArrayItem(0), JsonObjectKey(address)),address,baseline-field_3,baseline-shape_5,\"123\",Set())), (List(JsonArrayItem(0), JsonObjectKey(price)),KnownExampleField(List(JsonArrayItem(0), JsonObjectKey(price)),price,baseline-field_4,baseline-shape_7,657,Set(UnmatchedShape(List(JsonArrayItem(0), JsonObjectKey(price)),ShapeTrail(baseline-shape_9,List(ListItemTrail(baseline-shape_9,baseline-shape_8), ObjectFieldTrail(baseline-field_4,baseline-shape_7), NullableTrail(baseline-shape_7))))))), (List(JsonArrayItem(1), JsonObjectKey(address)),KnownExampleField(List(JsonArrayItem(1), JsonObjectKey(address)),address,baseline-field_3,baseline-shape_5,\"456\",Set())), (List(JsonArrayItem(1), JsonObjectKey(price)),KnownExampleField(List(JsonArrayItem(1), JsonObjectKey(price)),price,baseline-field_4,baseline-shape_7,322,Set())))",
+        "Vector((List(JsonArrayItem(0)),ExampleItem(List(JsonArrayItem(0)),0,{\n  \"address\" : \"123\",\n  \"price\" : 657\n},Set())), (List(JsonArrayItem(1)),ExampleItem(List(JsonArrayItem(1)),1,{\n  \"address\" : \"456\",\n  \"price\" : 322\n},Set())))",
+        "Vector((baseline-shape_5,SpecPrimitive(baseline-shape_5,$string,RenderName(List(NameComponent(String,StringColor,,None,None))),Set())), (baseline-shape_6,SpecPrimitive(baseline-shape_6,$unknown,RenderName(List(NameComponent(Unknown,UnknownColor,,None,None))),Set())), (baseline-shape_7,WrappedType(baseline-shape_7,$nullable,RenderName(List(NameComponent(,modifier, (nullable),Some(baseline-shape_6),None))),baseline-shape_6,Set())), (baseline-shape_8,SpecObject(baseline-shape_8,List(SpecField(address,baseline-field_3,baseline-shape_5,Set()), SpecField(price,baseline-field_4,baseline-shape_7,Set())),Set())), (baseline-shape_9,SpecArray(baseline-shape_9,baseline-shape_8,RenderName(List(NameComponent(List of ,ListColor,,Some(baseline-shape_8),Some(baseline-shape_8)))),Set())))"
+      ]
+    },
+    {
+      "diff" : {
+        "UnmatchedResponseBodyShape" : {
+          "interactionTrail" : {
+            "path" : [
+              {
+                "ResponseBody" : {
+                  "contentType" : "application/json",
+                  "statusCode" : 200
+                }
+              }
+            ]
+          },
+          "requestsTrail" : {
+            "SpecResponseBody" : {
+              "responseId" : "baseline-response_1"
+            }
+          },
+          "shapeDiffResult" : {
+            "UnmatchedShape" : {
+              "jsonTrail" : {
+                "path" : [
+                  {
+                    "JsonArrayItem" : {
+                      "index" : 1
+                    }
+                  },
+                  {
+                    "JsonObjectKey" : {
+                      "key" : "price"
+                    }
+                  }
+                ]
+              },
+              "shapeTrail" : {
+                "rootShapeId" : "baseline-shape_9",
+                "path" : [
+                  {
+                    "ListItemTrail" : {
+                      "listShapeId" : "baseline-shape_9",
+                      "itemShapeId" : "baseline-shape_8"
+                    }
+                  },
+                  {
+                    "ObjectFieldTrail" : {
+                      "fieldId" : "baseline-field_4",
+                      "fieldShapeId" : "baseline-shape_7"
+                    }
+                  },
+                  {
+                    "NullableTrail" : {
+                      "shapeId" : "baseline-shape_7"
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      },
+      "title" : "'price' in the 200 Response body was not a  Unknown  (nullable)",
+      "suggestions" : [
+        {
+          "title" : "Replace 'Unknown (nullable)'  with  'Number (nullable)'",
+          "commandsJson" : [
+            {
+              "AddShape" : {
+                "shapeId" : "testing-shape_3",
+                "baseShapeId" : "$number",
+                "name" : ""
+              }
+            },
+            {
+              "SetParameterShape" : {
+                "shapeDescriptor" : {
+                  "ProviderInShape" : {
+                    "shapeId" : "baseline-shape_7",
+                    "providerDescriptor" : {
+                      "ShapeProvider" : {
+                        "shapeId" : "testing-shape_3"
+                      }
+                    },
+                    "consumingParameterId" : "$nullableInner"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "title" : "Change shape to  'Number'",
+          "commandsJson" : [
+            {
+              "AddShape" : {
+                "shapeId" : "testing-shape_4",
+                "baseShapeId" : "$number",
+                "name" : ""
+              }
+            }
+          ]
+        }
+      ],
+      "preview" : [
+        "Vector((List(),ExampleArray(List(),Some(baseline-shape_9),Some(baseline-shape_8),Vector(List(JsonArrayItem(0)), List(JsonArrayItem(1))),Set())), (List(JsonArrayItem(0)),ExampleObject(List(JsonArrayItem(0)),Some(baseline-shape_8),List(List(JsonArrayItem(0), JsonObjectKey(address)), List(JsonArrayItem(0), JsonObjectKey(price))),List(),List(),Set())), (List(JsonArrayItem(0), JsonObjectKey(address)),ExamplePrimitive(List(JsonArrayItem(0), JsonObjectKey(address)),$string,Some(baseline-shape_5),\"123\",Set())), (List(JsonArrayItem(0), JsonObjectKey(price)),ExamplePrimitive(List(JsonArrayItem(0), JsonObjectKey(price)),$number,None,657,Set())), (List(JsonArrayItem(1)),ExampleObject(List(JsonArrayItem(1)),Some(baseline-shape_8),List(List(JsonArrayItem(1), JsonObjectKey(address)), List(JsonArrayItem(1), JsonObjectKey(price))),List(),List(),Set())), (List(JsonArrayItem(1), JsonObjectKey(address)),ExamplePrimitive(List(JsonArrayItem(1), JsonObjectKey(address)),$string,Some(baseline-shape_5),\"456\",Set())), (List(JsonArrayItem(1), JsonObjectKey(price)),ExamplePrimitive(List(JsonArrayItem(1), JsonObjectKey(price)),$number,None,322,Set(UnmatchedShape(List(JsonArrayItem(1), JsonObjectKey(price)),ShapeTrail(baseline-shape_9,List(ListItemTrail(baseline-shape_9,baseline-shape_8), ObjectFieldTrail(baseline-field_4,baseline-shape_7), NullableTrail(baseline-shape_7))))))))",
+        "Vector((List(JsonArrayItem(0), JsonObjectKey(address)),KnownExampleField(List(JsonArrayItem(0), JsonObjectKey(address)),address,baseline-field_3,baseline-shape_5,\"123\",Set())), (List(JsonArrayItem(0), JsonObjectKey(price)),KnownExampleField(List(JsonArrayItem(0), JsonObjectKey(price)),price,baseline-field_4,baseline-shape_7,657,Set())), (List(JsonArrayItem(1), JsonObjectKey(address)),KnownExampleField(List(JsonArrayItem(1), JsonObjectKey(address)),address,baseline-field_3,baseline-shape_5,\"456\",Set())), (List(JsonArrayItem(1), JsonObjectKey(price)),KnownExampleField(List(JsonArrayItem(1), JsonObjectKey(price)),price,baseline-field_4,baseline-shape_7,322,Set(UnmatchedShape(List(JsonArrayItem(1), JsonObjectKey(price)),ShapeTrail(baseline-shape_9,List(ListItemTrail(baseline-shape_9,baseline-shape_8), ObjectFieldTrail(baseline-field_4,baseline-shape_7), NullableTrail(baseline-shape_7))))))))",
+        "Vector((List(JsonArrayItem(0)),ExampleItem(List(JsonArrayItem(0)),0,{\n  \"address\" : \"123\",\n  \"price\" : 657\n},Set())), (List(JsonArrayItem(1)),ExampleItem(List(JsonArrayItem(1)),1,{\n  \"address\" : \"456\",\n  \"price\" : 322\n},Set())))",
+        "Vector((baseline-shape_5,SpecPrimitive(baseline-shape_5,$string,RenderName(List(NameComponent(String,StringColor,,None,None))),Set())), (baseline-shape_6,SpecPrimitive(baseline-shape_6,$unknown,RenderName(List(NameComponent(Unknown,UnknownColor,,None,None))),Set())), (baseline-shape_7,WrappedType(baseline-shape_7,$nullable,RenderName(List(NameComponent(,modifier, (nullable),Some(baseline-shape_6),None))),baseline-shape_6,Set())), (baseline-shape_8,SpecObject(baseline-shape_8,List(SpecField(address,baseline-field_3,baseline-shape_5,Set()), SpecField(price,baseline-field_4,baseline-shape_7,Set())),Set())), (baseline-shape_9,SpecArray(baseline-shape_9,baseline-shape_8,RenderName(List(NameComponent(List of ,ListColor,,Some(baseline-shape_8),Some(baseline-shape_8)))),Set())))"
+      ]
+    }
+  ]
+}

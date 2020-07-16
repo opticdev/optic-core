@@ -41,7 +41,7 @@
       "title" : "'favoriteColor' observed in the 200 Response body",
       "suggestions" : [
         {
-          "title" : "Add favoriteColor",
+          "title" : "Add field 'favoriteColor' as 'Object (2 fields)'",
           "commandsJson" : [
             {
               "AddShape" : {

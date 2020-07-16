@@ -7,6 +7,7 @@ import com.useoptic.contexts.rfc.Commands.RfcCommand
 import com.useoptic.contexts.shapes.Commands.ShapeId
 import com.useoptic.diff.{ChangeType, InteractiveDiffInterpretation}
 import com.useoptic.diff.initial.{DistributionAwareShapeBuilder, ShapeBuildingStrategy}
+import com.useoptic.diff.interactions.interpreters.copy.NewBodiesSuggestionTemplates
 import com.useoptic.diff.interactions.{BodyUtilities, InteractionDiffResult, InteractionTrail, RequestSpecTrail, RequestSpecTrailHelpers, UnmatchedRequestBodyContentType, UnmatchedResponseBodyContentType, UnmatchedResponseStatusCode}
 import com.useoptic.diff.shapes.JsonTrail
 import com.useoptic.diff.shapes.resolvers.{JsonLikeResolvers, ShapesResolvers}
@@ -92,16 +93,14 @@ class InitialBodyInterpreter(rfcState: RfcState)(implicit ids: OpticDomainIds) {
           )
 
           InteractiveDiffInterpretation(
-            s"Add Request with ${contentType} Body",
-            s"Added Request with ${contentType} Body",
+            NewBodiesSuggestionTemplates.addRequestType(contentType, true),
             commands,
             ChangeType.Addition
           )
         } else {
           val commands = baseCommands
           InteractiveDiffInterpretation(
-            s"Add Request with ${contentType} Content-Type but no Body",
-            s"Added Request with ${contentType} Content-Type but no Body",
+            NewBodiesSuggestionTemplates.addRequestType(contentType, false),
             commands,
             ChangeType.Addition
           )
@@ -111,8 +110,7 @@ class InitialBodyInterpreter(rfcState: RfcState)(implicit ids: OpticDomainIds) {
       case None => {
         val commands = baseCommands
         InteractiveDiffInterpretation(
-          s"Add Request with No Body",
-          s"Added Request with No Body",
+          NewBodiesSuggestionTemplates.addRequestNoContentOrBody(),
           commands,
           ChangeType.Addition
         )
@@ -132,13 +130,12 @@ class InitialBodyInterpreter(rfcState: RfcState)(implicit ids: OpticDomainIds) {
         val actuallyHasBody = jsonBody.isDefined
         if (actuallyHasBody) {
 
-          val commands = baseCommands ++ shapeCommands.flatten ++ Seq(
+          val commands = baseCommands ++ shapeCommands ++ Seq(
             RequestsCommands.SetResponseBodyShape(responseId, ShapedBodyDescriptor(contentType, rootShapeId, isRemoved = false))
           )
 
           InteractiveDiffInterpretation(
-            s"Add ${interactionTrail.statusCode()} Response with ${contentType} Body",
-            s"Added ${interactionTrail.statusCode()} Response with ${contentType} Body",
+            NewBodiesSuggestionTemplates.addResponseType(interactionTrail.statusCode(), Some(contentType), true),
             commands,
             ChangeType.Addition
           )
@@ -146,8 +143,7 @@ class InitialBodyInterpreter(rfcState: RfcState)(implicit ids: OpticDomainIds) {
           val commands = baseCommands
 
           InteractiveDiffInterpretation(
-            s"Add ${interactionTrail.statusCode()} Response with ${contentType} Content-Type but no Body",
-            s"Added ${interactionTrail.statusCode()} Response with ${contentType} Content-Type but no Body",
+            NewBodiesSuggestionTemplates.addResponseType(interactionTrail.statusCode(), Some(contentType), false),
             commands,
             ChangeType.Addition
           )
@@ -156,8 +152,7 @@ class InitialBodyInterpreter(rfcState: RfcState)(implicit ids: OpticDomainIds) {
       case None => {
         val commands = baseCommands
         InteractiveDiffInterpretation(
-          s"Add ${interactionTrail.statusCode()} Response with No Body",
-          s"Added ${interactionTrail.statusCode()} Response with No Body",
+          NewBodiesSuggestionTemplates.addResponseType(interactionTrail.statusCode(), None, false),
           commands,
           ChangeType.Addition
         )

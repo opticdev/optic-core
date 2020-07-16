@@ -52,7 +52,6 @@ class DiffVisitorSpec extends FunSpec {
           val spec = TestHelpers.fromCommands(initialCommands)
           val resolvers = new DefaultShapesResolvers(spec)
 
-          println(spec.requestsState.responses)
           val interaction: HttpInteraction = HttpInteraction(
             "uuid",
             Request("hhh", "GET", "/asdf", ArbitraryData(None, None, None), ArbitraryData(None, None, None), Body(None, ArbitraryData(None, None, None))),

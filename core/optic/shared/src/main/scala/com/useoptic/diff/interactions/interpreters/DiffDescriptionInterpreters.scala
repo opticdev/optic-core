@@ -10,6 +10,7 @@ import com.useoptic.diff.shapes.JsonTrailPathComponent._
 import com.useoptic.diff.shapes.resolvers.JsonLikeResolvers
 import com.useoptic.dsa.OpticDomainIds
 import com.useoptic.types.capture.HttpInteraction
+import com.useoptic.ux.ShapeNameRenderer
 
 import scala.scalajs.js.annotation.{JSExport, JSExportAll}
 
@@ -43,6 +44,7 @@ case class DiffDescription(title: String, assertion: String, interactionPointerD
 @JSExport
 @JSExportAll
 class DiffDescriptionInterpreters(rfcState: RfcState)(implicit ids: OpticDomainIds) {
+  private val namer = new ShapeNameRenderer(rfcState)
   def interpret(diff: ShapeDiffResult, inRequest: Boolean, interactionTrail: InteractionTrail, interaction: HttpInteraction): (String, InteractionPointerDescription) = {
 
     val inLocation = (if (inRequest) "Request" else s"${interactionTrail.statusCode()} Response") + " body"
@@ -118,19 +120,13 @@ class DiffDescriptionInterpreters(rfcState: RfcState)(implicit ids: OpticDomainI
   }
 
   def expectedShapeDescription(shapeTrail: ShapeTrail) = shapeTrail.path.lastOption match {
-    case Some(value) => value match {
-      case t: ObjectTrail => shapeName(t.shapeId)
-      case t: ObjectFieldTrail => shapeName(t.fieldShapeId)
-      case t: ListTrail => shapeName(t.shapeId)
-      case t: ListItemTrail => shapeName(t.itemShapeId)
-      case t: OneOfItemTrail => shapeName(t.itemShapeId)
-      case t: NullableTrail => "nullable shape?"
-      case t: NullableItemTrail => shapeName(t.innerShapeId)
-      case t: OptionalTrail => "optional"
-      case t: OptionalItemTrail => shapeName(t.innerShapeId)
-      //case UnknownTrail() => "unknown?"
+    case Some(pc: UnknownTrail) => "Unknown"
+    case Some(a: ShapeTrailPathComponent) => {
+      val abc = (namer.nameForShapeId(a.namedShape))
+      namer.nameForShapeId(a.namedShape).get.map(_.text).mkString(" ")
+    } case None => {
+      namer.nameForShapeId(shapeTrail.rootShapeId).get.map(_.text).mkString(" ")
     }
-    case None => shapeName(shapeTrail.rootShapeId)
   }
 
   def jsonTrailDescription(jsonTrail: JsonTrail) = jsonTrail.path.lastOption match {
