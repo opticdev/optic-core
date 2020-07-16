@@ -26,11 +26,26 @@ optic_core_build() {
   (
     set -o errexit
     cd "$OPTIC_CORE_ROOT"
-    sbt fullOptJS
+    sbt fastOptJS
     sbt "opticJVM/runMain com.useoptic.types.AvroMappings"
     sbt "opticJVM/generateTypescript"
     cp "optic/js/target/scala-2.12/optic-core-fastopt.js" "../workspace/packages/domain/src/domain.js"
     cp -r "build/" "../workspace/packages/domain-types/src"
+  )
+}
+
+just_link() {
+  (
+    set -o errexit
+
+    cd "$OPTIC_WS_ROOT"
+    cd packages/domain && yarn unlink && yarn link
+    cd "$OPTIC_WS_ROOT"
+    cd packages/domain-types && yarn unlink && yarn link
+    cd "$OPTIC_WS_ROOT"
+    cd packages/domain-utilities && yarn unlink && yarn link
+
+    yarn install
   )
 }
 
