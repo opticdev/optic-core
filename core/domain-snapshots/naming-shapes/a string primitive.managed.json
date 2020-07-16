@@ -1,0 +1,783 @@
+{
+  "events" : [
+    {
+      "APINamed" : {
+        "name" : "ToDo",
+        "eventContext" : null
+      }
+    },
+    {
+      "GitStateSet" : {
+        "branchName" : "master",
+        "commitId" : "740f99ab1dd694262faa68f7a55292015e8358c4",
+        "eventContext" : {
+          "clientId" : "aidan@queuesoftware.com",
+          "clientSessionId" : "df0a3eb4-f576-48af-8168-8516ac47cb81",
+          "clientCommandBatchId" : "1259fd9b-451c-4c4d-838c-d20d8714df87",
+          "createdAt" : "2019-11-22T18:23:47.448Z"
+        }
+      }
+    },
+    {
+      "PathComponentAdded" : {
+        "pathId" : "path_HsSXFVOYLX",
+        "parentPathId" : "root",
+        "name" : "todos",
+        "eventContext" : {
+          "clientId" : "aidan@queuesoftware.com",
+          "clientSessionId" : "0f8d6368-7fb1-428a-be79-9bcb2e261e2f",
+          "clientCommandBatchId" : "b8ba99ee-258f-49d7-a1a8-43436076c700",
+          "createdAt" : "2019-11-22T18:24:08.232Z"
+        }
+      }
+    },
+    {
+      "RequestAdded" : {
+        "requestId" : "request_VwicxIWnwr",
+        "pathId" : "path_HsSXFVOYLX",
+        "httpMethod" : "GET",
+        "eventContext" : {
+          "clientId" : "aidan@queuesoftware.com",
+          "clientSessionId" : "0f8d6368-7fb1-428a-be79-9bcb2e261e2f",
+          "clientCommandBatchId" : "3e2d5241-ca01-4216-b462-d90643ee5650",
+          "createdAt" : "2019-11-22T18:24:11.117Z"
+        }
+      }
+    },
+    {
+      "ContributionAdded" : {
+        "id" : "request_VwicxIWnwr",
+        "key" : "purpose",
+        "value" : "Get todos",
+        "eventContext" : {
+          "clientId" : "aidan@queuesoftware.com",
+          "clientSessionId" : "0f8d6368-7fb1-428a-be79-9bcb2e261e2f",
+          "clientCommandBatchId" : "3e2d5241-ca01-4216-b462-d90643ee5650",
+          "createdAt" : "2019-11-22T18:24:11.117Z"
+        }
+      }
+    },
+    {
+      "ResponseAdded" : {
+        "responseId" : "response_vDRZEfG6xP",
+        "requestId" : "request_VwicxIWnwr",
+        "httpStatusCode" : 200,
+        "eventContext" : {
+          "clientId" : "aidan@queuesoftware.com",
+          "clientSessionId" : "0f8d6368-7fb1-428a-be79-9bcb2e261e2f",
+          "clientCommandBatchId" : "2cbfc38f-5144-47e4-8c4a-5573be9826d9",
+          "createdAt" : "2019-11-22T18:24:11.669Z"
+        }
+      }
+    },
+    {
+      "ShapeAdded" : {
+        "shapeId" : "WDPBZw_0",
+        "baseShapeId" : "$list",
+        "parameters" : {
+          "DynamicParameterList" : {
+            "shapeParameterIds" : [
+            ]
+          }
+        },
+        "name" : "",
+        "eventContext" : {
+          "clientId" : "aidan@queuesoftware.com",
+          "clientSessionId" : "0f8d6368-7fb1-428a-be79-9bcb2e261e2f",
+          "clientCommandBatchId" : "11f21575-b991-4aea-98d5-6866d27c0daf",
+          "createdAt" : "2019-11-22T18:24:12.085Z"
+        }
+      }
+    },
+    {
+      "ShapeAdded" : {
+        "shapeId" : "WDPBZw_1",
+        "baseShapeId" : "$object",
+        "parameters" : {
+          "DynamicParameterList" : {
+            "shapeParameterIds" : [
+            ]
+          }
+        },
+        "name" : "",
+        "eventContext" : {
+          "clientId" : "aidan@queuesoftware.com",
+          "clientSessionId" : "0f8d6368-7fb1-428a-be79-9bcb2e261e2f",
+          "clientCommandBatchId" : "11f21575-b991-4aea-98d5-6866d27c0daf",
+          "createdAt" : "2019-11-22T18:24:12.086Z"
+        }
+      }
+    },
+    {
+      "ShapeAdded" : {
+        "shapeId" : "WDPBZw_3",
+        "baseShapeId" : "$string",
+        "parameters" : {
+          "DynamicParameterList" : {
+            "shapeParameterIds" : [
+            ]
+          }
+        },
+        "name" : "",
+        "eventContext" : {
+          "clientId" : "aidan@queuesoftware.com",
+          "clientSessionId" : "0f8d6368-7fb1-428a-be79-9bcb2e261e2f",
+          "clientCommandBatchId" : "11f21575-b991-4aea-98d5-6866d27c0daf",
+          "createdAt" : "2019-11-22T18:24:12.086Z"
+        }
+      }
+    },
+    {
+      "FieldAdded" : {
+        "fieldId" : "WDPBZw_2",
+        "shapeId" : "WDPBZw_1",
+        "name" : "dueDate",
+        "shapeDescriptor" : {
+          "FieldShapeFromShape" : {
+            "fieldId" : "WDPBZw_2",
+            "shapeId" : "WDPBZw_3"
+          }
+        },
+        "eventContext" : {
+          "clientId" : "aidan@queuesoftware.com",
+          "clientSessionId" : "0f8d6368-7fb1-428a-be79-9bcb2e261e2f",
+          "clientCommandBatchId" : "11f21575-b991-4aea-98d5-6866d27c0daf",
+          "createdAt" : "2019-11-22T18:24:12.086Z"
+        }
+      }
+    },
+    {
+      "ShapeAdded" : {
+        "shapeId" : "WDPBZw_5",
+        "baseShapeId" : "$string",
+        "parameters" : {
+          "DynamicParameterList" : {
+            "shapeParameterIds" : [
+            ]
+          }
+        },
+        "name" : "",
+        "eventContext" : {
+          "clientId" : "aidan@queuesoftware.com",
+          "clientSessionId" : "0f8d6368-7fb1-428a-be79-9bcb2e261e2f",
+          "clientCommandBatchId" : "11f21575-b991-4aea-98d5-6866d27c0daf",
+          "createdAt" : "2019-11-22T18:24:12.086Z"
+        }
+      }
+    },
+    {
+      "FieldAdded" : {
+        "fieldId" : "WDPBZw_4",
+        "shapeId" : "WDPBZw_1",
+        "name" : "id",
+        "shapeDescriptor" : {
+          "FieldShapeFromShape" : {
+            "fieldId" : "WDPBZw_4",
+            "shapeId" : "WDPBZw_5"
+          }
+        },
+        "eventContext" : {
+          "clientId" : "aidan@queuesoftware.com",
+          "clientSessionId" : "0f8d6368-7fb1-428a-be79-9bcb2e261e2f",
+          "clientCommandBatchId" : "11f21575-b991-4aea-98d5-6866d27c0daf",
+          "createdAt" : "2019-11-22T18:24:12.086Z"
+        }
+      }
+    },
+    {
+      "ShapeAdded" : {
+        "shapeId" : "WDPBZw_7",
+        "baseShapeId" : "$boolean",
+        "parameters" : {
+          "DynamicParameterList" : {
+            "shapeParameterIds" : [
+            ]
+          }
+        },
+        "name" : "",
+        "eventContext" : {
+          "clientId" : "aidan@queuesoftware.com",
+          "clientSessionId" : "0f8d6368-7fb1-428a-be79-9bcb2e261e2f",
+          "clientCommandBatchId" : "11f21575-b991-4aea-98d5-6866d27c0daf",
+          "createdAt" : "2019-11-22T18:24:12.086Z"
+        }
+      }
+    },
+    {
+      "FieldAdded" : {
+        "fieldId" : "WDPBZw_6",
+        "shapeId" : "WDPBZw_1",
+        "name" : "isDone",
+        "shapeDescriptor" : {
+          "FieldShapeFromShape" : {
+            "fieldId" : "WDPBZw_6",
+            "shapeId" : "WDPBZw_7"
+          }
+        },
+        "eventContext" : {
+          "clientId" : "aidan@queuesoftware.com",
+          "clientSessionId" : "0f8d6368-7fb1-428a-be79-9bcb2e261e2f",
+          "clientCommandBatchId" : "11f21575-b991-4aea-98d5-6866d27c0daf",
+          "createdAt" : "2019-11-22T18:24:12.086Z"
+        }
+      }
+    },
+    {
+      "ShapeAdded" : {
+        "shapeId" : "WDPBZw_9",
+        "baseShapeId" : "$string",
+        "parameters" : {
+          "DynamicParameterList" : {
+            "shapeParameterIds" : [
+            ]
+          }
+        },
+        "name" : "",
+        "eventContext" : {
+          "clientId" : "aidan@queuesoftware.com",
+          "clientSessionId" : "0f8d6368-7fb1-428a-be79-9bcb2e261e2f",
+          "clientCommandBatchId" : "11f21575-b991-4aea-98d5-6866d27c0daf",
+          "createdAt" : "2019-11-22T18:24:12.086Z"
+        }
+      }
+    },
+    {
+      "FieldAdded" : {
+        "fieldId" : "WDPBZw_8",
+        "shapeId" : "WDPBZw_1",
+        "name" : "task",
+        "shapeDescriptor" : {
+          "FieldShapeFromShape" : {
+            "fieldId" : "WDPBZw_8",
+            "shapeId" : "WDPBZw_9"
+          }
+        },
+        "eventContext" : {
+          "clientId" : "aidan@queuesoftware.com",
+          "clientSessionId" : "0f8d6368-7fb1-428a-be79-9bcb2e261e2f",
+          "clientCommandBatchId" : "11f21575-b991-4aea-98d5-6866d27c0daf",
+          "createdAt" : "2019-11-22T18:24:12.087Z"
+        }
+      }
+    },
+    {
+      "ShapeAdded" : {
+        "shapeId" : "WDPBZw_10",
+        "baseShapeId" : "WDPBZw_1",
+        "parameters" : {
+          "DynamicParameterList" : {
+            "shapeParameterIds" : [
+            ]
+          }
+        },
+        "name" : "",
+        "eventContext" : {
+          "clientId" : "aidan@queuesoftware.com",
+          "clientSessionId" : "0f8d6368-7fb1-428a-be79-9bcb2e261e2f",
+          "clientCommandBatchId" : "11f21575-b991-4aea-98d5-6866d27c0daf",
+          "createdAt" : "2019-11-22T18:24:12.087Z"
+        }
+      }
+    },
+    {
+      "ShapeParameterShapeSet" : {
+        "shapeDescriptor" : {
+          "ProviderInShape" : {
+            "shapeId" : "WDPBZw_0",
+            "providerDescriptor" : {
+              "ShapeProvider" : {
+                "shapeId" : "WDPBZw_10"
+              }
+            },
+            "consumingParameterId" : "$listItem"
+          }
+        },
+        "eventContext" : {
+          "clientId" : "aidan@queuesoftware.com",
+          "clientSessionId" : "0f8d6368-7fb1-428a-be79-9bcb2e261e2f",
+          "clientCommandBatchId" : "11f21575-b991-4aea-98d5-6866d27c0daf",
+          "createdAt" : "2019-11-22T18:24:12.087Z"
+        }
+      }
+    },
+    {
+      "ShapeAdded" : {
+        "shapeId" : "shape_yBBWmDKHYA",
+        "baseShapeId" : "WDPBZw_0",
+        "parameters" : {
+          "DynamicParameterList" : {
+            "shapeParameterIds" : [
+            ]
+          }
+        },
+        "name" : "",
+        "eventContext" : {
+          "clientId" : "aidan@queuesoftware.com",
+          "clientSessionId" : "0f8d6368-7fb1-428a-be79-9bcb2e261e2f",
+          "clientCommandBatchId" : "11f21575-b991-4aea-98d5-6866d27c0daf",
+          "createdAt" : "2019-11-22T18:24:12.087Z"
+        }
+      }
+    },
+    {
+      "ResponseBodySet" : {
+        "responseId" : "response_vDRZEfG6xP",
+        "bodyDescriptor" : {
+          "httpContentType" : "application/json; charset=utf-8",
+          "shapeId" : "shape_yBBWmDKHYA",
+          "isRemoved" : false
+        },
+        "eventContext" : {
+          "clientId" : "aidan@queuesoftware.com",
+          "clientSessionId" : "0f8d6368-7fb1-428a-be79-9bcb2e261e2f",
+          "clientCommandBatchId" : "11f21575-b991-4aea-98d5-6866d27c0daf",
+          "createdAt" : "2019-11-22T18:24:12.087Z"
+        }
+      }
+    },
+    {
+      "GitStateSet" : {
+        "branchName" : "master",
+        "commitId" : "740f99ab1dd694262faa68f7a55292015e8358c4",
+        "eventContext" : {
+          "clientId" : "aidan@queuesoftware.com",
+          "clientSessionId" : "cd26b488-064a-4e4f-bdb4-74c2127ab2f7",
+          "clientCommandBatchId" : "492cf16f-8fa5-4209-8bd9-6ad3219effb5",
+          "createdAt" : "2019-11-22T22:48:56.083Z"
+        }
+      }
+    },
+    {
+      "GitStateSet" : {
+        "branchName" : "master",
+        "commitId" : "740f99ab1dd694262faa68f7a55292015e8358c4",
+        "eventContext" : {
+          "clientId" : "aidan@queuesoftware.com",
+          "clientSessionId" : "bfebfc5e-a537-449b-905c-f1230560f989",
+          "clientCommandBatchId" : "1ff9be62-738a-41e6-8947-eb9dabbc7e4d",
+          "createdAt" : "2019-11-22T22:51:07.843Z"
+        }
+      }
+    },
+    {
+      "GitStateSet" : {
+        "branchName" : "master",
+        "commitId" : "740f99ab1dd694262faa68f7a55292015e8358c4",
+        "eventContext" : {
+          "clientId" : "aidan@queuesoftware.com",
+          "clientSessionId" : "e2e8af27-68cd-4f9d-9a45-13d801fbfd75",
+          "clientCommandBatchId" : "aa40484c-ee44-4872-86d9-db3f068feba9",
+          "createdAt" : "2019-11-22T23:11:50.895Z"
+        }
+      }
+    },
+    {
+      "PathParameterAdded" : {
+        "pathId" : "path_egLMqmABlL",
+        "parentPathId" : "path_HsSXFVOYLX",
+        "name" : "todoId",
+        "eventContext" : null
+      }
+    },
+    {
+      "ShapeAdded" : {
+        "shapeId" : "shape_oAewELVi8F",
+        "baseShapeId" : "$string",
+        "parameters" : {
+          "DynamicParameterList" : {
+            "shapeParameterIds" : [
+            ]
+          }
+        },
+        "name" : "",
+        "eventContext" : null
+      }
+    },
+    {
+      "PathParameterShapeSet" : {
+        "pathId" : "path_egLMqmABlL",
+        "shapeDescriptor" : {
+          "shapeId" : "shape_oAewELVi8F",
+          "isRemoved" : false
+        },
+        "eventContext" : null
+      }
+    },
+    {
+      "RequestAdded" : {
+        "requestId" : "request_bJyzwU0FfJ",
+        "pathId" : "path_egLMqmABlL",
+        "httpMethod" : "PATCH",
+        "eventContext" : {
+          "clientId" : "aidan@queuesoftware.com",
+          "clientSessionId" : "dbd72045-4c6d-49fb-a325-0ede88233c36",
+          "clientCommandBatchId" : "9c73a3a4-14f9-4582-8413-c5f14a120996",
+          "createdAt" : "2019-11-22T23:12:09.710Z"
+        }
+      }
+    },
+    {
+      "ContributionAdded" : {
+        "id" : "request_bJyzwU0FfJ",
+        "key" : "purpose",
+        "value" : "Update a todo by ID",
+        "eventContext" : {
+          "clientId" : "aidan@queuesoftware.com",
+          "clientSessionId" : "dbd72045-4c6d-49fb-a325-0ede88233c36",
+          "clientCommandBatchId" : "9c73a3a4-14f9-4582-8413-c5f14a120996",
+          "createdAt" : "2019-11-22T23:12:09.710Z"
+        }
+      }
+    },
+    {
+      "ShapeAdded" : {
+        "shapeId" : "gKfXSj_0",
+        "baseShapeId" : "$object",
+        "parameters" : {
+          "DynamicParameterList" : {
+            "shapeParameterIds" : [
+            ]
+          }
+        },
+        "name" : "",
+        "eventContext" : {
+          "clientId" : "aidan@queuesoftware.com",
+          "clientSessionId" : "dbd72045-4c6d-49fb-a325-0ede88233c36",
+          "clientCommandBatchId" : "201dda0b-b625-47c2-9f58-30e1aa6d3ab5",
+          "createdAt" : "2019-11-22T23:12:10.824Z"
+        }
+      }
+    },
+    {
+      "ShapeAdded" : {
+        "shapeId" : "gKfXSj_2",
+        "baseShapeId" : "$boolean",
+        "parameters" : {
+          "DynamicParameterList" : {
+            "shapeParameterIds" : [
+            ]
+          }
+        },
+        "name" : "",
+        "eventContext" : {
+          "clientId" : "aidan@queuesoftware.com",
+          "clientSessionId" : "dbd72045-4c6d-49fb-a325-0ede88233c36",
+          "clientCommandBatchId" : "201dda0b-b625-47c2-9f58-30e1aa6d3ab5",
+          "createdAt" : "2019-11-22T23:12:10.824Z"
+        }
+      }
+    },
+    {
+      "FieldAdded" : {
+        "fieldId" : "gKfXSj_1",
+        "shapeId" : "gKfXSj_0",
+        "name" : "isDone",
+        "shapeDescriptor" : {
+          "FieldShapeFromShape" : {
+            "fieldId" : "gKfXSj_1",
+            "shapeId" : "gKfXSj_2"
+          }
+        },
+        "eventContext" : {
+          "clientId" : "aidan@queuesoftware.com",
+          "clientSessionId" : "dbd72045-4c6d-49fb-a325-0ede88233c36",
+          "clientCommandBatchId" : "201dda0b-b625-47c2-9f58-30e1aa6d3ab5",
+          "createdAt" : "2019-11-22T23:12:10.824Z"
+        }
+      }
+    },
+    {
+      "ShapeAdded" : {
+        "shapeId" : "gKfXSj_4",
+        "baseShapeId" : "$string",
+        "parameters" : {
+          "DynamicParameterList" : {
+            "shapeParameterIds" : [
+            ]
+          }
+        },
+        "name" : "",
+        "eventContext" : {
+          "clientId" : "aidan@queuesoftware.com",
+          "clientSessionId" : "dbd72045-4c6d-49fb-a325-0ede88233c36",
+          "clientCommandBatchId" : "201dda0b-b625-47c2-9f58-30e1aa6d3ab5",
+          "createdAt" : "2019-11-22T23:12:10.824Z"
+        }
+      }
+    },
+    {
+      "FieldAdded" : {
+        "fieldId" : "gKfXSj_3",
+        "shapeId" : "gKfXSj_0",
+        "name" : "task",
+        "shapeDescriptor" : {
+          "FieldShapeFromShape" : {
+            "fieldId" : "gKfXSj_3",
+            "shapeId" : "gKfXSj_4"
+          }
+        },
+        "eventContext" : {
+          "clientId" : "aidan@queuesoftware.com",
+          "clientSessionId" : "dbd72045-4c6d-49fb-a325-0ede88233c36",
+          "clientCommandBatchId" : "201dda0b-b625-47c2-9f58-30e1aa6d3ab5",
+          "createdAt" : "2019-11-22T23:12:10.825Z"
+        }
+      }
+    },
+    {
+      "ShapeAdded" : {
+        "shapeId" : "shape_BpCrQC4UMA",
+        "baseShapeId" : "gKfXSj_0",
+        "parameters" : {
+          "DynamicParameterList" : {
+            "shapeParameterIds" : [
+            ]
+          }
+        },
+        "name" : "",
+        "eventContext" : {
+          "clientId" : "aidan@queuesoftware.com",
+          "clientSessionId" : "dbd72045-4c6d-49fb-a325-0ede88233c36",
+          "clientCommandBatchId" : "201dda0b-b625-47c2-9f58-30e1aa6d3ab5",
+          "createdAt" : "2019-11-22T23:12:10.825Z"
+        }
+      }
+    },
+    {
+      "RequestBodySet" : {
+        "requestId" : "request_bJyzwU0FfJ",
+        "bodyDescriptor" : {
+          "httpContentType" : "application/json",
+          "shapeId" : "shape_BpCrQC4UMA",
+          "isRemoved" : false
+        },
+        "eventContext" : {
+          "clientId" : "aidan@queuesoftware.com",
+          "clientSessionId" : "dbd72045-4c6d-49fb-a325-0ede88233c36",
+          "clientCommandBatchId" : "201dda0b-b625-47c2-9f58-30e1aa6d3ab5",
+          "createdAt" : "2019-11-22T23:12:10.825Z"
+        }
+      }
+    },
+    {
+      "ResponseAdded" : {
+        "responseId" : "response_CjZlTuKOGj",
+        "requestId" : "request_bJyzwU0FfJ",
+        "httpStatusCode" : 200,
+        "eventContext" : {
+          "clientId" : "aidan@queuesoftware.com",
+          "clientSessionId" : "dbd72045-4c6d-49fb-a325-0ede88233c36",
+          "clientCommandBatchId" : "752f1da7-8ce7-4d3a-8ed2-3833d2c925e4",
+          "createdAt" : "2019-11-22T23:12:11.005Z"
+        }
+      }
+    },
+    {
+      "ShapeAdded" : {
+        "shapeId" : "0uJPFW_0",
+        "baseShapeId" : "$object",
+        "parameters" : {
+          "DynamicParameterList" : {
+            "shapeParameterIds" : [
+            ]
+          }
+        },
+        "name" : "",
+        "eventContext" : {
+          "clientId" : "aidan@queuesoftware.com",
+          "clientSessionId" : "dbd72045-4c6d-49fb-a325-0ede88233c36",
+          "clientCommandBatchId" : "763a984f-ead1-42c1-8ba6-f23dd6d29934",
+          "createdAt" : "2019-11-22T23:12:11.215Z"
+        }
+      }
+    },
+    {
+      "ShapeAdded" : {
+        "shapeId" : "0uJPFW_2",
+        "baseShapeId" : "$string",
+        "parameters" : {
+          "DynamicParameterList" : {
+            "shapeParameterIds" : [
+            ]
+          }
+        },
+        "name" : "",
+        "eventContext" : {
+          "clientId" : "aidan@queuesoftware.com",
+          "clientSessionId" : "dbd72045-4c6d-49fb-a325-0ede88233c36",
+          "clientCommandBatchId" : "763a984f-ead1-42c1-8ba6-f23dd6d29934",
+          "createdAt" : "2019-11-22T23:12:11.216Z"
+        }
+      }
+    },
+    {
+      "FieldAdded" : {
+        "fieldId" : "0uJPFW_1",
+        "shapeId" : "0uJPFW_0",
+        "name" : "dueDate",
+        "shapeDescriptor" : {
+          "FieldShapeFromShape" : {
+            "fieldId" : "0uJPFW_1",
+            "shapeId" : "0uJPFW_2"
+          }
+        },
+        "eventContext" : {
+          "clientId" : "aidan@queuesoftware.com",
+          "clientSessionId" : "dbd72045-4c6d-49fb-a325-0ede88233c36",
+          "clientCommandBatchId" : "763a984f-ead1-42c1-8ba6-f23dd6d29934",
+          "createdAt" : "2019-11-22T23:12:11.216Z"
+        }
+      }
+    },
+    {
+      "ShapeAdded" : {
+        "shapeId" : "0uJPFW_4",
+        "baseShapeId" : "$string",
+        "parameters" : {
+          "DynamicParameterList" : {
+            "shapeParameterIds" : [
+            ]
+          }
+        },
+        "name" : "",
+        "eventContext" : {
+          "clientId" : "aidan@queuesoftware.com",
+          "clientSessionId" : "dbd72045-4c6d-49fb-a325-0ede88233c36",
+          "clientCommandBatchId" : "763a984f-ead1-42c1-8ba6-f23dd6d29934",
+          "createdAt" : "2019-11-22T23:12:11.216Z"
+        }
+      }
+    },
+    {
+      "FieldAdded" : {
+        "fieldId" : "0uJPFW_3",
+        "shapeId" : "0uJPFW_0",
+        "name" : "id",
+        "shapeDescriptor" : {
+          "FieldShapeFromShape" : {
+            "fieldId" : "0uJPFW_3",
+            "shapeId" : "0uJPFW_4"
+          }
+        },
+        "eventContext" : {
+          "clientId" : "aidan@queuesoftware.com",
+          "clientSessionId" : "dbd72045-4c6d-49fb-a325-0ede88233c36",
+          "clientCommandBatchId" : "763a984f-ead1-42c1-8ba6-f23dd6d29934",
+          "createdAt" : "2019-11-22T23:12:11.216Z"
+        }
+      }
+    },
+    {
+      "ShapeAdded" : {
+        "shapeId" : "0uJPFW_6",
+        "baseShapeId" : "$boolean",
+        "parameters" : {
+          "DynamicParameterList" : {
+            "shapeParameterIds" : [
+            ]
+          }
+        },
+        "name" : "",
+        "eventContext" : {
+          "clientId" : "aidan@queuesoftware.com",
+          "clientSessionId" : "dbd72045-4c6d-49fb-a325-0ede88233c36",
+          "clientCommandBatchId" : "763a984f-ead1-42c1-8ba6-f23dd6d29934",
+          "createdAt" : "2019-11-22T23:12:11.216Z"
+        }
+      }
+    },
+    {
+      "FieldAdded" : {
+        "fieldId" : "0uJPFW_5",
+        "shapeId" : "0uJPFW_0",
+        "name" : "isDone",
+        "shapeDescriptor" : {
+          "FieldShapeFromShape" : {
+            "fieldId" : "0uJPFW_5",
+            "shapeId" : "0uJPFW_6"
+          }
+        },
+        "eventContext" : {
+          "clientId" : "aidan@queuesoftware.com",
+          "clientSessionId" : "dbd72045-4c6d-49fb-a325-0ede88233c36",
+          "clientCommandBatchId" : "763a984f-ead1-42c1-8ba6-f23dd6d29934",
+          "createdAt" : "2019-11-22T23:12:11.216Z"
+        }
+      }
+    },
+    {
+      "ShapeAdded" : {
+        "shapeId" : "0uJPFW_8",
+        "baseShapeId" : "$string",
+        "parameters" : {
+          "DynamicParameterList" : {
+            "shapeParameterIds" : [
+            ]
+          }
+        },
+        "name" : "",
+        "eventContext" : {
+          "clientId" : "aidan@queuesoftware.com",
+          "clientSessionId" : "dbd72045-4c6d-49fb-a325-0ede88233c36",
+          "clientCommandBatchId" : "763a984f-ead1-42c1-8ba6-f23dd6d29934",
+          "createdAt" : "2019-11-22T23:12:11.217Z"
+        }
+      }
+    },
+    {
+      "FieldAdded" : {
+        "fieldId" : "0uJPFW_7",
+        "shapeId" : "0uJPFW_0",
+        "name" : "task",
+        "shapeDescriptor" : {
+          "FieldShapeFromShape" : {
+            "fieldId" : "0uJPFW_7",
+            "shapeId" : "0uJPFW_8"
+          }
+        },
+        "eventContext" : {
+          "clientId" : "aidan@queuesoftware.com",
+          "clientSessionId" : "dbd72045-4c6d-49fb-a325-0ede88233c36",
+          "clientCommandBatchId" : "763a984f-ead1-42c1-8ba6-f23dd6d29934",
+          "createdAt" : "2019-11-22T23:12:11.217Z"
+        }
+      }
+    },
+    {
+      "ShapeAdded" : {
+        "shapeId" : "shape_lq3nVzCXqn",
+        "baseShapeId" : "0uJPFW_0",
+        "parameters" : {
+          "DynamicParameterList" : {
+            "shapeParameterIds" : [
+            ]
+          }
+        },
+        "name" : "",
+        "eventContext" : {
+          "clientId" : "aidan@queuesoftware.com",
+          "clientSessionId" : "dbd72045-4c6d-49fb-a325-0ede88233c36",
+          "clientCommandBatchId" : "763a984f-ead1-42c1-8ba6-f23dd6d29934",
+          "createdAt" : "2019-11-22T23:12:11.217Z"
+        }
+      }
+    },
+    {
+      "ResponseBodySet" : {
+        "responseId" : "response_CjZlTuKOGj",
+        "bodyDescriptor" : {
+          "httpContentType" : "application/json; charset=utf-8",
+          "shapeId" : "shape_lq3nVzCXqn",
+          "isRemoved" : false
+        },
+        "eventContext" : {
+          "clientId" : "aidan@queuesoftware.com",
+          "clientSessionId" : "dbd72045-4c6d-49fb-a325-0ede88233c36",
+          "clientCommandBatchId" : "763a984f-ead1-42c1-8ba6-f23dd6d29934",
+          "createdAt" : "2019-11-22T23:12:11.217Z"
+        }
+      }
+    }
+  ],
+  "shapeId" : "WDPBZw_9"
+}

@@ -1,0 +1,6 @@
+{
+  "flatStringName" : "String",
+  "renderComponents" : [
+    "ColoredName(String,StringColor,None)"
+  ]
+}

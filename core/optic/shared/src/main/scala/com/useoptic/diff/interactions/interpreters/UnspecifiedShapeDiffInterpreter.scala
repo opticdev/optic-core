@@ -16,6 +16,7 @@ import com.useoptic.logging.Logger
 import com.useoptic.types.capture.HttpInteraction
 import com.useoptic.contexts.shapes.ShapesHelper.OptionalKind
 import com.useoptic.contexts.shapes.ShapesHelper.NullableKind
+import com.useoptic.diff.interactions.interpreters.copy.{ListTemplates, NullableShapeTemplates, ObjectSuggestionTemplates}
 
 class UnspecifiedShapeDiffInterpreter(
     resolvers: ShapesResolvers,
@@ -62,8 +63,7 @@ class UnspecifiedShapeDiffInterpreter(
       choice.coreShapeKind match {
         case ObjectKind => true
         case ListKind   => true
-        case NullableKind =>
-          false //@TODO: support going from Nullable<Unknown> to Nullable<T>
+        case NullableKind => true
         case _ => false
       }
     })
@@ -80,8 +80,8 @@ class UnspecifiedShapeDiffInterpreter(
             Logger.log(json.get)
             val key =
               shapeDiff.jsonTrail.path.last.asInstanceOf[JsonObjectKey].key
-            val (inlineShapeId, newCommands) =
-              DistributionAwareShapeBuilder.toCommands(Vector(json.get))(ids, shapeBuildingStrategy)
+            val (inlineShapeId, newCommands, fieldShapeName) =
+              DistributionAwareShapeBuilder.toCommandsWithName(Vector(json.get))(ids, shapeBuildingStrategy)
 
             val fieldId = ids.newFieldId
             val commands = newCommands.flatten ++ Seq(
@@ -94,8 +94,7 @@ class UnspecifiedShapeDiffInterpreter(
             )
             Seq(
               InteractiveDiffInterpretation(
-                s"Add ${key}",
-                s"Add ${key} to the object",
+                ObjectSuggestionTemplates.addField(key, fieldShapeName),
                 commands,
                 ChangeType.Addition
               )
@@ -107,8 +106,8 @@ class UnspecifiedShapeDiffInterpreter(
               shapeDiff.jsonTrail,
               interaction
             )
-            val (inlineShapeId, newCommands) =
-              DistributionAwareShapeBuilder.toCommands(Vector(json.get))
+            val (inlineShapeId, newCommands, listItemShapeName) =
+              DistributionAwareShapeBuilder.toCommandsWithName(Vector(json.get))
             val commands = newCommands.flatten ++ Seq(
               SetParameterShape(
                 ProviderInShape(
@@ -120,10 +119,37 @@ class UnspecifiedShapeDiffInterpreter(
             )
             Seq(
               InteractiveDiffInterpretation(
-                s"Set the list item shape",
-                s"Set the list item shape",
+                ListTemplates.setListItemShape(listItemShapeName),
                 commands,
-                ChangeType.Addition
+                ChangeType.Update
+              )
+            )
+
+          }
+          case NullableKind => {
+            val json = JsonLikeResolvers.tryResolveJsonLike(
+              interactionTrail,
+              shapeDiff.jsonTrail,
+              interaction
+            )
+            val (inlineShapeId, newCommands, nullableInnerShape) =
+              DistributionAwareShapeBuilder.toCommandsWithName(Vector(json.get))
+
+            val commands = newCommands.flatten ++ Seq(
+              SetParameterShape(
+                ProviderInShape(
+                  c.shapeId,
+                  ShapeProvider(inlineShapeId),
+                  NullableKind.innerParam
+                )
+              )
+            )
+
+            Seq(
+              InteractiveDiffInterpretation(
+                NullableShapeTemplates.assignNullable(nullableInnerShape),
+                commands,
+                ChangeType.Update
               )
             )
 

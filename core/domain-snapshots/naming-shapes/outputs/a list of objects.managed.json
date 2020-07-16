@@ -1,0 +1,9 @@
+{
+  "flatStringName" : "List of  Object (4 fields) ",
+  "renderComponents" : [
+    "ColoredName(List of ,ListColor,None)",
+    "ColoredName(Object,ObjectColor,Some(WDPBZw_1))",
+    "ColoredName((4 fields),modifier,None)",
+    "ColoredName(,ListColor,None)"
+  ]
+}

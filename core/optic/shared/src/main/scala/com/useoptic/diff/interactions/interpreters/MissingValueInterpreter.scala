@@ -8,18 +8,21 @@ import com.useoptic.diff.initial.{DistributionAwareShapeBuilder, ShapeBuildingSt
 import com.useoptic.diff.interactions.interpretations.BasicInterpretations
 import com.useoptic.diff.{ChangeType, InteractiveDiffInterpretation}
 import com.useoptic.diff.interactions._
+import com.useoptic.diff.interactions.interpreters.copy.{NullableShapeTemplates, ObjectSuggestionTemplates, OneOfTemplates}
 import com.useoptic.diff.interpreters.InteractiveDiffInterpreter
 import com.useoptic.diff.shapes._
 import com.useoptic.diff.shapes.resolvers.JsonLikeResolvers
 import com.useoptic.dsa.OpticDomainIds
 import com.useoptic.logging.Logger
 import com.useoptic.types.capture.HttpInteraction
+import com.useoptic.ux.ShapeNameRenderer
 
 class MissingValueInterpreter(rfcState: RfcState)(implicit ids: OpticDomainIds) extends InteractiveDiffInterpreter[InteractionDiffResult] {
 
   private val basicInterpretations = new BasicInterpretations(rfcState)
   private val descriptionInterpreters = new DiffDescriptionInterpreters(rfcState)
   implicit val shapeBuildingStrategy = ShapeBuildingStrategy.learnASingleInteraction
+  private val namer = new ShapeNameRenderer(rfcState)
 
   override def interpret(diff: InteractionDiffResult, interaction: HttpInteraction): Seq[InteractiveDiffInterpretation] = {
     diff match {
@@ -58,30 +61,70 @@ class MissingValueInterpreter(rfcState: RfcState)(implicit ids: OpticDomainIds) 
           WrapWithNullable(interactionTrail, requestsTrail, jsonTrail, shapeTrail, interaction),
         )
       } else {
-        Seq(
-          WrapWithOneOf(interactionTrail, requestsTrail, jsonTrail, shapeTrail, interaction),
-          basicInterpretations.ChangeShape(interactionTrail, requestsTrail, shapeTrail, jsonTrail, interaction),
-        )
+        shapeTrail.path.lastOption match {
+          case Some(t: NullableTrail) => {
+            SetNullableInnerShape(interactionTrail, requestsTrail, jsonTrail, shapeTrail, interaction) ++
+              Seq(basicInterpretations.ChangeShape(interactionTrail, requestsTrail, shapeTrail, jsonTrail, interaction))
+          }
+          case _ => {
+            Seq(
+              WrapWithOneOf(interactionTrail, requestsTrail, jsonTrail, shapeTrail, interaction),
+              basicInterpretations.ChangeShape(interactionTrail, requestsTrail, shapeTrail, jsonTrail, interaction),
+            )
+          }
+        }
       }
     }
   }
 
-  def RemoveFromSpec(interactionTrail: InteractionTrail, requestsTrail: RequestSpecTrail, jsonTrail: JsonTrail, shapeTrail: ShapeTrail, interaction: HttpInteraction): InteractiveDiffInterpretation = {
-    val identifier = descriptionInterpreters.jsonTrailDetailedDescription(jsonTrail)
-    val commands = shapeTrail.path.lastOption match {
-      case Some(value) => value match {
-        case t: ObjectFieldTrail => {
-          Seq(
-            Commands.RemoveField(t.fieldId)
+  def SetNullableInnerShape(interactionTrail: InteractionTrail, requestsTrail: RequestSpecTrail, jsonTrail: JsonTrail, shapeTrail: ShapeTrail, interaction: HttpInteraction): Seq[InteractiveDiffInterpretation] = {
+    shapeTrail.path.lastOption match {
+      case Some(t: NullableTrail) => {
+        val json = JsonLikeResolvers.tryResolveJsonLike(
+          interactionTrail,
+          jsonTrail,
+          interaction
+        )
+        val (inlineShapeId, newCommands, name) =
+          DistributionAwareShapeBuilder.toCommandsWithName(Vector(json.get))
+
+        val commands = newCommands.flatten ++ Seq(
+          SetParameterShape(
+            ProviderInShape(
+              t.shapeId,
+              ShapeProvider(inlineShapeId),
+              NullableKind.innerParam
+            )
           )
-        }
-        case _ => Seq()
+        )
+
+        Seq(
+          InteractiveDiffInterpretation(
+            NullableShapeTemplates.assignNullable(name),
+            commands,
+            ChangeType.Update
+          )
+        )
       }
-      case None => Seq()
+      case _ => Seq.empty
     }
+  }
+
+  def RemoveFromSpec(interactionTrail: InteractionTrail, requestsTrail: RequestSpecTrail, jsonTrail: JsonTrail, shapeTrail: ShapeTrail, interaction: HttpInteraction): InteractiveDiffInterpretation = {
+
+    //if this fails we got other problems
+    val fieldId = shapeTrail.path.lastOption match {
+      case Some(value) => value match {
+        case t: ObjectFieldTrail => t.fieldId
+      }
+    }
+
+    val commands = Seq(Commands.RemoveField(fieldId))
+
+    val fieldName = rfcState.shapesState.flattenedField(fieldId).name
+
     InteractiveDiffInterpretation(
-      s"Remove ${identifier}",
-      s"Removed ${identifier}",
+      ObjectSuggestionTemplates.removeField(fieldName),
       commands,
       ChangeType.Removal
     )
@@ -92,28 +135,11 @@ class MissingValueInterpreter(rfcState: RfcState)(implicit ids: OpticDomainIds) 
     val baseCommands = Seq(
       AddShape(wrapperShapeId, OptionalKind.baseShapeId, ""),
     )
-    val additionalCommands = shapeTrail.path.lastOption match {
-      case Some(pc: ListItemTrail) => {
-        Seq(
-          SetParameterShape(
-            ProviderInShape(
-              wrapperShapeId,
-              ShapeProvider(pc.itemShapeId),
-              OptionalKind.innerParam
-            )
-          ),
-          SetParameterShape(
-            ProviderInShape(
-              pc.listShapeId,
-              ShapeProvider(wrapperShapeId),
-              ListKind.innerParam
-            )
-          )
-        )
-      }
+    val (additionalCommands, fieldName) = shapeTrail.path.lastOption match {
       case Some(pc: ObjectFieldTrail) => {
         val field = rfcState.shapesState.flattenedField(pc.fieldId)
-        Seq(
+        val fieldName = field.name
+        (Seq(
           SetParameterShape(
             ProviderInShape(
               wrapperShapeId,
@@ -125,17 +151,14 @@ class MissingValueInterpreter(rfcState: RfcState)(implicit ids: OpticDomainIds) 
             )
           ),
           SetFieldShape(FieldShapeFromShape(field.fieldId, wrapperShapeId)),
-        )
+        ), fieldName)
       }
-      case _ => Seq.empty
     }
+
     val commands = baseCommands ++ additionalCommands
 
-    val identifier = descriptionInterpreters.jsonTrailDetailedDescription(jsonTrail)
-
     InteractiveDiffInterpretation(
-      s"Make ${identifier} optional",
-      s"Made ${identifier} optional",
+      ObjectSuggestionTemplates.makeFieldOptional(fieldName),
       commands,
       ChangeType.Update
     )
@@ -146,9 +169,9 @@ class MissingValueInterpreter(rfcState: RfcState)(implicit ids: OpticDomainIds) 
     val baseCommands = Seq(
       AddShape(wrapperShapeId, NullableKind.baseShapeId, ""),
     )
-    val additionalCommands = shapeTrail.path.lastOption match {
+    val (additionalCommands, location) = shapeTrail.path.lastOption match {
       case Some(pc: ListItemTrail) => {
-        Seq(
+        (Seq(
           SetParameterShape(
             ProviderInShape(
               wrapperShapeId,
@@ -163,11 +186,11 @@ class MissingValueInterpreter(rfcState: RfcState)(implicit ids: OpticDomainIds) 
               ListKind.innerParam
             )
           )
-        )
+        ), "list item")
       }
       case Some(pc: ObjectFieldTrail) => {
         val field = rfcState.shapesState.flattenedField(pc.fieldId)
-        Seq(
+        (Seq(
           SetParameterShape(
             ProviderInShape(
               wrapperShapeId,
@@ -179,17 +202,14 @@ class MissingValueInterpreter(rfcState: RfcState)(implicit ids: OpticDomainIds) 
             )
           ),
           SetFieldShape(FieldShapeFromShape(field.fieldId, wrapperShapeId)),
-        )
+        ), field.name)
       }
-      case _ => Seq.empty
     }
+
     val commands = baseCommands ++ additionalCommands
 
-    val identifier = descriptionInterpreters.jsonTrailDetailedDescription(jsonTrail)
-
     InteractiveDiffInterpretation(
-      s"Make ${identifier} nullable",
-      s"Made ${identifier} nullable",
+      NullableShapeTemplates.makeNullable(location),
       commands,
       ChangeType.Update
     )
@@ -200,13 +220,15 @@ class MissingValueInterpreter(rfcState: RfcState)(implicit ids: OpticDomainIds) 
     val wrapperShapeId = ids.newShapeId
     val p1 = ids.newShapeParameterId
     val p2 = ids.newShapeParameterId
-    val (inlineShapeId, newCommands) = DistributionAwareShapeBuilder.toCommands(Vector(resolved.get))
+    val (inlineShapeId, newCommands, t2Name) = DistributionAwareShapeBuilder.toCommandsWithName(Vector(resolved.get))
+
     val baseCommands = newCommands.flatten ++ Seq(
       AddShape(wrapperShapeId, OneOfKind.baseShapeId, ""),
       AddShapeParameter(p1, wrapperShapeId, ""),
       AddShapeParameter(p2, wrapperShapeId, ""),
       SetParameterShape(ProviderInShape(wrapperShapeId, ShapeProvider(inlineShapeId), p2))
     )
+
     val additionalCommands = shapeTrail.path.lastOption match {
       case Some(pc: ObjectFieldTrail) => {
         Seq(
@@ -237,20 +259,17 @@ class MissingValueInterpreter(rfcState: RfcState)(implicit ids: OpticDomainIds) 
 
     val identifier = descriptionInterpreters.jsonTrailDetailedDescription(jsonTrail)
 
-    val t1 = shapeTrail.path.lastOption match {
-      case Some(pc: ObjectFieldTrail) => descriptionInterpreters.shapeName(pc.fieldShapeId)
-      case Some(pc: ListItemTrail) => descriptionInterpreters.shapeName(pc.itemShapeId)
-      case x => {
-        //@TODO: support nested OneOfItemTrail
-        Logger.log(x)
-        ""
+    val t1Name = shapeTrail.path.lastOption match {
+      case Some(pc: UnknownTrail) => "Unknown"
+      case Some(a: ShapeTrailPathComponent) => {
+        namer.nameForShapeId(a.namedShape).get.map(_.text).mkString(" ")
+      } case None => {
+        namer.nameForShapeId(shapeTrail.rootShapeId).get.map(_.text).mkString(" ")
       }
     }
-    val t2 = JsonLikeResolvers.jsonToCoreKind(resolved.get).name
 
     InteractiveDiffInterpretation(
-      s"Allow ${identifier} to be either a ${t1} or ${t2}",
-      s"Allowed ${identifier} to be either a ${t1} or ${t2}",
+      OneOfTemplates.makeOneOf(identifier, t1Name, t2Name),
       commands,
       ChangeType.Addition
     )
@@ -261,8 +280,7 @@ class MissingValueInterpreter(rfcState: RfcState)(implicit ids: OpticDomainIds) 
     //@todo
 
     InteractiveDiffInterpretation(
-      "Add to OneOf",
-      "Make it so x can be T1, T2, ..., Tn",
+      OneOfTemplates.addToOneOf(),
       Seq(),
       ChangeType.Addition
     )

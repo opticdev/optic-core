@@ -20,6 +20,7 @@ import com.useoptic.types.capture.{HttpInteraction, JsonLikeFrom}
 import com.useoptic.diff.shapes.OptionalItemTrail
 import com.useoptic.diff.shapes.OptionalTrail
 import com.useoptic.contexts.shapes.ShapesHelper.OptionalKind
+import com.useoptic.diff.interactions.interpreters.copy.{ChangeShapeSuggestionTemplates, NewBodiesSuggestionTemplates, ObjectSuggestionTemplates}
 import com.useoptic.diff.shapes.NullableItemTrail
 import com.useoptic.diff.shapes.NullableTrail
 import com.useoptic.diff.shapes.OneOfTrail
@@ -37,50 +38,7 @@ class BasicInterpretations(rfcState: RfcState)(implicit ids: OpticDomainIds) {
       RequestsCommands.AddResponse(responseId, requestId, interactionTrail.statusCode())
     )
     InteractiveDiffInterpretation(
-      s"Add ${interactionTrail.statusCode()} Response with ${interactionTrail.responseBodyContentTypeOption().getOrElse("No")} Body",
-      s"Added ${interactionTrail.statusCode()} Response with ${interactionTrail.responseBodyContentTypeOption().getOrElse("No")} Body",
-      commands,
-      ChangeType.Addition
-    )
-  }
-
-  @Deprecated
-  def SetRequestBodyShape(interactionTrail: InteractionTrail, requestsTrail: RequestSpecTrail, interaction: HttpInteraction): InteractiveDiffInterpretation = {
-    val actualJson = BodyUtilities.parseBody(interaction.request.body).get
-    val (inlineShapeId, newCommands) = DistributionAwareShapeBuilder.toCommands(Vector(actualJson))
-    val wrapperId = ids.newShapeId
-    val requestId = RequestSpecTrailHelpers.requestId(requestsTrail).get
-    val contentType = interactionTrail.requestContentType()
-
-    val commands = newCommands.flatten ++ Seq(
-      ShapesCommands.AddShape(wrapperId, inlineShapeId, ""),
-      RequestsCommands.SetRequestBodyShape(requestId, ShapedBodyDescriptor(contentType, wrapperId, isRemoved = false))
-    )
-
-    InteractiveDiffInterpretation(
-      s"Add Request with ${contentType} Body",
-      s"Added Request with ${contentType} Body",
-      commands,
-      ChangeType.Addition
-    )
-  }
-
-  @Deprecated
-  def SetResponseBodyShape(interactionTrail: InteractionTrail, requestsTrail: RequestSpecTrail, interaction: HttpInteraction): InteractiveDiffInterpretation = {
-    val actualJson = BodyUtilities.parseBody(interaction.response.body).get
-    val (inlineShapeId, newCommands) = DistributionAwareShapeBuilder.toCommands(Vector(actualJson))
-    val wrapperId = ids.newShapeId
-    val responseId = RequestSpecTrailHelpers.responseId(requestsTrail).get
-    val contentType = interactionTrail.responseContentType()
-
-    val commands = newCommands.flatten ++ Seq(
-      ShapesCommands.AddShape(wrapperId, inlineShapeId, ""),
-      RequestsCommands.SetResponseBodyShape(responseId, ShapedBodyDescriptor(contentType, wrapperId, isRemoved = false))
-    )
-
-    InteractiveDiffInterpretation(
-      s"Add ${interactionTrail.statusCode()} Response with ${contentType} Body",
-      s"Added ${interactionTrail.statusCode()} Response with ${contentType} Body",
+      NewBodiesSuggestionTemplates.addResponseType(interactionTrail.statusCode(), interactionTrail.responseBodyContentTypeOption(), interactionTrail.responseBodyContentTypeOption().isDefined),
       commands,
       ChangeType.Addition
     )
@@ -107,16 +65,14 @@ class BasicInterpretations(rfcState: RfcState)(implicit ids: OpticDomainIds) {
           )
 
           InteractiveDiffInterpretation(
-            s"Add Request with ${contentType} Body",
-            s"Added Request with ${contentType} Body",
+            NewBodiesSuggestionTemplates.addRequestType(contentType, hasBody = true),
             commands,
             ChangeType.Addition
           )
         } else {
           val commands = baseCommands
           InteractiveDiffInterpretation(
-            s"Add Request with ${contentType} Content-Type but no Body",
-            s"Added Request with ${contentType} Content-Type but no Body",
+            NewBodiesSuggestionTemplates.addRequestType(contentType, hasBody = false),
             commands,
             ChangeType.Addition
           )
@@ -126,8 +82,7 @@ class BasicInterpretations(rfcState: RfcState)(implicit ids: OpticDomainIds) {
       case None => {
         val commands = baseCommands
         InteractiveDiffInterpretation(
-          s"Add Request with No Body",
-          s"Added Request with No Body",
+          NewBodiesSuggestionTemplates.addRequestNoBody(),
           commands,
           ChangeType.Addition
         )
@@ -155,8 +110,7 @@ class BasicInterpretations(rfcState: RfcState)(implicit ids: OpticDomainIds) {
           )
 
           InteractiveDiffInterpretation(
-            s"Add ${interactionTrail.statusCode()} Response with ${contentType} Body",
-            s"Added ${interactionTrail.statusCode()} Response with ${contentType} Body",
+            NewBodiesSuggestionTemplates.addResponseType(interactionTrail.statusCode(), Some(contentType), true),
             commands,
             ChangeType.Addition
           )
@@ -164,8 +118,7 @@ class BasicInterpretations(rfcState: RfcState)(implicit ids: OpticDomainIds) {
           val commands = baseCommands
 
           InteractiveDiffInterpretation(
-            s"Add ${interactionTrail.statusCode()} Response with ${contentType} Content-Type but no Body",
-            s"Added ${interactionTrail.statusCode()} Response with ${contentType} Content-Type but no Body",
+            NewBodiesSuggestionTemplates.addResponseType(interactionTrail.statusCode(), Some(contentType), false),
             commands,
             ChangeType.Addition
           )
@@ -174,8 +127,7 @@ class BasicInterpretations(rfcState: RfcState)(implicit ids: OpticDomainIds) {
       case None => {
         val commands = baseCommands
         InteractiveDiffInterpretation(
-          s"Add ${interactionTrail.statusCode()} Response with No Body",
-          s"Added ${interactionTrail.statusCode()} Response with No Body",
+          NewBodiesSuggestionTemplates.addResponseType(interactionTrail.statusCode(), None, false),
           commands,
           ChangeType.Addition
         )
@@ -188,7 +140,7 @@ class BasicInterpretations(rfcState: RfcState)(implicit ids: OpticDomainIds) {
     val resolved = JsonLikeResolvers.tryResolveJsonLike(interactionTrail, jsonTrail, interaction)
 
     //@TODO: inject real shapesState? for now this will always create a new shape
-    val (inlineShapeId, newCommands) = DistributionAwareShapeBuilder.toCommands(Vector(resolved.get))
+    val (inlineShapeId, newCommands, name) = DistributionAwareShapeBuilder.toCommandsWithName(Vector(resolved.get))
 
     val additionalCommands: Seq[RfcCommand] = shapeTrail.path.lastOption match {
       case Some(trailItem) => trailItem match {
@@ -252,11 +204,12 @@ class BasicInterpretations(rfcState: RfcState)(implicit ids: OpticDomainIds) {
     }
     val commands = newCommands.flatten ++ additionalCommands
 
-    val toShape = JsonLikeResolvers.jsonToCoreKind(resolved.get).name
-
     InteractiveDiffInterpretation(
-      s"Change shape to ${toShape}",
-      s"Changed the shape of ${descriptionInterpreters.jsonTrailDetailedDescription(jsonTrail)} ${descriptionInterpreters.shapeName(shapeTrail.rootShapeId)} to ${toShape}",
+      ChangeShapeSuggestionTemplates.changeShape(
+        //consider changing
+        descriptionInterpreters.jsonTrailDetailedDescription(jsonTrail),
+        name
+      ),
       commands,
       ChangeType.Update
     )
@@ -267,7 +220,7 @@ class BasicInterpretations(rfcState: RfcState)(implicit ids: OpticDomainIds) {
     val resolved = JsonLikeResolvers.tryResolveJsonLike(interactionTrail, jsonTrail, interaction)
 
     //@TODO: inject real shapesState? for now this will always create a new shape
-    val (inlineShapeId, newCommands) = DistributionAwareShapeBuilder.toCommands(Vector(resolved.get))
+    val (inlineShapeId, newCommands, name) = DistributionAwareShapeBuilder.toCommandsWithName(Vector(resolved.get))
     val fieldId = ids.newFieldId
     val shapeId = shapeTrail.lastObject().get
     val fieldName = jsonTrail.path.last.asInstanceOf[JsonObjectKey].key
@@ -276,9 +229,9 @@ class BasicInterpretations(rfcState: RfcState)(implicit ids: OpticDomainIds) {
     )
 
     val commands = newCommands.flatten ++ additionalCommands
+
     InteractiveDiffInterpretation(
-      s"Add field '${fieldName}'",
-      s"Added ${fieldName}",
+      ObjectSuggestionTemplates.addField(fieldName, name),
       commands,
       ChangeType.Addition
     )
