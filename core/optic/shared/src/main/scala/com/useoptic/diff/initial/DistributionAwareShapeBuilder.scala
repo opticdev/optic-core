@@ -29,7 +29,7 @@ object DistributionAwareShapeBuilder {
     (rootShape.id, commands.toImmutable)
   }
 
-  def toCommandsWithName(bodies: Vector[JsonLike])(implicit ids: OpticDomainIds, shapeBuildingStrategy: ShapeBuildingStrategy): (ShapeId, ImmutableCommandStream, Seq[ColoredName]) = {
+  def toCommandsWithName(bodies: Vector[JsonLike])(implicit ids: OpticDomainIds, shapeBuildingStrategy: ShapeBuildingStrategy): (ShapeId, ImmutableCommandStream, String) = {
     val (rootShape, commands) = toCommands(bodies)
 
     val eventStore = RfcServiceJSFacade.makeEventStore()
@@ -40,8 +40,9 @@ object DistributionAwareShapeBuilder {
     val currentState = rfcService.currentState(simulatedId)
 
     val namer = new ShapeNameRenderer(currentState)
+    val flatName = namer.nameForShapeId(rootShape).get.map(_.text).mkString(" ").trim()
 
-    (rootShape, commands, namer.nameForShapeId(rootShape).get)
+    (rootShape, commands, flatName)
   }
 
   def buildCommandsFor(shape: ShapesToMake, parent: Option[ShapesToMake])(implicit commands: MutableCommandStream, ids: OpticDomainIds): Unit = {
