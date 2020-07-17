@@ -47,7 +47,7 @@
       "title" : "shape at index 0 is not a Object (3 fields)",
       "suggestions" : [
         {
-          "title" : "Allow 'shape at index 0' to be either a 'Object (3 fields)' or 'List of  Unknown'",
+          "title" : "Allow shape at index '0' to be either a 'Object (3 fields)' or 'List of  Unknown'",
           "commandsJson" : [
             {
               "AddShape" : {
@@ -147,7 +147,7 @@
           ]
         },
         {
-          "title" : "Change shape to  'List of  Unknown'",
+          "title" : "Change shape to 'List of  Unknown'",
           "commandsJson" : [
             {
               "AddShape" : {

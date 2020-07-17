@@ -44,7 +44,7 @@
           }
         }
       },
-      "title" : "'firstName' is missing",
+      "title" : "firstName is missing",
       "suggestions" : [
         {
           "title" : "Make field 'firstName' optional",

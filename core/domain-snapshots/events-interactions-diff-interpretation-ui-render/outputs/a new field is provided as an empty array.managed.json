@@ -60,7 +60,7 @@
           }
         }
       },
-      "title" : "'array' observed",
+      "title" : "array observed",
       "suggestions" : [
         {
           "title" : "Add field 'array' as 'List of  Unknown'",

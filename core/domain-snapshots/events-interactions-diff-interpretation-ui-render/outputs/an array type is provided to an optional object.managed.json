@@ -71,10 +71,10 @@
           }
         }
       },
-      "title" : "'coordinates' is not a  Object (2 fields)  (optional)",
+      "title" : "coordinates is not a  Object (2 fields)  (optional)",
       "suggestions" : [
         {
-          "title" : "Allow 'field 'coordinates'' to be either a ' Object (2 fields)  (optional)' or 'List of  Number'",
+          "title" : "Allow field 'coordinates' to be either a ' Object (2 fields)  (optional)' or 'List of  Number'",
           "commandsJson" : [
             {
               "AddShape" : {
@@ -144,7 +144,7 @@
           ]
         },
         {
-          "title" : "Change shape to  'List of  Number'",
+          "title" : "Change shape to 'List of  Number'",
           "commandsJson" : [
             {
               "AddShape" : {
@@ -262,10 +262,10 @@
           }
         }
       },
-      "title" : "'coordinates' is not a Object (2 fields)",
+      "title" : "coordinates is not a Object (2 fields)",
       "suggestions" : [
         {
-          "title" : "Allow 'field 'coordinates'' to be either a 'Object (2 fields)' or 'List of  Number'",
+          "title" : "Allow field 'coordinates' to be either a 'Object (2 fields)' or 'List of  Number'",
           "commandsJson" : [
             {
               "AddShape" : {
@@ -335,7 +335,7 @@
           ]
         },
         {
-          "title" : "Change shape to  'List of  Number'",
+          "title" : "Change shape to 'List of  Number'",
           "commandsJson" : [
             {
               "AddShape" : {

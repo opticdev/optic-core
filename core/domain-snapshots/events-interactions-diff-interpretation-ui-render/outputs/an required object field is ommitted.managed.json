@@ -44,7 +44,7 @@
           }
         }
       },
-      "title" : "'stats' is missing",
+      "title" : "stats is missing",
       "suggestions" : [
         {
           "title" : "Make field 'stats' optional",

@@ -44,10 +44,10 @@
           }
         }
       },
-      "title" : "'age' is not a Number",
+      "title" : "age is not a Number",
       "suggestions" : [
         {
-          "title" : "Allow 'field 'age'' to be either a 'Number' or 'String'",
+          "title" : "Allow field 'age' to be either a 'Number' or 'String'",
           "commandsJson" : [
             {
               "AddShape" : {
@@ -120,7 +120,7 @@
           ]
         },
         {
-          "title" : "Change shape to  'String'",
+          "title" : "Change shape to 'String'",
           "commandsJson" : [
             {
               "AddShape" : {

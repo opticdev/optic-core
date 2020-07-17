@@ -88,7 +88,7 @@
           }
         }
       },
-      "title" : "'lat' is missing",
+      "title" : "lat is missing",
       "suggestions" : [
         {
           "title" : "Make field 'lat' optional",
@@ -233,7 +233,7 @@
           }
         }
       },
-      "title" : "'long' is missing",
+      "title" : "long is missing",
       "suggestions" : [
         {
           "title" : "Make field 'long' optional",

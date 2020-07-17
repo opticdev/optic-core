@@ -71,7 +71,7 @@
           }
         }
       },
-      "title" : "'format' observed",
+      "title" : "format observed",
       "suggestions" : [
         {
           "title" : "Add field 'format' as 'String'",

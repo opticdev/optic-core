@@ -44,10 +44,10 @@
           }
         }
       },
-      "title" : "'rivals' is not a List of  String ",
+      "title" : "rivals is not a List of  String ",
       "suggestions" : [
         {
-          "title" : "Allow 'field 'rivals'' to be either a 'List of  String ' or 'Object (1 field)'",
+          "title" : "Allow field 'rivals' to be either a 'List of  String ' or 'Object (1 field)'",
           "commandsJson" : [
             {
               "AddShape" : {
@@ -140,7 +140,7 @@
           ]
         },
         {
-          "title" : "Change shape to  'Object (1 field)'",
+          "title" : "Change shape to 'Object (1 field)'",
           "commandsJson" : [
             {
               "AddShape" : {

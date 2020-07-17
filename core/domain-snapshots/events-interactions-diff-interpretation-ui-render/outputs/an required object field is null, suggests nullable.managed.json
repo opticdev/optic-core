@@ -44,7 +44,7 @@
           }
         }
       },
-      "title" : "'stats' is not a Object (1 field)",
+      "title" : "stats is not a Object (1 field)",
       "suggestions" : [
         {
           "title" : "Make 'stats' nullable",

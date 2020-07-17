@@ -55,7 +55,7 @@
           }
         }
       },
-      "title" : "'rank' is missing",
+      "title" : "rank is missing",
       "suggestions" : [
         {
           "title" : "Make field 'rank' optional",

@@ -38,7 +38,7 @@
           }
         }
       },
-      "title" : "'favoriteColor' observed",
+      "title" : "favoriteColor observed",
       "suggestions" : [
         {
           "title" : "Add field 'favoriteColor' as 'Object (2 fields)'",

@@ -44,10 +44,10 @@
           }
         }
       },
-      "title" : "'stats' is not a Object (1 field)",
+      "title" : "stats is not a Object (1 field)",
       "suggestions" : [
         {
-          "title" : "Allow 'field 'stats'' to be either a 'Object (1 field)' or 'List of  Number'",
+          "title" : "Allow field 'stats' to be either a 'Object (1 field)' or 'List of  Number'",
           "commandsJson" : [
             {
               "AddShape" : {
@@ -142,7 +142,7 @@
           ]
         },
         {
-          "title" : "Change shape to  'List of  Number'",
+          "title" : "Change shape to 'List of  Number'",
           "commandsJson" : [
             {
               "AddShape" : {
