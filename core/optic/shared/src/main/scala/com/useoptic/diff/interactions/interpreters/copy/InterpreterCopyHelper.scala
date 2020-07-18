@@ -1,8 +1,11 @@
 package com.useoptic.diff.interactions.interpreters.copy
 
+import scala.scalajs.js.annotation.JSExportAll
+
 object InterpreterCopyHelper {
 
-  type Copy = Seq[InterpreterCopy]
+  type Copy = Seq[Text]
+  @JSExportAll
   case class CopyPair(action: Copy, pastTense: Copy)
 
   implicit class InterpreterCopyStringHelper(val string: String) {
@@ -22,12 +25,10 @@ object InterpreterCopyHelper {
 
 }
 
-sealed trait InterpreterCopy {
-  def value: String
-}
 object InterpreterCopyStyles {
   def normal: String = "normal"
   def code: String = "code"
 }
 
-case class Text(value: String, style: String) extends InterpreterCopy
+@JSExportAll
+case class Text(value: String, style: String)

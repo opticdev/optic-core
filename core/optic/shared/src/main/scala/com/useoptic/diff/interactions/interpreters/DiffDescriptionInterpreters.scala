@@ -5,6 +5,8 @@ import com.useoptic.contexts.shapes.Commands.{FieldId, ShapeId}
 import com.useoptic.diff.ChangeType
 import com.useoptic.diff.ChangeType.ChangeType
 import com.useoptic.diff.interactions._
+import com.useoptic.diff.interactions.interpreters.copy.InterpreterCopyHelper.Copy
+import com.useoptic.diff.interactions.interpreters.copy.{NewBodiesTemplates, ShapeDiffTemplates}
 import com.useoptic.diff.shapes._
 import com.useoptic.diff.shapes.JsonTrailPathComponent._
 import com.useoptic.diff.shapes.resolvers.JsonLikeResolvers
@@ -18,55 +20,54 @@ import scala.scalajs.js.annotation.{JSExport, JSExportAll}
 sealed trait InteractionPointerDescription {
   def changeType: ChangeType
   def assertion: String
-  def summary: String
+  def summary: Copy
   def path: Seq[String]
 }
 
-case class Unspecified(jsonTrail: JsonTrail, assertion: String, summary: String, path: Seq[String]) extends InteractionPointerDescription {
+case class Unspecified(jsonTrail: JsonTrail, assertion: String, summary: Copy, path: Seq[String]) extends InteractionPointerDescription {
   def changeType: ChangeType = ChangeType.Addition
 }
 
-case class SpecifiedButNotMatching(jsonTrail: JsonTrail, shapeTrail: ShapeTrail, assertion: String, summary: String, path: Seq[String]) extends InteractionPointerDescription {
+case class SpecifiedButNotMatching(jsonTrail: JsonTrail, shapeTrail: ShapeTrail, assertion: String, summary: Copy, path: Seq[String]) extends InteractionPointerDescription {
   def changeType: ChangeType = ChangeType.Update
 }
 
-case class SpecifiedButNotFound(jsonTrail: JsonTrail, shapeTrail: ShapeTrail, assertion: String, summary: String, path: Seq[String]) extends InteractionPointerDescription {
+case class SpecifiedButNotFound(jsonTrail: JsonTrail, shapeTrail: ShapeTrail, assertion: String, summary: Copy, path: Seq[String]) extends InteractionPointerDescription {
   def changeType: ChangeType = ChangeType.Removal
 }
 
 @JSExportAll
-case class DiffDescription(title: String, assertion: String, interactionPointerDescription: Option[InteractionPointerDescription], changeType: ChangeType) {
+case class DiffDescription(titleCopy: Copy, assertion: String, interactionPointerDescription: Option[InteractionPointerDescription], changeType: ChangeType) {
   def changeTypeAsString: String = changeType.toString
-  def summary: String = interactionPointerDescription.map(_.summary).getOrElse("")
+  def summary: Copy = interactionPointerDescription.map(_.summary).getOrElse(Seq.empty)
   def path: Seq[String] = interactionPointerDescription.map(_.path).getOrElse(Seq.empty)
+  def title: String = titleCopy.map(_.value).mkString(" ") //backwards compatible
 }
 
 @JSExport
 @JSExportAll
 class DiffDescriptionInterpreters(rfcState: RfcState)(implicit ids: OpticDomainIds) {
   private val namer = new ShapeNameRenderer(rfcState)
-  def interpret(diff: ShapeDiffResult, inRequest: Boolean, interactionTrail: InteractionTrail, interaction: HttpInteraction): (String, InteractionPointerDescription) = {
+  def interpret(diff: ShapeDiffResult, inRequest: Boolean, interactionTrail: InteractionTrail, interaction: HttpInteraction): (Copy, InteractionPointerDescription) = {
 
     val inLocation = (if (inRequest) "Request" else s"${interactionTrail.statusCode()} Response") + " body"
 
     diff match {
       case UnspecifiedShape(jsonTrail, shapeTrail) => {
-        val title = s"${jsonTrailDescription(jsonTrail)} observed in the ${inLocation}".capitalize
-        val pointer = Unspecified(jsonTrail, jsonTrailAssertion(jsonTrail), s"New ${jsonTrailDetailedDescription(jsonTrail)}", jsonTrailPathDescription(jsonTrail))
+        val title = ShapeDiffTemplates.unspecifiedObserved(jsonTrailDescription(jsonTrail))
+        val pointer = Unspecified(jsonTrail, jsonTrailAssertion(jsonTrail), ShapeDiffTemplates.newX(jsonTrailDetailedDescription(jsonTrail)), jsonTrailPathDescription(jsonTrail))
         (title, pointer)
       }
       case UnmatchedShape(jsonTrail, shapeTrail) => {
         val shapeDescription = expectedShapeDescription(shapeTrail)
-
         val bodyOption = JsonLikeResolvers.tryResolveJson(interactionTrail, jsonTrail, interaction)
-
         if (bodyOption.isEmpty) {
-          val title = s"${jsonTrailDescription(jsonTrail)} in the ${inLocation} is missing"
-          val pointer = SpecifiedButNotFound(jsonTrail, shapeTrail, s"required field is missing", s"Missing required ${jsonTrailDetailedDescription(jsonTrail)}",jsonTrailPathDescription(jsonTrail))
+          val title = ShapeDiffTemplates.missing(jsonTrailDescription(jsonTrail))
+          val pointer = SpecifiedButNotFound(jsonTrail, shapeTrail, s"required field is missing", ShapeDiffTemplates.missingRequired(jsonTrailDetailedDescription(jsonTrail)), jsonTrailPathDescription(jsonTrail))
           (title, pointer)
         } else {
-          val title = s"${jsonTrailDescription(jsonTrail)} in the ${inLocation} was not a ${shapeDescription}"
-          val pointer = SpecifiedButNotMatching(jsonTrail, shapeTrail, s"expected a ${shapeDescription}", s"Expected ${jsonTrailDetailedDescription(jsonTrail)} to be ${shapeDescription}", jsonTrailPathDescription((jsonTrail)))
+          val title = ShapeDiffTemplates.wrongShape(jsonTrailDescription(jsonTrail), shapeDescription)
+          val pointer = SpecifiedButNotMatching(jsonTrail, shapeTrail, s"expected a ${shapeDescription}", ShapeDiffTemplates.expectationNotMet(jsonTrailDetailedDescription(jsonTrail), shapeDescription), jsonTrailPathDescription((jsonTrail)))
           (title, pointer)
         }
       }
@@ -76,35 +77,33 @@ class DiffDescriptionInterpreters(rfcState: RfcState)(implicit ids: OpticDomainI
   def interpret(diff: InteractionDiffResult, interaction: HttpInteraction): DiffDescription = {
     diff match {
       case d: UnmatchedRequestUrl => {
-        DiffDescription("Undocumented URL", s"${interaction.request.method} ${interaction.request.path} is not documented in the spec", None, ChangeType.Addition)
+        DiffDescription(NewBodiesTemplates.undocumented(interaction.request.method,interaction.request.path), "Not documented", None, ChangeType.Addition)
       }
       case d: UnmatchedRequestMethod => {
-        DiffDescription("Undocumented Method", s"${interaction.request.method} ${interaction.request.path} is not documented in the spec", None, ChangeType.Addition)
+        DiffDescription(NewBodiesTemplates.undocumented(interaction.request.method,interaction.request.path), "Not documented", None, ChangeType.Addition)
       }
       case d: UnmatchedRequestBodyContentType => {
         ContentTypeHelpers.contentType(interaction.request) match {
-          case Some(contentTypeHeader) => DiffDescription("Undocumented Body", s"The ${contentTypeHeader} content type is not documented in the spec", None, ChangeType.Addition)
-          case None => DiffDescription("Undocumented Body", "A request with no body is not documented in the spec", None, ChangeType.Addition)
+          case Some(contentTypeHeader) => DiffDescription(NewBodiesTemplates.undocumentedContentType(contentTypeHeader), s"Not documented", None, ChangeType.Addition)
+          case None => DiffDescription(NewBodiesTemplates.undocumentedNoBody(), s"Not documented", None, ChangeType.Addition)
         }
       }
       case d: UnmatchedRequestBodyShape => {
         val (shapeDiffDescription, pointerDescription) = interpret(d.shapeDiffResult, inRequest=true, d.interactionTrail, interaction)
-        val title = s"${shapeDiffDescription}"
-        DiffDescription(title, pointerDescription.assertion, Some(pointerDescription), pointerDescription.changeType)
+        DiffDescription(shapeDiffDescription, pointerDescription.assertion, Some(pointerDescription), pointerDescription.changeType)
       }
       case d: UnmatchedResponseStatusCode => {
-        DiffDescription("Undocumented Status Code", s"The ${interaction.response.statusCode} status code is not documented in the spec", None, ChangeType.Addition)
+        DiffDescription(NewBodiesTemplates.undocumentedStatusCode(interaction.response.statusCode), s"Not documented", None, ChangeType.Addition)
       }
       case d: UnmatchedResponseBodyContentType => {
         ContentTypeHelpers.contentType(interaction.response) match {
-          case Some(contentTypeHeader) => DiffDescription("Undocumented Body", s"The ${contentTypeHeader} content type is not documented in the spec", None, ChangeType.Addition)
-          case None => DiffDescription("Undocumented Body", "A response with no body is not documented in the spec", None, ChangeType.Addition)
+          case Some(contentTypeHeader) => DiffDescription(NewBodiesTemplates.undocumentedContentType(contentTypeHeader), s"Not documented", None, ChangeType.Addition)
+          case None => DiffDescription(NewBodiesTemplates.undocumentedNoBody(), s"Not documented", None, ChangeType.Addition)
         }
       }
       case d: UnmatchedResponseBodyShape => {
         val (shapeDiffDescription, pointerDescription) = interpret(d.shapeDiffResult, inRequest=false,  d.interactionTrail, interaction)
-        val title = s"${shapeDiffDescription}"
-        DiffDescription(title, pointerDescription.assertion, Some(pointerDescription), pointerDescription.changeType)
+        DiffDescription(shapeDiffDescription, pointerDescription.assertion, Some(pointerDescription), pointerDescription.changeType)
       }
     }
   }
@@ -131,20 +130,23 @@ class DiffDescriptionInterpreters(rfcState: RfcState)(implicit ids: OpticDomainI
 
   def jsonTrailDescription(jsonTrail: JsonTrail) = jsonTrail.path.lastOption match {
     case Some(value) => value match {
-      case JsonObjectKey(key) => s"'${key}'"
+      case JsonObjectKey(key) => s"${key}"
       case JsonArrayItem(index) => s"shape at index ${index}"
       case _ => "shape?"
     }
     case None => "shape"
   }
 
-  def jsonTrailDetailedDescription(jsonTrail: JsonTrail) = jsonTrail.path.lastOption match {
-    case Some(value) => value match {
-      case JsonObjectKey(key) => s"field '${key}'"
-      case JsonArrayItem(index) => s"shape at index ${index}"
-      case _ => "shape?"
+  def jsonTrailDetailedDescription(jsonTrail: JsonTrail): Copy = {
+    import com.useoptic.diff.interactions.interpreters.copy.InterpreterCopyHelper._
+    jsonTrail.path.lastOption match {
+      case Some(value) => value match {
+        case JsonObjectKey(key) => Seq("field".t, key.code)
+        case JsonArrayItem(index) => Seq("shape at index".t, index.toString.code)
+        case _ => Seq("Shape".t)
+      }
+      case None => Seq("Shape".t)
     }
-    case None => "shape"
   }
 
   def jsonTrailPathDescription(jsonTrail: JsonTrail) : Seq[String] = jsonTrail.path.foldLeft(Seq.empty : Seq[String])((acc, pathComponent) => {

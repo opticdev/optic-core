@@ -60,7 +60,7 @@
           }
         }
       },
-      "title" : "'price' in the 200 Response body was not a  Unknown  (nullable)",
+      "title" : "price is not a  Unknown  (nullable)",
       "suggestions" : [
         {
           "title" : "Replace 'Unknown (nullable)'  with  'Number (nullable)'",
@@ -90,7 +90,7 @@
           ]
         },
         {
-          "title" : "Change shape to  'Number'",
+          "title" : "Change shape to 'Number'",
           "commandsJson" : [
             {
               "AddShape" : {
@@ -169,7 +169,7 @@
           }
         }
       },
-      "title" : "'price' in the 200 Response body was not a  Unknown  (nullable)",
+      "title" : "price is not a  Unknown  (nullable)",
       "suggestions" : [
         {
           "title" : "Replace 'Unknown (nullable)'  with  'Number (nullable)'",
@@ -199,7 +199,7 @@
           ]
         },
         {
-          "title" : "Change shape to  'Number'",
+          "title" : "Change shape to 'Number'",
           "commandsJson" : [
             {
               "AddShape" : {
