@@ -39,13 +39,12 @@ just_link() {
     set -o errexit
 
     cd "$OPTIC_WS_ROOT"
-    cd packages/domain && yarn unlink && yarn link
+    cd packages/domain && yalc publish
     cd "$OPTIC_WS_ROOT"
-    cd packages/domain-types && yarn unlink && yarn link
+    cd packages/domain-types && yalc publish
     cd "$OPTIC_WS_ROOT"
-    cd packages/domain-utilities && yarn unlink && yarn link
+    cd packages/domain-utilities && yalc add @useoptic/domain && yalc publish
 
-    yarn install
   )
 }
 
@@ -54,15 +53,21 @@ optic_build() {
     set -o errexit
 
     optic_core_build
-
-    cd "$OPTIC_WS_ROOT/packages/domain" && yarn unlink && yarn link
-    cd "$OPTIC_WS_ROOT/packages/domain-types" && yarn unlink  && yarn link
-    cd "$OPTIC_WS_ROOT/packages/domain-utilities" && yarn unlink && yarn link
-
     yarn install
-
     optic_workspace_clean
     optic_workspace_build
+  )
+}
+
+optic_build_and_link() {
+  (
+    set -o errexit
+
+    optic_core_build
+    yarn install
+    optic_workspace_clean
+    optic_workspace_build
+    just_link
   )
 }
 
