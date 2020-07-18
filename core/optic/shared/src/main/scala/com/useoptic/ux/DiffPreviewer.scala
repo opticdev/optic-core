@@ -85,7 +85,6 @@ class DiffPreviewer(resolvers: ShapesResolvers, spec: RfcState) {
       return None
     }
 
-
     val (shapeId, commands) = DistributionAwareShapeBuilder.toCommands(bodies)(ids = OpticIds.generator, shapeBuildingStrategy)
     val flattenedCommands = commands.flatten
 

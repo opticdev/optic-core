@@ -55,16 +55,25 @@ optic_build() {
 
     optic_core_build
 
-    cd "$OPTIC_WS_ROOT"
-    cd packages/domain && yarn link
-    cd "$OPTIC_WS_ROOT"
-    cd packages/domain-types && yarn link
-    cd "$OPTIC_WS_ROOT"
-    cd packages/domain-utilities && yarn link
+    cd "$OPTIC_WS_ROOT/packages/domain" && yarn unlink && yarn link
+    cd "$OPTIC_WS_ROOT/packages/domain-types" && yarn unlink  && yarn link
+    cd "$OPTIC_WS_ROOT/packages/domain-utilities" && yarn unlink && yarn link
 
     yarn install
 
     optic_workspace_clean
     optic_workspace_build
+  )
+}
+
+bump_domain() {
+  if [[ -z "$1" ]]; then
+    echo "No version provided"
+    exit 1
+  fi
+  (
+    set -o errexit
+    echo "$OPTIC_WS_ROOT"
+    cd "$OPTIC_WS_ROOT" && node scripts/bump.js $1
   )
 }

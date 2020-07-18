@@ -9,7 +9,7 @@ import com.useoptic.diff.{DiffResult, InteractiveDiffInterpretation}
 import com.useoptic.diff.helpers.DiffHelpers.{InteractionPointersGroupedByDiff, diff}
 import com.useoptic.diff.helpers.UndocumentedUrlHelpers.UrlCounter
 import com.useoptic.diff.initial.ShapeBuildingStrategy
-import com.useoptic.diff.interactions.interpreters.{DefaultInterpreters, DiffDescription, DiffDescriptionInterpreters}
+import com.useoptic.diff.interactions.interpreters.{DefaultInterpreters, DiffDescription, DiffDescriptionInterpreters, InitialBodyInterpreter}
 import com.useoptic.diff.interactions._
 import com.useoptic.diff.shapes.resolvers.ShapesResolvers
 import com.useoptic.dsa.OpticIds
@@ -67,7 +67,7 @@ object DiffResultHelper {
           .toSeq.distinct)
         .toMap
     }
-    
+
     val endpointsFromDiff = {
       normalizedDiffs.filterNot {
         case (a: UnmatchedRequestUrl, _) => true
@@ -344,28 +344,10 @@ abstract class NewRegionDiff {
   }
 
   def previewShapeRender(rfcState: RfcState, interactions: Vector[HttpInteraction], inferPolymorphism: Boolean): PreviewShapeAndCommands = {
-    val diffPreviewer = new DiffPreviewer(ShapesResolvers.newResolver(rfcState), rfcState)
-
-    def getBody(i: HttpInteraction) = {
-      if (inRequest) {
-        i.request.body
-      } else {
-        i.response.body
-      }
-    }
-
-    val firstInteraction = interactions.head
-
-    if (inferPolymorphism) {
-      val bodies = interactions.map(getBody).flatMap(BodyUtilities.parseBody)
-      implicit val shapeBuildingStrategy = ShapeBuildingStrategy.inferPolymorphism
-      val preview = diffPreviewer.shapeOnlyFromShapeBuilder(bodies)
-      PreviewShapeAndCommands(preview.map(_._2), toSuggestion(Vector(interactions.head), rfcState, inferPolymorphism).headOption)
-    } else {
-      implicit val shapeBuildingStrategy = ShapeBuildingStrategy.learnASingleInteraction
-      val preview = diffPreviewer.shapeOnlyFromShapeBuilder(Vector(BodyUtilities.parseBody(getBody(firstInteraction))).flatten)
-      PreviewShapeAndCommands(preview.map(_._2), toSuggestion(interactions, rfcState, inferPolymorphism).headOption)
-    }
+    implicit val ids = OpticIds.generator
+    val initialBodyInterpreter = new InitialBodyInterpreter(rfcState)
+    val body = initialBodyInterpreter.interpret(diff, inferPolymorphism, interactions)
+    PreviewShapeAndCommands(body.shape, Some(body.suggestion))
   }
 
 

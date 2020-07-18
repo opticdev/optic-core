@@ -47,7 +47,8 @@ trait JsonFileFixture {
 
   // THIS WILL NO LONGER WORK SINCE WE FACTORED CORE OUT
   def universeFromUserSession(slug: String): Universe = {
-    val filePath = ("../workspaces/ui/public/private-sessions/"+slug+".json")
+    val filePath ="optic/shared/src/test/scala/com/useoptic/debug_user_issues/" + slug + ".json"
+
     val json = parseFile(filePath).right.get
     eventsAndInteractionsFrom(json)
   }
