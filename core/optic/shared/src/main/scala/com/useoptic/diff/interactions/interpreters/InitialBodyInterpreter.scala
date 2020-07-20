@@ -74,13 +74,12 @@ class InitialBodyInterpreter(rfcState: RfcState)(implicit ids: OpticDomainIds) {
           val actuallyHasBody = jsonBody.isDefined
           if (actuallyHasBody) {
             val baseShape = buildBaseShape().get
-            val shapeCommands = baseShape._1
-            val rootShapeId = baseShape._2.getRootShape.get.baseShapeId
+            val (shapeCommands, preview, rootShapeId) = baseShape
             val commands = baseCommands ++ shapeCommands ++ Seq(
               RequestsCommands.SetRequestBodyShape(requestId, ShapedBodyDescriptor(contentType, rootShapeId, isRemoved = false))
             )
             InitialBodyInterpretation(
-              Some(baseShape._2),
+              Some(preview),
               InteractiveDiffInterpretation(
                 NewBodiesSuggestionTemplates.addRequestType(contentType, true),
                 commands,
@@ -127,15 +126,13 @@ class InitialBodyInterpreter(rfcState: RfcState)(implicit ids: OpticDomainIds) {
           if (actuallyHasBody) {
 
             val baseShape = buildBaseShape().get
-            val shapeCommands = baseShape._1
-            val rootShapeId = baseShape._2.getRootShape.get.baseShapeId
-
+            val (shapeCommands, preview, rootShapeId) = baseShape
             val commands = baseCommands ++ shapeCommands ++ Seq(
               RequestsCommands.SetResponseBodyShape(responseId, ShapedBodyDescriptor(contentType, rootShapeId, isRemoved = false))
             )
 
             InitialBodyInterpretation(
-              Some(baseShape._2),
+              Some(preview),
               InteractiveDiffInterpretation(
                 NewBodiesSuggestionTemplates.addResponseType(interactionTrail.statusCode(), Some(contentType), true),
                 commands,
