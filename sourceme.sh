@@ -34,32 +34,11 @@ optic_core_build() {
   )
 }
 
-just_link() {
-  (
-    set -o errexit
-
-    cd "$OPTIC_WS_ROOT"
-    cd packages/domain
-    yarn unlink || true
-    yarn link
-    cd "$OPTIC_WS_ROOT"
-    cd packages/domain-types
-    yarn unlink || true
-    yarn link
-    cd "$OPTIC_WS_ROOT"
-    cd packages/domain-utilities
-    yarn unlink || true
-    yarn link
-
-    yarn install
-  )
-}
 
 optic_build() {
   (
     set -o errexit
     optic_core_build
-    just_link
     cd "$OPTIC_WS_ROOT"
     yarn install
     cd "$OPTIC_WS_ROOT"
