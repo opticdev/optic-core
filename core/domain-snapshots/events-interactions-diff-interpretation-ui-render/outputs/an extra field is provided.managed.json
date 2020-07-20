@@ -38,7 +38,7 @@
           }
         }
       },
-      "title" : "'favoriteColor' observed in the 200 Response body",
+      "title" : "favoriteColor observed",
       "suggestions" : [
         {
           "title" : "Add field 'favoriteColor' as 'String'",

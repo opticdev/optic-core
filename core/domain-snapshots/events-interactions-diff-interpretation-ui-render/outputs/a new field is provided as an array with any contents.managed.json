@@ -60,7 +60,7 @@
           }
         }
       },
-      "title" : "'array' observed in the 200 Response body",
+      "title" : "array observed",
       "suggestions" : [
         {
           "title" : "Add field 'array' as 'List of  Number'",

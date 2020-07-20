@@ -71,7 +71,7 @@
           }
         }
       },
-      "title" : "'format' observed in the 200 Response body",
+      "title" : "format observed",
       "suggestions" : [
         {
           "title" : "Add field 'format' as 'String'",

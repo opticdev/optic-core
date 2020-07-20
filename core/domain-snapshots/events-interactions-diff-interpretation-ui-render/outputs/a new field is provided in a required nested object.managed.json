@@ -60,7 +60,7 @@
           }
         }
       },
-      "title" : "'motto' observed in the 200 Response body",
+      "title" : "motto observed",
       "suggestions" : [
         {
           "title" : "Add field 'motto' as 'String'",

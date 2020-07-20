@@ -55,10 +55,10 @@
           }
         }
       },
-      "title" : "shape at index 1 in the 200 Response body was not a String",
+      "title" : "shape at index 1 is not a String",
       "suggestions" : [
         {
-          "title" : "Allow 'shape at index 1' to be either a 'String' or 'Number'",
+          "title" : "Allow shape at index '1' to be either a 'String' or 'Number'",
           "commandsJson" : [
             {
               "AddShape" : {
@@ -136,7 +136,7 @@
           ]
         },
         {
-          "title" : "Change shape to  'Number'",
+          "title" : "Change shape to 'Number'",
           "commandsJson" : [
             {
               "AddShape" : {

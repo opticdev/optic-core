@@ -4,6 +4,25 @@ import com.useoptic.diff.interactions.interpreters.copy.InterpreterCopyHelper._
 
 object NewBodiesTemplates {
 
+  def undocumented(method: String, path: String): Copy =
+    Seq(
+      method.code,
+      " ".t,
+      path.code,
+      "is not documented".t
+    )
+
+  def undocumentedContentType(contentTypeHeader: String): Copy =
+    Seq("The".t, contentTypeHeader.code, "Content-Type is not documented".t)
+
+  def undocumentedNoBody(): Copy =
+    Seq("Empty body is not documented".t)
+
+
+  def undocumentedStatusCode(statusCode: Int): Copy =
+    Seq("Response status code".t, statusCode.toString.code, "is not documented".t)
+
+
 
 }
 
