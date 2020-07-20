@@ -79,7 +79,7 @@ class DiffPreviewer(resolvers: ShapesResolvers, spec: RfcState) {
     })
   }
 
-  def shapeOnlyFromShapeBuilder(bodies: Vector[JsonLike])(implicit shapeBuildingStrategy: ShapeBuildingStrategy): Option[(Vector[RfcCommand], ShapeOnlyRenderHelper)] = {
+  def shapeOnlyFromShapeBuilder(bodies: Vector[JsonLike])(implicit shapeBuildingStrategy: ShapeBuildingStrategy): Option[(Vector[RfcCommand], ShapeOnlyRenderHelper, ShapeId)] = {
 
     if (bodies.isEmpty) {
       return None
@@ -102,7 +102,7 @@ class DiffPreviewer(resolvers: ShapesResolvers, spec: RfcState) {
 
     val rfcState = service.currentState(simulatedId)
     val resolvers = new DefaultShapesResolvers(rfcState)
-    new DiffPreviewer(resolvers, rfcState).previewShape(Some(shapeId)).map(preview => (flattenedCommands, preview))
+    new DiffPreviewer(resolvers, rfcState).previewShape(Some(shapeId)).map(preview => (flattenedCommands, preview, shapeId))
   }
 
 }

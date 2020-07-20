@@ -37,6 +37,12 @@ trait JsonFileFixture {
     EventSerialization.fromJson(json).get
   }
 
+  def eventsFromDebugIssues(slug: String): Vector[Events.RfcEvent] = {
+    val filePath = "optic/shared/src/test/scala/com/useoptic/debug_user_issues/" + slug + ".json"
+    val json =parseFile(filePath).right.get
+    EventSerialization.fromJson(json).get
+  }
+
   // THIS WILL NO LONGER WORK SINCE WE FACTORED CORE OUT
   def universeFromExampleSession(slug: String): Universe = {
     import better.files._

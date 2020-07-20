@@ -4,15 +4,11 @@ import com.useoptic.contexts.requests.Commands
 import com.useoptic.contexts.requests.Commands.PathComponentId
 import com.useoptic.contexts.requests.projections.AllEndpointsProjection
 import com.useoptic.contexts.rfc.RfcState
-import com.useoptic.diff.helpers.DiffHelpers
 import com.useoptic.diff.{DiffResult, InteractiveDiffInterpretation}
 import com.useoptic.diff.helpers.DiffHelpers.{InteractionPointersGroupedByDiff, diff}
-import com.useoptic.diff.helpers.UndocumentedUrlHelpers.UrlCounter
-import com.useoptic.diff.initial.ShapeBuildingStrategy
 import com.useoptic.diff.interactions.interpreters.{DefaultInterpreters, DiffDescription, DiffDescriptionInterpreters, InitialBodyInterpreter}
 import com.useoptic.diff.interactions._
 import com.useoptic.diff.shapes.resolvers.ShapesResolvers
-import com.useoptic.dsa.OpticIds
 import com.useoptic.types.capture.{Body, HttpInteraction}
 import com.useoptic.dsa.OpticIds
 
@@ -332,7 +328,7 @@ abstract class NewRegionDiff {
   def firstInteractionPointer: String = interactionPointers.head
   def interactionsCount: Int = interactionPointers.size
 
-  def randomPointers: Seq[String] = Random.shuffle(interactionPointers).take(100)
+  def randomPointers: Seq[String] = Random.shuffle(interactionPointers).take(20)
 
   def previewBodyRender(currentInteraction: HttpInteraction): Option[SideBySideRenderHelper] = {
     val body = if (inRequest) {
@@ -413,9 +409,10 @@ case class EndpointDiffGrouping(requestDiffs: Seq[EndpointBodyDiffRegion],
 
 }
 @JSExportAll
-case class EndpointBodyDiffRegion(contentType: Option[String], statusCode: Option[Int], bodyDiffs: Seq[BodyDiff]) {
+case class EndpointBodyDiffRegion(contentType: Option[String], statusCode: Option[Int], _bodyDiffs: Seq[BodyDiff]) {
   def id = s"${statusCode.toString} ${contentType.getOrElse("no_body")}"
   def count = bodyDiffs.size
+  def bodyDiffs = _bodyDiffs.sortBy(_.diff.shapeDiffResultOption.map(_.jsonTrail.toString).getOrElse("")) // stable sort
 }
 @JSExportAll
 case class EndpointResponseRegion(statusCode: Int, regions: Seq[EndpointBodyDiffRegion])
