@@ -34,7 +34,7 @@ class InitialBodyInterpreter(rfcState: RfcState)(implicit ids: OpticDomainIds) {
   def interpret(diff: InteractionDiffResult, inferPolymorphism: Boolean, interactions: Vector[HttpInteraction]): InitialBodyInterpretation = {
     require(interactions.nonEmpty, "There must be at least one interaction associated with a diff")
 
-    def buildBaseShape(): Option[(Vector[RfcCommand], ShapeOnlyRenderHelper)] = {
+    def buildBaseShape(): Option[(Vector[RfcCommand], ShapeOnlyRenderHelper, ShapeId)] = {
 
       def getBody(i: HttpInteraction) = {
         if (inRequest(diff)) {

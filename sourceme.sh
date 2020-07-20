@@ -43,7 +43,7 @@ just_link() {
     cd "$OPTIC_WS_ROOT"
     cd packages/domain-types && yalc publish
     cd "$OPTIC_WS_ROOT"
-    cd packages/domain-utilities && yalc add @useoptic/domain && yalc publish
+    cd packages/domain-utilities && yalc add @useoptic/domain @useoptic/domain-types && yalc publish
 
   )
 }
