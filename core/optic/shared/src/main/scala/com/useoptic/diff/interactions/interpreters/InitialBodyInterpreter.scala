@@ -31,137 +31,153 @@ class InitialBodyInterpreter(rfcState: RfcState)(implicit ids: OpticDomainIds) {
   }
 
 
-  def interpret(diff: InteractionDiffResult, inferPolymorphism: Boolean, interactions: Vector[HttpInteraction]) = {
+  def interpret(diff: InteractionDiffResult, inferPolymorphism: Boolean, interactions: Vector[HttpInteraction]): InitialBodyInterpretation = {
     require(interactions.nonEmpty, "There must be at least one interaction associated with a diff")
 
-    def getBody(i: HttpInteraction) = {
-      if (inRequest(diff)) {
-        Some(i.request.body)
-      } else if (inResponse(diff)) {
-        Some(i.response.body)
-      } else {
-        None
-      }
-    }
+    def buildBaseShape(): Option[(Vector[RfcCommand], ShapeOnlyRenderHelper, ShapeId)] = {
 
-    if (inferPolymorphism) {
-      implicit val shapeBuildingStrategy = ShapeBuildingStrategy.inferPolymorphism
+      def getBody(i: HttpInteraction) = {
+        if (inRequest(diff)) {
+          Some(i.request.body)
+        } else if (inResponse(diff)) {
+          Some(i.response.body)
+        } else {
+          None
+        }
+      }
+
+      implicit val shapeBuildingStrategy = if (inferPolymorphism) ShapeBuildingStrategy.inferPolymorphism else ShapeBuildingStrategy.learnASingleInteraction
       val bodies = interactions.flatMap(getBody).flatMap(BodyUtilities.parseBody)
-      diffPreviewer.shapeOnlyFromShapeBuilder(bodies).map {
-        case (commands, shapeRender) => {
+      val filteredBodies = if (inferPolymorphism) {
+        bodies
+      } else {
+        bodies.take(1)
+      }
 
-          val suggestion = if (inRequest(diff)) {
-            AddRequestContentType(diff.interactionTrail, diff.requestsTrail, interactions.head, commands, shapeRender.getRootShape.get.baseShapeId)
+      diffPreviewer.shapeOnlyFromShapeBuilder(filteredBodies)
+    }
+
+    val interactionTrail: InteractionTrail = diff.interactionTrail
+    val requestsTrail: RequestSpecTrail = diff.requestsTrail
+
+    def AddRequestContentType(): InitialBodyInterpretation = {
+      val requestId = ids.newRequestId
+      val anInteraction = interactions.head
+
+      val pathId = RequestSpecTrailHelpers.pathId(requestsTrail).get
+      val baseCommands = Seq(
+        RequestsCommands.AddRequest(requestId, pathId, anInteraction.request.method),
+      )
+      interactionTrail.requestBodyContentTypeOption() match {
+        case Some(contentType) => {
+          val jsonBody = JsonLikeResolvers.tryResolveJsonLike(interactionTrail, JsonTrail(Seq()), anInteraction)
+          val actuallyHasBody = jsonBody.isDefined
+          if (actuallyHasBody) {
+            val baseShape = buildBaseShape().get
+            val shapeCommands = baseShape._1
+            val rootShapeId = baseShape._2.getRootShape.get.baseShapeId
+            val commands = baseCommands ++ shapeCommands ++ Seq(
+              RequestsCommands.SetRequestBodyShape(requestId, ShapedBodyDescriptor(contentType, rootShapeId, isRemoved = false))
+            )
+            InitialBodyInterpretation(
+              Some(baseShape._2),
+              InteractiveDiffInterpretation(
+                NewBodiesSuggestionTemplates.addRequestType(contentType, true),
+                commands,
+                ChangeType.Addition
+              )
+            )
           } else {
-            AddResponseContentType(diff.interactionTrail, diff.requestsTrail, interactions.head, commands, shapeRender.getRootShape.get.baseShapeId)
+            val commands = baseCommands
+            InitialBodyInterpretation(
+              None,
+              InteractiveDiffInterpretation(
+                NewBodiesSuggestionTemplates.addRequestType(contentType, false),
+                commands,
+                ChangeType.Addition
+              )
+            )
           }
 
-          InitialBodyInterpretation(shapeRender, suggestion)
+        }
+        case None => {
+          val commands = baseCommands
+          InitialBodyInterpretation(
+            None,
+            InteractiveDiffInterpretation(
+              NewBodiesSuggestionTemplates.addRequestNoContentOrBody(),
+              commands,
+              ChangeType.Addition
+          ))
         }
       }
+    }
+
+    def AddResponseContentType(): InitialBodyInterpretation = {
+      val responseId = ids.newResponseId
+      val anInteraction = interactions.head
+      val pathId = RequestSpecTrailHelpers.pathId(requestsTrail).get
+      val baseCommands = Seq(
+        RequestsCommands.AddResponseByPathAndMethod(responseId, pathId, anInteraction.request.method, anInteraction.response.statusCode),
+      )
+      interactionTrail.responseBodyContentTypeOption() match {
+        case Some(contentType) => {
+          val jsonBody = JsonLikeResolvers.tryResolveJsonLike(interactionTrail, JsonTrail(Seq()), anInteraction)
+          val actuallyHasBody = jsonBody.isDefined
+          if (actuallyHasBody) {
+
+            val baseShape = buildBaseShape().get
+            val shapeCommands = baseShape._1
+            val rootShapeId = baseShape._2.getRootShape.get.baseShapeId
+
+            val commands = baseCommands ++ shapeCommands ++ Seq(
+              RequestsCommands.SetResponseBodyShape(responseId, ShapedBodyDescriptor(contentType, rootShapeId, isRemoved = false))
+            )
+
+            InitialBodyInterpretation(
+              Some(baseShape._2),
+              InteractiveDiffInterpretation(
+                NewBodiesSuggestionTemplates.addResponseType(interactionTrail.statusCode(), Some(contentType), true),
+                commands,
+                ChangeType.Addition
+              )
+            )
+          } else {
+            val commands = baseCommands
+
+            InitialBodyInterpretation(
+              None,
+              InteractiveDiffInterpretation(
+                NewBodiesSuggestionTemplates.addResponseType(interactionTrail.statusCode(), Some(contentType), false),
+                commands,
+                ChangeType.Addition
+            ))
+          }
+        }
+        case None => {
+          val commands = baseCommands
+          InitialBodyInterpretation(
+            None,
+              InteractiveDiffInterpretation(
+              NewBodiesSuggestionTemplates.addResponseType(interactionTrail.statusCode(), None, false),
+              commands,
+              ChangeType.Addition
+            )
+          )
+        }
+      }
+    }
+
+
+    if (inRequest(diff)) {
+      AddRequestContentType()
     } else {
-      implicit val shapeBuildingStrategy = ShapeBuildingStrategy.learnASingleInteraction
-      val bodies = interactions.headOption.flatMap(getBody).flatMap(BodyUtilities.parseBody).toVector
-      diffPreviewer.shapeOnlyFromShapeBuilder(bodies).map {
-        case (commands, shapeRender) => {
-          val suggestion = if (inRequest(diff)) {
-            AddRequestContentType(diff.interactionTrail, diff.requestsTrail, interactions.head, commands, shapeRender.getRootShape.get.baseShapeId)
-          } else {
-            AddResponseContentType(diff.interactionTrail, diff.requestsTrail, interactions.head, commands, shapeRender.getRootShape.get.baseShapeId)
-          }
-
-          InitialBodyInterpretation(shapeRender, suggestion)
-        }
-      }
+      AddResponseContentType()
     }
 
   }
-
-  def AddRequestContentType(interactionTrail: InteractionTrail, requestsTrail: RequestSpecTrail, anInteraction: HttpInteraction, shapeCommands: Vector[RfcCommand], rootShapeId: ShapeId): InteractiveDiffInterpretation = {
-    val requestId = ids.newRequestId
-    val pathId = RequestSpecTrailHelpers.pathId(requestsTrail).get
-    val baseCommands = Seq(
-      RequestsCommands.AddRequest(requestId, pathId, anInteraction.request.method),
-    )
-    interactionTrail.requestBodyContentTypeOption() match {
-      case Some(contentType) => {
-        val jsonBody = JsonLikeResolvers.tryResolveJsonLike(interactionTrail, JsonTrail(Seq()), anInteraction)
-        val actuallyHasBody = jsonBody.isDefined
-        if (actuallyHasBody) {
-          val commands = baseCommands ++ shapeCommands ++ Seq(
-            RequestsCommands.SetRequestBodyShape(requestId, ShapedBodyDescriptor(contentType, rootShapeId, isRemoved = false))
-          )
-
-          InteractiveDiffInterpretation(
-            NewBodiesSuggestionTemplates.addRequestType(contentType, true),
-            commands,
-            ChangeType.Addition
-          )
-        } else {
-          val commands = baseCommands
-          InteractiveDiffInterpretation(
-            NewBodiesSuggestionTemplates.addRequestType(contentType, false),
-            commands,
-            ChangeType.Addition
-          )
-        }
-
-      }
-      case None => {
-        val commands = baseCommands
-        InteractiveDiffInterpretation(
-          NewBodiesSuggestionTemplates.addRequestNoContentOrBody(),
-          commands,
-          ChangeType.Addition
-        )
-      }
-    }
-  }
-
-  def AddResponseContentType(interactionTrail: InteractionTrail, requestsTrail: RequestSpecTrail, anInteraction: HttpInteraction, shapeCommands: Vector[RfcCommand], rootShapeId: ShapeId) = {
-    val responseId = ids.newResponseId
-    val pathId = RequestSpecTrailHelpers.pathId(requestsTrail).get
-    val baseCommands = Seq(
-      RequestsCommands.AddResponseByPathAndMethod(responseId, pathId, anInteraction.request.method, anInteraction.response.statusCode),
-    )
-    interactionTrail.responseBodyContentTypeOption() match {
-      case Some(contentType) => {
-        val jsonBody = JsonLikeResolvers.tryResolveJsonLike(interactionTrail, JsonTrail(Seq()), anInteraction)
-        val actuallyHasBody = jsonBody.isDefined
-        if (actuallyHasBody) {
-
-          val commands = baseCommands ++ shapeCommands ++ Seq(
-            RequestsCommands.SetResponseBodyShape(responseId, ShapedBodyDescriptor(contentType, rootShapeId, isRemoved = false))
-          )
-
-          InteractiveDiffInterpretation(
-            NewBodiesSuggestionTemplates.addResponseType(interactionTrail.statusCode(), Some(contentType), true),
-            commands,
-            ChangeType.Addition
-          )
-        } else {
-          val commands = baseCommands
-
-          InteractiveDiffInterpretation(
-            NewBodiesSuggestionTemplates.addResponseType(interactionTrail.statusCode(), Some(contentType), false),
-            commands,
-            ChangeType.Addition
-          )
-        }
-      }
-      case None => {
-        val commands = baseCommands
-        InteractiveDiffInterpretation(
-          NewBodiesSuggestionTemplates.addResponseType(interactionTrail.statusCode(), None, false),
-          commands,
-          ChangeType.Addition
-        )
-      }
-    }
-  }
-
 
 }
 
 
-case class InitialBodyInterpretation(shape: ShapeOnlyRenderHelper, suggestion: InteractiveDiffInterpretation)
+case class InitialBodyInterpretation(shape: Option[ShapeOnlyRenderHelper], suggestion: InteractiveDiffInterpretation)

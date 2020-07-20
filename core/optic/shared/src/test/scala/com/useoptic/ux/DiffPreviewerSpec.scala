@@ -91,7 +91,19 @@ class DiffPreviewerSpec extends FunSpec with JsonFileFixture {
   it("render simulated spec json") {
     val rfcState = RfcAggregate.initialState
     val resolvers = new DefaultShapesResolvers(rfcState)
-    val (commands, shapeOnly) = new DiffPreviewer(resolvers, rfcState).shapeOnlyFromShapeBuilder(Vector(JsonLikeFrom.json(JsonExamples.basicTodo).get))(ShapeBuildingStrategy.inferPolymorphism).get
+    val (commands, shapeOnly, rootShapeId) = new DiffPreviewer(resolvers, rfcState).shapeOnlyFromShapeBuilder(Vector(JsonLikeFrom.json(JsonExamples.basicTodo).get))(ShapeBuildingStrategy.inferPolymorphism).get
     assert(shapeOnly.specShapes.size == 3)
+  }
+
+
+  it("can render a string properly") {
+    val rawBody = Body(Some("text/html"), ArbitraryData(
+      shapeHashV1Base64 = Some("CAASUgpMPCFET0NUWVBFIGh0bWw+CjxodG1sPgo8aGVhZD4KICAgIDx0aXRsZT5uR2VuaXVzUFVMU0U8L3RpdGxlPgogICAgPGxpbmsgaHJlZhICCAISNQovY29weTsKICAgICAgICA8L2Rpdj4KICAgIDwvZGl2Pgo8L2Rpdj4KCjxkaXYgaWQSAggCElgKUiBtc2llIDwgMTEpIHsKCiAgICAgICAgICAgIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdiYWRCcm93c2VyRGl2Jykuc3R5bGUuZGlzcGxheSASAggC")
+    ))
+
+    val body = BodyUtilities.parseBody(rawBody)
+
+    null
+
   }
 }
