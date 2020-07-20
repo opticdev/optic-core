@@ -39,46 +39,31 @@ just_link() {
     set -o errexit
 
     cd "$OPTIC_WS_ROOT"
-    cd packages/domain && yalc publish
+    cd packages/domain
+    yarn unlink || true
+    yarn link
     cd "$OPTIC_WS_ROOT"
-    cd packages/domain-types && yalc publish
+    cd packages/domain-types
+    yarn unlink || true
+    yarn link
     cd "$OPTIC_WS_ROOT"
-    cd packages/domain-utilities && yalc add @useoptic/domain @useoptic/domain-types && yalc publish
+    cd packages/domain-utilities
+    yarn unlink || true
+    yarn link
 
+    yarn install
   )
 }
 
 optic_build() {
   (
     set -o errexit
-
     optic_core_build
-    yarn install
-    optic_workspace_clean
-    optic_workspace_build
-  )
-}
-
-optic_build_and_link() {
-  (
-    set -o errexit
-
-    optic_core_build
-    yarn install
-    optic_workspace_clean
-    optic_workspace_build
     just_link
-  )
-}
-
-bump_domain() {
-  if [[ -z "$1" ]]; then
-    echo "No version provided"
-    exit 1
-  fi
-  (
-    set -o errexit
-    echo "$OPTIC_WS_ROOT"
-    cd "$OPTIC_WS_ROOT" && node scripts/bump.js $1
+    cd "$OPTIC_WS_ROOT"
+    yarn install
+    cd "$OPTIC_WS_ROOT"
+    optic_workspace_clean
+    optic_workspace_build
   )
 }
