@@ -8,6 +8,7 @@ import com.useoptic.diff.{DiffResult, InteractiveDiffInterpretation}
 import com.useoptic.diff.helpers.DiffHelpers.{InteractionPointersGroupedByDiff, diff}
 import com.useoptic.diff.interactions.interpreters.{DefaultInterpreters, DiffDescription, DiffDescriptionInterpreters, InitialBodyInterpreter}
 import com.useoptic.diff.interactions._
+import com.useoptic.diff.shapes.JsonTrail
 import com.useoptic.diff.shapes.resolvers.ShapesResolvers
 import com.useoptic.types.capture.{Body, HttpInteraction}
 import com.useoptic.dsa.OpticIds
@@ -264,6 +265,11 @@ object DiffResultHelper {
     descriptionInterpreters.interpret(firstDiff, anInteraction)
   }.toOption
 
+  def jsonTrailsWithDiff(bodyDiff: BodyDiff, anInteraction: HttpInteraction, simulatedRfcState: RfcState): Seq[JsonTrail] = {
+    bodyDiff.denormalizedDiffs.flatMap(_.shapeDiffResultOption).map(_.jsonTrail)
+  }
+
+  //Stop using this...
   def previewDiff(bodyDiff: BodyDiff, anInteraction: HttpInteraction, simulatedRfcState: RfcState): Option[SideBySideRenderHelper] = {
 
     val simulatedDiffPreviewer = new DiffPreviewer(simulatedRfcState)
