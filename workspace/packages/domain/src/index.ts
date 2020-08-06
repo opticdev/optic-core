@@ -18,6 +18,8 @@ export const ScalaJSHelpers = opticEngine.ScalaJSHelpers;
 
 export const CompareEquality = opticEngine.com.useoptic.CompareEquality();
 
+export const JsonTrailHelper = opticEngine.com.useoptic.JsonTrailHelper();
+
 export const Facade = contexts.rfc.RfcServiceJSFacade();
 export const Queries = (eventStore: any, service: any, aggregateId: string) =>
   new opticEngine.Queries(eventStore, service, aggregateId);
