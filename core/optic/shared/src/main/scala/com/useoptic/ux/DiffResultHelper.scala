@@ -265,10 +265,6 @@ object DiffResultHelper {
     descriptionInterpreters.interpret(firstDiff, anInteraction)
   }.toOption
 
-  def jsonTrailsWithDiff(bodyDiff: BodyDiff, anInteraction: HttpInteraction, simulatedRfcState: RfcState): Seq[JsonTrail] = {
-    bodyDiff.denormalizedDiffs.flatMap(_.shapeDiffResultOption).map(_.jsonTrail)
-  }
-
   //Stop using this...
   def previewDiff(bodyDiff: BodyDiff, anInteraction: HttpInteraction, simulatedRfcState: RfcState): Option[SideBySideRenderHelper] = {
 
@@ -388,6 +384,10 @@ abstract class BodyDiff {
 
   def firstInteractionPointer: String = interactionPointers.head
   def interactionsCount: Int = interactionPointers.size
+
+  lazy val jsonTrails: Seq[JsonTrail] =  denormalizedDiffs.flatMap(_.shapeDiffResultOption).map(_.jsonTrail)
+  def matchesJsonTrail(jsonTrail: JsonTrail): Boolean = jsonTrails.contains(jsonTrail)
+  def startsWithJsonTrail(jsonTrail: JsonTrail): Boolean = jsonTrails.exists(_.path.startsWith(jsonTrail.path))
 }
 
 @JSExportAll
