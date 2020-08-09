@@ -40,12 +40,13 @@ class OASProjection(queries: InMemoryQueries, rfcService: RfcService, aggregateI
   def getContributionOption(id: String, key: String) = queries.contributions.get(id).flatMap(_.get(key))
 
   def operationFromRequest(request: HttpRequest): Operation = {
+    val endpointId = s"${request.requestDescriptor.pathComponentId}.${request.requestDescriptor.httpMethod.toUpperCase}"
 
     val requestBody = bodyToOAS(request.requestDescriptor.bodyDescriptor)
 
     val operationId = getContributionOption(request.requestId, "oas.operationId").getOrElse(request.requestId)
-    val summary = getContributionOption(request.requestId, "purpose")
-    val description = getContributionOption(request.requestId, "description")
+    val summary = getContributionOption(endpointId, "purpose")
+    val description = getContributionOption(endpointId, "description")
 
     val responses = responsesForRequest(request).sortBy(_.responseDescriptor.httpStatusCode).map {
       case res => {
