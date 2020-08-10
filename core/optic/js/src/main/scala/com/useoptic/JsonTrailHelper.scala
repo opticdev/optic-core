@@ -1,8 +1,9 @@
 package com.useoptic
 
-import com.useoptic.diff.shapes.JsonTrail
+import com.useoptic.diff.shapes.{JsonTrail, JsonTrailPathComponent}
 import com.useoptic.diff.shapes.JsonTrailPathComponent.{JsonArrayItem, JsonObjectKey}
 
+import scala.scalajs.js
 import scala.scalajs.js.annotation.{JSExport, JSExportAll}
 
 
@@ -34,4 +35,23 @@ object JsonTrailHelper {
 
   def appendObjectKey(key: String, trail: JsonTrail) = trail.withChild(JsonObjectKey(key))
   def appendArrayIndex(index: Int, trail: JsonTrail) = trail.withChild(JsonArrayItem(index))
+
+  def fromJs(array: js.Array[Any]): JsonTrail = {
+    val trailPath = array.flatMap {
+      case k: String => Some(JsonObjectKey(k))
+      case i: Int => Some(JsonArrayItem(i))
+      case _ => None
+    }
+    JsonTrail(trailPath)
+  }
+
+  def toJs(jsonTrail: JsonTrail): js.Array[Any] = {
+    val primitiveTrail = jsonTrail.path.flatMap {
+      case JsonObjectKey(key) => Some(key)
+      case JsonArrayItem(index) => Some(index)
+      case _ => None
+    }
+
+    js.Array.apply(primitiveTrail:_*)
+  }
 }
