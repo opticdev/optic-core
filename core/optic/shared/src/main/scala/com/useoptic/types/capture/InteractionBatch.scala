@@ -43,7 +43,7 @@ case class Response(statusCode: Int, headers: ArbitraryData, body: Body)
 case class Body(contentType: Option[String], value: ArbitraryData) {
   def isEmpty: Boolean = contentType.isEmpty && value.shapeHashV1Base64.isEmpty && value.asJsonString.isEmpty && value.asText.isEmpty
   def nonEmpty: Boolean = !isEmpty
-  def jsonOption = BodyUtilities.parseBody(this).map(_.asJson)
+  def jsonOption: Option[Json] = BodyUtilities.parseBody(this).map(_.asJson)
 }
 
 
