@@ -29,10 +29,10 @@ object Changelog {
     }).toMap
 
     val union = same ++ removed ++ added
+
     union.map(endpoint => {
       val fullEndpoint = Vector(headEndpoints.find(_.bare == endpoint).map(_.operation), targetEndpoints.find(_.bare == endpoint).map(_.operation)).flatten.head
-
-      ChangelogByEndpoints("", endpoint.method, endpoint.path, fullEndpoint.summary.getOrElse(s"${endpoint.method} ${endpoint.path}"),
+      ChangelogByEndpoints(fullEndpoint.pathId, endpoint.method, endpoint.path, fullEndpoint.summary.getOrElse(s"${endpoint.method} ${endpoint.path}"),
         added.contains(endpoint),
         removed.contains(endpoint),
         sameEndpointsDidChange.find(_._1 == endpoint).map(_._2).getOrElse(false),

@@ -1,12 +1,12 @@
 package com.useoptic.contexts.rfc.projections
 
-import com.useoptic.contexts.requests.Commands.{BodyDescriptor, ParameterizedPathComponentDescriptor, ShapedBodyDescriptor}
+import com.useoptic.contexts.requests.Commands.{BodyDescriptor, ParameterizedPathComponentDescriptor, PathComponentId, ShapedBodyDescriptor}
 import com.useoptic.contexts.requests.{Commands, HttpRequest, HttpResponse}
 import com.useoptic.contexts.rfc.{InMemoryQueries, RfcService, RfcState}
 import com.useoptic.contexts.shapes.ShapesHelper
 import com.useoptic.contexts.shapes.ShapesHelper.OptionalKind
 import com.useoptic.contexts.shapes.projections.{FlatShapeResult, JsonSchemaProjection}
-import com.useoptic.ddd.{AggregateId}
+import com.useoptic.ddd.AggregateId
 import io.circe.Json
 
 // this is not a projection. it is a query
@@ -70,7 +70,7 @@ class OASProjection(queries: InMemoryQueries, rfcService: RfcService, aggregateI
     })
 
 
-    Operation(operationId, summary, description, requestBody, queryParamShape, responses)
+    Operation(operationId, request.requestDescriptor.pathComponentId, summary, description, requestBody, queryParamShape, responses)
   }
 
   lazy val oasOperations = {
@@ -141,6 +141,7 @@ object OASDomain {
   }
 
   case class Operation(operationId: String,
+                       pathId: PathComponentId,
                        summary: Option[String],
                        description: Option[String],
                        requestBody: Option[Body],

@@ -33,6 +33,10 @@ class ChangelogSpec extends FunSpec with JsonFileFixture {
 
   it("finds 1 addition between with 2 endpoints and 3 endpoints") {
     val changelog = Changelog.from(spec2, spec3)
+    import io.circe._
+    import io.circe.generic.auto._
+    import io.circe.syntax._
+    println(changelog.asJson)
     assert(changelog.count(_.added) == 1)
     assert(changelog.count(_.removed) == 0)
     assert(changelog.count(_.updated) == 0)
