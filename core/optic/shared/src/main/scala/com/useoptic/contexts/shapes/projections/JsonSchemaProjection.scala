@@ -34,7 +34,7 @@ class JsonSchemaProjection(queries: InMemoryQueries, shapeId: String) {
         schema.assignType("object".asJson)
 
         val required = new scala.collection.mutable.ListBuffer[String]()
-        val fields = shape.fields.map { case field =>
+        val fields = shape.fields.sortBy(_.fieldName).map { case field =>
           val fieldName = field.fieldName
           val fieldShape = flatShapeToJsonSchema(field.shape, expand = false)
           if (field.shape.baseShapeId != OptionalKind.baseShapeId) {
@@ -43,7 +43,7 @@ class JsonSchemaProjection(queries: InMemoryQueries, shapeId: String) {
           fieldName -> fieldShape
         }
         if (required.nonEmpty) {
-          schema.addRequired(required.toList)
+          schema.addRequired(required.sorted.toList)
         }
         schema.addProperties(fields)
       }
