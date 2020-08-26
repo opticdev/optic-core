@@ -1,8 +1,6 @@
 package com.useoptic
 
 import com.useoptic.changelog.Changelog
-import com.useoptic.contexts.rfc.Events.RfcEvent
-import io.circe._
 import io.circe.generic.auto._
 import io.circe.syntax._
 import io.circe.scalajs.{convertJsToJson, convertJsonToJs}

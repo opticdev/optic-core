@@ -1,6 +1,5 @@
 package com.useoptic.changelog
 
-import better.files.File.Events
 import com.useoptic.contexts.rfc.Events.RfcEvent
 import com.useoptic.contexts.rfc.projections.{OASDomain, OASProjection}
 import com.useoptic.contexts.rfc.{InMemoryQueries, RfcService, RfcServiceJSFacade, RfcState}
