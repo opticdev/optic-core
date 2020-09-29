@@ -1,0 +1,99 @@
+{
+  "diffs" : [
+    {
+      "diff" : {
+        "UnmatchedResponseBodyShape" : {
+          "interactionTrail" : {
+            "path" : [
+              {
+                "ResponseBody" : {
+                  "contentType" : "application/json",
+                  "statusCode" : 200
+                }
+              }
+            ]
+          },
+          "requestsTrail" : {
+            "SpecResponseBody" : {
+              "responseId" : "baseline-response_1"
+            }
+          },
+          "shapeDiffResult" : {
+            "UnmatchedShape" : {
+              "jsonTrail" : {
+                "path" : [
+                  {
+                    "JsonObjectKey" : {
+                      "key" : "firstName"
+                    }
+                  }
+                ]
+              },
+              "shapeTrail" : {
+                "rootShapeId" : "baseline-shape_8",
+                "path" : [
+                  {
+                    "ObjectFieldTrail" : {
+                      "fieldId" : "baseline-field_3",
+                      "fieldShapeId" : "baseline-shape_6"
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      },
+      "title" : "firstName is missing",
+      "suggestions" : [
+        {
+          "title" : "Make field 'firstName' optional",
+          "commandsJson" : [
+            {
+              "AddShape" : {
+                "shapeId" : "testing-shape_1",
+                "baseShapeId" : "$optional",
+                "name" : ""
+              }
+            },
+            {
+              "SetParameterShape" : {
+                "shapeDescriptor" : {
+                  "ProviderInShape" : {
+                    "shapeId" : "testing-shape_1",
+                    "providerDescriptor" : {
+                      "ShapeProvider" : {
+                        "shapeId" : "baseline-shape_6"
+                      }
+                    },
+                    "consumingParameterId" : "$optionalInner"
+                  }
+                }
+              }
+            },
+            {
+              "SetFieldShape" : {
+                "shapeDescriptor" : {
+                  "FieldShapeFromShape" : {
+                    "fieldId" : "baseline-field_3",
+                    "shapeId" : "testing-shape_1"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "title" : "Remove field 'firstName'",
+          "commandsJson" : [
+            {
+              "RemoveField" : {
+                "fieldId" : "baseline-field_3"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
