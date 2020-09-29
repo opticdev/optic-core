@@ -67,13 +67,6 @@ class DiffPreviewerSpec extends FunSpec with JsonFileFixture {
       assert(rootshape.fields.exists(_.diffs.nonEmpty))
     }
 
-    it("can render a diff in array items preview") {
-      val preview = diffPreview(ShapeExamples.stringArray, JsonExamples.stringArrayWithNumbers)
-      val rootshape = preview.get.getRootShape.get
-      assert(rootshape.items.size == 12)
-      //      assert(rootshape.items.count(_.diffs.nonEmpty) == 9)
-    }
-
   }
 
   it("shape only render") {
