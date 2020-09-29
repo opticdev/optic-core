@@ -59,8 +59,6 @@ class DiffUseCasesSpec extends EndEndDiffTask with JsonFileFixture {
           Json.fromString("San Fransisco"),
           Json.fromInt(17584),
           Json.fromString("Boston"),
-          Json.fromString("California"),
-          Json.fromInt(43463),
         ))))
       })
     )))
@@ -183,7 +181,7 @@ class DiffUseCasesSpec extends EndEndDiffTask with JsonFileFixture {
 
   when("a required array field of strings provided with an object", () => EndEndDiffTask.Input(baselinePWSEvents._1, {
     Vector(personWithStats.forkResponseBody(j => {
-      json"""{"name":{"first":"Bob","last":"C"},"rivals":[{"food": "rice"}, {"food": "cookies"}],"stats":{"rank":1}}"""
+      json"""{"name":{"first":"Bob","last":"C"},"rivals":[{"food": "rice"}, {"food": "cookies"},  {"food": "chips"}],"stats":{"rank":1}}"""
     }))
   }))
 

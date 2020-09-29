@@ -33,40 +33,6 @@ object JsonLikeFrom {
   // real json
   def rawJson(text: String): Option[JsonLike] = parse(text).toOption.flatMap(JsonLikeFrom.json)
 
-//  def map(value: Map[String, JsonLike]): JsonLike = new JsonLike {
-//    override def isString: Boolean = false
-//    override def isBoolean: Boolean = false
-//    override def isNumber: Boolean = false
-//    override def isNull: Boolean = false
-//    override def isArray: Boolean = false
-//    override def isObject: Boolean = true
-//    override def fields: Map[String, JsonLike] = value
-//    override def items: Vector[JsonLike] = Vector.empty
-//    override def asJson: Json = Json.fromJsonObject(JsonObject.fromMap(value.mapValues(_.asJson)))
-//
-//    override def distinctItemsByIndex: Vector[(Int, JsonLike)] = ???
-//  }
-//
-//  def array(a: Vector[JsonLike]) = new JsonLike {
-//    override def isString: Boolean = false
-//
-//    override def isBoolean: Boolean = false
-//
-//    override def isNumber: Boolean = false
-//
-//    override def isNull: Boolean = false
-//
-//    override def isArray: Boolean = true
-//
-//    override def isObject: Boolean = false
-//
-//    override def fields: Map[String, JsonLike] = Map.empty
-//
-//    override def items: Vector[JsonLike] = a
-//
-//    override def asJson: Json = Json.fromValues(a.map(_.asJson))
-//  }
-
   def json(json: Json): Option[JsonLike] = Some(new JsonLike {
     override def isString: Boolean = json.isString
 
@@ -93,14 +59,15 @@ object JsonLikeFrom {
     override def asJson: Json = json
 
     override def distinctItemsByIndex: Vector[(Int, JsonLike)] = {
-      val jsonHashItems = items.map(JsonToShapeHash.fromJson)
-        .flatMap(i => JsonLikeFrom.shapeHashDescriptor(i, None))
+      val jsonHashItems = items.map(i => (JsonToShapeHash.fromJson(i), i.asJson))
+        .flatMap(i => JsonLikeFrom.shapeHashDescriptor(i._1, Some(i._2)))
 
-      jsonHashItems
+      val itemWithIndex = jsonHashItems
         .zipWithIndex
-        .groupBy(_._1) // group by distinct hashes
-        .mapValues(_.map(_._2).min) // get min index
-        .map(_.swap).toVector.sortBy(_._1) // make vector, sort by first index
+
+      itemWithIndex.map(_._1).distinct.map((uniqueHash:JsonLike) => {
+        (itemWithIndex.find(_._1 == uniqueHash).get._2, uniqueHash)
+      }).sortBy(_._1)
 
     }
 
@@ -133,14 +100,12 @@ object JsonLikeFrom {
     override def shapeDescription: Option[ShapeDescriptor] = Some(shapeDescriptor)
 
     override def distinctItemsByIndex: Vector[(Int, JsonLike)] = {
-      this.items.distinct
-      val itemsByIndex = items
+      val itemWithIndex = items
         .zipWithIndex
-        .groupBy(_._1) // group by distinct hashes
-        .mapValues(_.map(_._2).min) // get min index
-        .map(_.swap).toVector.sortBy(_._1) // make vector, sort by first index
 
-      itemsByIndex
+      itemWithIndex.map(_._1).distinct.map((uniqueHash:JsonLike) => {
+        (itemWithIndex.find(_._1 == uniqueHash).get._2, uniqueHash)
+      }).sortBy(_._1)
     }
 
     override def isString: Boolean = shapeDescriptor.`type`.isString
@@ -164,12 +129,14 @@ object JsonLikeFrom {
       }.toMap
     }
 
-    override def items: Vector[JsonLike] = shapeDescriptor.items.zipWithIndex.map {
-      case (item, index) => {
-        val realFieldJson = Try(realJson.get.asArray.get(index)).toOption
-        shapeHashDescriptor(item, realFieldJson)
-      }
-    }.toVector.flatten
+    override def items: Vector[JsonLike] = {
+      shapeDescriptor.items.zipWithIndex.map {
+        case (item, index) => {
+          val realFieldJson = Try(realJson.get.asArray.get(index)).toOption
+          shapeHashDescriptor(item, realFieldJson)
+        }
+      }.toVector.flatten
+    }
 
     override def asJson: Json = {
       if (realJson.isDefined) {
