@@ -3,17 +3,14 @@ package com.useoptic.end_to_end.snapshot_task
 import com.useoptic.contexts.rfc.Commands.RfcCommand
 import com.useoptic.contexts.rfc.Events.RfcEvent
 import com.useoptic.contexts.rfc.{RfcCommandContext, RfcService, RfcServiceJSFacade}
-import com.useoptic.diff.InteractiveDiffInterpretation
 import com.useoptic.diff.helpers.DiffHelpers
-import com.useoptic.diff.interactions.{InteractionDiffResult, ShapeRelatedDiff, UnmatchedRequestBodyContentType, UnmatchedRequestBodyShape, UnmatchedRequestMethod, UnmatchedRequestUrl, UnmatchedResponseBodyContentType, UnmatchedResponseBodyShape, UnmatchedResponseStatusCode}
-import com.useoptic.diff.interactions.interpretations.BasicInterpretations
+import com.useoptic.diff.interactions.{InteractionDiffResult}
 import com.useoptic.diff.interactions.interpreters.{DefaultInterpreters, DiffDescription, DiffDescriptionInterpreters}
 import com.useoptic.diff.shapes.resolvers.ShapesResolvers
 import com.useoptic.dsa.OpticIds
 import com.useoptic.end_to_end.snapshot_task.EndEndDiffTask.{DiffOutput, DiffWithDescriptionAndUX, Input, SuggestionSlim}
 import com.useoptic.serialization.{CommandSerialization, EventSerialization, InteractionSerialization}
 import com.useoptic.types.capture.{HttpInteraction, JsonLikeFrom}
-import com.useoptic.ux.{DiffPreviewer, SideBySideRenderHelper}
 import io.circe.Json
 import io.circe._
 import io.circe.generic.auto._
@@ -25,7 +22,7 @@ object EndEndDiffTask {
   case class Input(events: Vector[RfcEvent], interpretations: Vector[HttpInteraction], ids: OpticDomainIds = OpticIds.newPrefixedDeterministicIdGenerator("testing"))
 
   case class SuggestionSlim(title: String, commandsJson: Json)
-  case class DiffWithDescriptionAndUX(diff: InteractionDiffResult, title: String, suggestions: Vector[SuggestionSlim], preview: Option[Json])
+  case class DiffWithDescriptionAndUX(diff: InteractionDiffResult, title: String, suggestions: Vector[SuggestionSlim])
   case class DiffOutput(diffs: Vector[DiffWithDescriptionAndUX])
 }
 
@@ -69,26 +66,12 @@ class EndEndDiffTask
       val interpret = new DiffDescriptionInterpreters(rfcState)
       val description = interpret.interpret(diff, interactions.head)
 
-      val previewer = new DiffPreviewer(rfcState)
-
-      val preview = diff match {
-        case diff: ShapeRelatedDiff => diff match {
-          case UnmatchedRequestBodyShape(interactionTrail, requestsTrail, shapeDiffResult) => {
-            previewer.previewDiff(interactions.head.request.body.jsonOption.flatMap(JsonLikeFrom.json), Some(shapeDiffResult.shapeTrail.rootShapeId), Set(shapeDiffResult), Set.empty)
-          }
-          case UnmatchedResponseBodyShape(interactionTrail, requestsTrail, shapeDiffResult) => {
-            previewer.previewDiff(interactions.head.response.body.jsonOption.flatMap(JsonLikeFrom.json), Some(shapeDiffResult.shapeTrail.rootShapeId), Set(shapeDiffResult), Set.empty)
-          }
-        }
-        case _ => None
-      }
-
       val basicInterpreter = new DefaultInterpreters(shapesResolvers, rfcState)
       val suggestions = basicInterpreter.interpret(diff, interactions.head).map(i => {
         SuggestionSlim(i.action, CommandSerialization.toJson(i.commands))
       })
 
-      DiffWithDescriptionAndUX(diff, description.title, suggestions.toVector, preview.map(_.toJson))
+      DiffWithDescriptionAndUX(diff, description.title, suggestions.toVector)
     }))
   }
 }
