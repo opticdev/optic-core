@@ -499,7 +499,7 @@
         "body" : {
           "contentType" : "application/json",
           "value" : {
-            "shapeHashV1Base64" : null,
+            "shapeHashV1Base64" : "Ek0KCGxvY2F0aW9uEkESPwoMcHJpbmNpcGFsaXR5Ei8SCgoEY2l0eRICCAISEAoKcG9wdWxhdGlvbhICCAMSDwoLY29vcmRpbmF0ZXMSAA==",
             "asJsonString" : "{\"location\":{\"principality\":{\"city\":\"San Fransisco\",\"population\":830000,\"coordinates\":{}}}}",
             "asText" : "{\"location\":{\"principality\":{\"city\":\"San Fransisco\",\"population\":830000,\"coordinates\":{}}}}"
           }

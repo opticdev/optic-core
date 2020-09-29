@@ -474,7 +474,7 @@
         "body" : {
           "contentType" : "application/json",
           "value" : {
-            "shapeHashV1Base64" : null,
+            "shapeHashV1Base64" : "EiEKBG5hbWUSGRILCgVmaXJzdBICCAISCgoEbGFzdBICCAISKAoGcml2YWxzEh4IARoMEgoKBGZvb2QSAggCGgwSCgoEZm9vZBICCAISFQoFc3RhdHMSDBIKCgRyYW5rEgIIAw==",
             "asJsonString" : "{\"name\":{\"first\":\"Bob\",\"last\":\"C\"},\"rivals\":[{\"food\":\"rice\"},{\"food\":\"cookies\"}],\"stats\":{\"rank\":1}}",
             "asText" : "{\"name\":{\"first\":\"Bob\",\"last\":\"C\"},\"rivals\":[{\"food\":\"rice\"},{\"food\":\"cookies\"}],\"stats\":{\"rank\":1}}"
           }

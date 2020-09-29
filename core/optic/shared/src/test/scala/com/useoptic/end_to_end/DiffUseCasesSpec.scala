@@ -59,6 +59,8 @@ class DiffUseCasesSpec extends EndEndDiffTask with JsonFileFixture {
           Json.fromString("San Fransisco"),
           Json.fromInt(17584),
           Json.fromString("Boston"),
+          Json.fromString("California"),
+          Json.fromInt(43463),
         ))))
       })
     )))

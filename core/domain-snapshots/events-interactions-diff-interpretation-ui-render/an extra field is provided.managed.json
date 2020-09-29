@@ -398,7 +398,7 @@
         "body" : {
           "contentType" : "application/json",
           "value" : {
-            "shapeHashV1Base64" : null,
+            "shapeHashV1Base64" : "EgkKA2FnZRICCAMSDgoIbGFzdE5hbWUSAggCEg8KCWZpcnN0TmFtZRICCAISEwoNZmF2b3JpdGVDb2xvchICCAISGAoGY2l0aWVzEg4IARoCCAIaAggCGgIIAg==",
             "asJsonString" : "{\"firstName\":\"Aidan\",\"lastName\":\"C\",\"age\":26,\"cities\":[\"San Fransisco\",\"New York\",\"Durham\"],\"favoriteColor\":\"Syracuse-Orange\"}",
             "asText" : "{\"firstName\":\"Aidan\",\"lastName\":\"C\",\"age\":26,\"cities\":[\"San Fransisco\",\"New York\",\"Durham\"],\"favoriteColor\":\"Syracuse-Orange\"}"
           }

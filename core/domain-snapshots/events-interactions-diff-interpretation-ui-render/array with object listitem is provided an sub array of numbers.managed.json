@@ -355,7 +355,7 @@
         "body" : {
           "contentType" : "application/json",
           "value" : {
-            "shapeHashV1Base64" : null,
+            "shapeHashV1Base64" : "CAEaDggBGgIIAxoCCAMaAggD",
             "asJsonString" : "[[1,2,3]]",
             "asText" : "[[1,2,3]]"
           }

@@ -355,7 +355,7 @@
         "body" : {
           "contentType" : "application/json",
           "value" : {
-            "shapeHashV1Base64" : null,
+            "shapeHashV1Base64" : "CAEaMRIKCgRuYW1lEgIIAhIJCgNhZ2USAggCEhgKBmNvbG9ycxIOCAEaAggCGgIIAhoCCAI=",
             "asJsonString" : "[{\"name\":\"joe\",\"age\":\"thirty\",\"colors\":[\"red\",\"green\",\"yellow\"]}]",
             "asText" : "[{\"name\":\"joe\",\"age\":\"thirty\",\"colors\":[\"red\",\"green\",\"yellow\"]}]"
           }

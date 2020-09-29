@@ -2,7 +2,8 @@ package com.useoptic.types.capture
 
 import io.circe.{Json, JsonObject}
 import io.circe.parser.parse
-import optic_shape_hash.shapehash.ShapeDescriptor
+import optic_shape_hash.shapehash.{JsonToShapeHash, ShapeDescriptor}
+import optic_shape_hash.shapehash.ShapeDescriptor.PrimitiveType
 
 import scala.util.Try
 
@@ -22,7 +23,9 @@ abstract class JsonLike {
   def fields: Map[String, JsonLike]
 
   def items: Vector[JsonLike]
+  def distinctItemsByIndex: Vector[(Int, JsonLike)]
 
+  def shapeDescription: Option[ShapeDescriptor] = None
   def asJson: Json
 }
 
@@ -30,37 +33,39 @@ object JsonLikeFrom {
   // real json
   def rawJson(text: String): Option[JsonLike] = parse(text).toOption.flatMap(JsonLikeFrom.json)
 
-  def map(value: Map[String, JsonLike]): JsonLike = new JsonLike {
-    override def isString: Boolean = false
-    override def isBoolean: Boolean = false
-    override def isNumber: Boolean = false
-    override def isNull: Boolean = false
-    override def isArray: Boolean = false
-    override def isObject: Boolean = true
-    override def fields: Map[String, JsonLike] = value
-    override def items: Vector[JsonLike] = Vector.empty
-    override def asJson: Json = Json.fromJsonObject(JsonObject.fromMap(value.mapValues(_.asJson)))
-  }
-
-  def array(a: Vector[JsonLike]) = new JsonLike {
-    override def isString: Boolean = false
-
-    override def isBoolean: Boolean = false
-
-    override def isNumber: Boolean = false
-
-    override def isNull: Boolean = false
-
-    override def isArray: Boolean = true
-
-    override def isObject: Boolean = false
-
-    override def fields: Map[String, JsonLike] = Map.empty
-
-    override def items: Vector[JsonLike] = a
-
-    override def asJson: Json = Json.fromValues(a.map(_.asJson))
-  }
+//  def map(value: Map[String, JsonLike]): JsonLike = new JsonLike {
+//    override def isString: Boolean = false
+//    override def isBoolean: Boolean = false
+//    override def isNumber: Boolean = false
+//    override def isNull: Boolean = false
+//    override def isArray: Boolean = false
+//    override def isObject: Boolean = true
+//    override def fields: Map[String, JsonLike] = value
+//    override def items: Vector[JsonLike] = Vector.empty
+//    override def asJson: Json = Json.fromJsonObject(JsonObject.fromMap(value.mapValues(_.asJson)))
+//
+//    override def distinctItemsByIndex: Vector[(Int, JsonLike)] = ???
+//  }
+//
+//  def array(a: Vector[JsonLike]) = new JsonLike {
+//    override def isString: Boolean = false
+//
+//    override def isBoolean: Boolean = false
+//
+//    override def isNumber: Boolean = false
+//
+//    override def isNull: Boolean = false
+//
+//    override def isArray: Boolean = true
+//
+//    override def isObject: Boolean = false
+//
+//    override def fields: Map[String, JsonLike] = Map.empty
+//
+//    override def items: Vector[JsonLike] = a
+//
+//    override def asJson: Json = Json.fromValues(a.map(_.asJson))
+//  }
 
   def json(json: Json): Option[JsonLike] = Some(new JsonLike {
     override def isString: Boolean = json.isString
@@ -86,6 +91,25 @@ object JsonLikeFrom {
         .map(i => JsonLikeFrom.json(i).get)
 
     override def asJson: Json = json
+
+    override def distinctItemsByIndex: Vector[(Int, JsonLike)] = {
+      val jsonHashItems = items.map(JsonToShapeHash.fromJson)
+        .flatMap(i => JsonLikeFrom.shapeHashDescriptor(i, None))
+
+      jsonHashItems
+        .zipWithIndex
+        .groupBy(_._1) // group by distinct hashes
+        .mapValues(_.map(_._2).min) // get min index
+        .map(_.swap).toVector.sortBy(_._1) // make vector, sort by first index
+
+    }
+
+    override def equals(obj: Any): Boolean = obj match {
+      case other: JsonLike => {
+        other.asJson == this.asJson
+      }
+      case _ => false
+    }
   })
 
   //shape hash
@@ -100,6 +124,25 @@ object JsonLikeFrom {
   }.toOption.flatten
 
   def shapeHashDescriptor(shapeDescriptor: ShapeDescriptor, realJson: Option[Json]): Option[JsonLike] = Some(new JsonLike {
+
+    override def equals(obj: Any): Boolean = obj match {
+      case other: JsonLike => other.shapeDescription.contains(shapeDescriptor)
+      case _ => false
+    }
+
+    override def shapeDescription: Option[ShapeDescriptor] = Some(shapeDescriptor)
+
+    override def distinctItemsByIndex: Vector[(Int, JsonLike)] = {
+      this.items.distinct
+      val itemsByIndex = items
+        .zipWithIndex
+        .groupBy(_._1) // group by distinct hashes
+        .mapValues(_.map(_._2).min) // get min index
+        .map(_.swap).toVector.sortBy(_._1) // make vector, sort by first index
+
+      itemsByIndex
+    }
+
     override def isString: Boolean = shapeDescriptor.`type`.isString
 
     override def isBoolean: Boolean = shapeDescriptor.`type`.isBoolean
@@ -163,6 +206,7 @@ object JsonLikeFrom {
     override def fields: Map[String, JsonLike] = Map.empty
 
     override def items: Vector[JsonLike] = Vector.empty
+    override def distinctItemsByIndex: Vector[(Int, JsonLike)] = Vector.empty
 
     override def asJson: Json = Json.fromString(text)
   })
