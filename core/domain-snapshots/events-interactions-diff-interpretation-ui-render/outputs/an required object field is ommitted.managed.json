@@ -1,0 +1,99 @@
+{
+  "diffs" : [
+    {
+      "diff" : {
+        "UnmatchedResponseBodyShape" : {
+          "interactionTrail" : {
+            "path" : [
+              {
+                "ResponseBody" : {
+                  "contentType" : "application/json",
+                  "statusCode" : 200
+                }
+              }
+            ]
+          },
+          "requestsTrail" : {
+            "SpecResponseBody" : {
+              "responseId" : "response_1"
+            }
+          },
+          "shapeDiffResult" : {
+            "UnmatchedShape" : {
+              "jsonTrail" : {
+                "path" : [
+                  {
+                    "JsonObjectKey" : {
+                      "key" : "stats"
+                    }
+                  }
+                ]
+              },
+              "shapeTrail" : {
+                "rootShapeId" : "shape_10",
+                "path" : [
+                  {
+                    "ObjectFieldTrail" : {
+                      "fieldId" : "field_6",
+                      "fieldShapeId" : "shape_9"
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      },
+      "title" : "stats is missing",
+      "suggestions" : [
+        {
+          "title" : "Make field 'stats' optional",
+          "commandsJson" : [
+            {
+              "AddShape" : {
+                "shapeId" : "testing-shape_1",
+                "baseShapeId" : "$optional",
+                "name" : ""
+              }
+            },
+            {
+              "SetParameterShape" : {
+                "shapeDescriptor" : {
+                  "ProviderInShape" : {
+                    "shapeId" : "testing-shape_1",
+                    "providerDescriptor" : {
+                      "ShapeProvider" : {
+                        "shapeId" : "shape_9"
+                      }
+                    },
+                    "consumingParameterId" : "$optionalInner"
+                  }
+                }
+              }
+            },
+            {
+              "SetFieldShape" : {
+                "shapeDescriptor" : {
+                  "FieldShapeFromShape" : {
+                    "fieldId" : "field_6",
+                    "shapeId" : "testing-shape_1"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "title" : "Remove field 'stats'",
+          "commandsJson" : [
+            {
+              "RemoveField" : {
+                "fieldId" : "field_6"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,147 @@
+{
+  "diffs" : [
+    {
+      "diff" : {
+        "UnmatchedResponseBodyShape" : {
+          "interactionTrail" : {
+            "path" : [
+              {
+                "ResponseBody" : {
+                  "contentType" : "application/json",
+                  "statusCode" : 200
+                }
+              }
+            ]
+          },
+          "requestsTrail" : {
+            "SpecResponseBody" : {
+              "responseId" : "baseline-response_1"
+            }
+          },
+          "shapeDiffResult" : {
+            "UnmatchedShape" : {
+              "jsonTrail" : {
+                "path" : [
+                  {
+                    "JsonObjectKey" : {
+                      "key" : "age"
+                    }
+                  }
+                ]
+              },
+              "shapeTrail" : {
+                "rootShapeId" : "baseline-shape_8",
+                "path" : [
+                  {
+                    "ObjectFieldTrail" : {
+                      "fieldId" : "baseline-field_1",
+                      "fieldShapeId" : "baseline-shape_2"
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      },
+      "title" : "age is not a Number",
+      "suggestions" : [
+        {
+          "title" : "Allow field 'age' to be either a 'Number' or 'String'",
+          "commandsJson" : [
+            {
+              "AddShape" : {
+                "shapeId" : "testing-shape_2",
+                "baseShapeId" : "$string",
+                "name" : ""
+              }
+            },
+            {
+              "AddShape" : {
+                "shapeId" : "testing-shape_1",
+                "baseShapeId" : "$oneOf",
+                "name" : ""
+              }
+            },
+            {
+              "AddShapeParameter" : {
+                "shapeParameterId" : "testing-shape-parameter_1",
+                "shapeId" : "testing-shape_1",
+                "name" : ""
+              }
+            },
+            {
+              "AddShapeParameter" : {
+                "shapeParameterId" : "testing-shape-parameter_2",
+                "shapeId" : "testing-shape_1",
+                "name" : ""
+              }
+            },
+            {
+              "SetParameterShape" : {
+                "shapeDescriptor" : {
+                  "ProviderInShape" : {
+                    "shapeId" : "testing-shape_1",
+                    "providerDescriptor" : {
+                      "ShapeProvider" : {
+                        "shapeId" : "testing-shape_2"
+                      }
+                    },
+                    "consumingParameterId" : "testing-shape-parameter_2"
+                  }
+                }
+              }
+            },
+            {
+              "SetParameterShape" : {
+                "shapeDescriptor" : {
+                  "ProviderInShape" : {
+                    "shapeId" : "testing-shape_1",
+                    "providerDescriptor" : {
+                      "ShapeProvider" : {
+                        "shapeId" : "baseline-shape_2"
+                      }
+                    },
+                    "consumingParameterId" : "testing-shape-parameter_1"
+                  }
+                }
+              }
+            },
+            {
+              "SetFieldShape" : {
+                "shapeDescriptor" : {
+                  "FieldShapeFromShape" : {
+                    "fieldId" : "baseline-field_1",
+                    "shapeId" : "testing-shape_1"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "title" : "Change shape to 'String'",
+          "commandsJson" : [
+            {
+              "AddShape" : {
+                "shapeId" : "testing-shape_3",
+                "baseShapeId" : "$string",
+                "name" : ""
+              }
+            },
+            {
+              "SetFieldShape" : {
+                "shapeDescriptor" : {
+                  "FieldShapeFromShape" : {
+                    "fieldId" : "baseline-field_1",
+                    "shapeId" : "testing-shape_3"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
