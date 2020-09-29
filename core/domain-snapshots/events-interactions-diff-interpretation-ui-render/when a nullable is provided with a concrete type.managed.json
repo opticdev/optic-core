@@ -317,7 +317,7 @@
         "body" : {
           "contentType" : "application/json",
           "value" : {
-            "shapeHashV1Base64" : null,
+            "shapeHashV1Base64" : "CAEaHBINCgdhZGRyZXNzEgIIAhILCgVwcmljZRICCAMaHBINCgdhZGRyZXNzEgIIAhILCgVwcmljZRICCAM=",
             "asJsonString" : "[{\"address\":\"123\",\"price\":657},{\"address\":\"456\",\"price\":322}]",
             "asText" : "[{\"address\":\"123\",\"price\":657},{\"address\":\"456\",\"price\":322}]"
           }

@@ -52,6 +52,17 @@ object DiffResultHelper {
     allEndpointDiffs.find(i => i.method == method && i.pathId == pathId)
   }
 
+  def newRegionsForPathAndMethod(allEndpointDiffs: Seq[EndpointDiffs], pathId: PathComponentId, method: String, rfcState: RfcState, ignoredDiffs: Seq[DiffResult]): Seq[NewRegionDiff] = {
+    val newRegions = groupEndpointDiffsByRegion(diffsForPathAndMethod(allEndpointDiffs, pathId, method, ignoredDiffs), rfcState, method, pathId).newRegions
+
+    def acceptedStatusCode(statusCode: Int): Boolean = (statusCode >= 200 && statusCode <300) || (statusCode >= 400 && statusCode <500)
+
+    newRegions.filter {
+      case i if acceptedStatusCode(i.statusCode.getOrElse(200)) => true
+      case _ => false
+    }
+  }
+
   def endpointDiffs(diffs: InteractionPointersGroupedByDiff, rfcState: RfcState): Seq[EndpointDiffs] = {
 
     val allEndpoints = AllEndpointsProjection.fromRfcState(rfcState)

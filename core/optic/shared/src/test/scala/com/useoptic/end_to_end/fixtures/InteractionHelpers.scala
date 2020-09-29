@@ -1,7 +1,10 @@
 package com.useoptic.end_to_end.fixtures
 
-import com.useoptic.types.capture.{ArbitraryData, Body, HttpInteraction, Request, Response}
+import java.util.Base64
+
+import com.useoptic.types.capture.{ArbitraryData, Body, HttpInteraction, JsonLikeFrom, Request, Response}
 import io.circe.Json
+import optic_shape_hash.shapehash.JsonToShapeHash
 
 object InteractionHelpers {
 
@@ -36,12 +39,16 @@ object InteractionHelpers {
 
     def withRequestBody(json: Json) = interaction.copy(request = interaction.request.copy(body = interaction.request.body.copy(
       contentType = Some("application/json"),
-      value = ArbitraryData(None, asText = Some(json.noSpaces), asJsonString = Some(json.noSpaces))
+      value = ArbitraryData(
+        shapeHashV1Base64 = Some(JsonToShapeHash.fromJson(JsonLikeFrom.json(json).get)).map(i => Base64.getEncoder().encodeToString(i.toByteString.toByteArray())),
+        asText = Some(json.noSpaces), asJsonString = Some(json.noSpaces))
     )))
 
     def withResponseBody(json: Json) = interaction.copy(response = interaction.response.copy(body = interaction.response.body.copy(
       contentType = Some("application/json"),
-      value = ArbitraryData(None, asText = Some(json.noSpaces), asJsonString = Some(json.noSpaces))
+      value = ArbitraryData(
+        shapeHashV1Base64 = Some(JsonToShapeHash.fromJson(JsonLikeFrom.json(json).get)).map(i => Base64.getEncoder().encodeToString(i.toByteString.toByteArray())),
+        asText = Some(json.noSpaces), asJsonString = Some(json.noSpaces))
     )))
 
     def forkRequestBody(fork: Json => Json) = {

@@ -499,7 +499,7 @@
         "body" : {
           "contentType" : "application/json",
           "value" : {
-            "shapeHashV1Base64" : null,
+            "shapeHashV1Base64" : "EkkKCGxvY2F0aW9uEj0SOwoMcHJpbmNpcGFsaXR5EisSCwoFbW90dG8SAggCEgoKBGNpdHkSAggCEhAKCnBvcHVsYXRpb24SAggD",
             "asJsonString" : "{\"location\":{\"principality\":{\"motto\":\"Experientia Docet\",\"city\":\"San Fransisco\",\"population\":830000}}}",
             "asText" : "{\"location\":{\"principality\":{\"motto\":\"Experientia Docet\",\"city\":\"San Fransisco\",\"population\":830000}}}"
           }

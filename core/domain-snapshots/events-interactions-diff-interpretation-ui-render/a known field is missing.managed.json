@@ -398,7 +398,7 @@
         "body" : {
           "contentType" : "application/json",
           "value" : {
-            "shapeHashV1Base64" : null,
+            "shapeHashV1Base64" : "Eg4KCGxhc3ROYW1lEgIIAhIJCgNhZ2USAggDEhgKBmNpdGllcxIOCAEaAggCGgIIAhoCCAI=",
             "asJsonString" : "{\"lastName\":\"C\",\"age\":26,\"cities\":[\"San Fransisco\",\"New York\",\"Durham\"]}",
             "asText" : "{\"lastName\":\"C\",\"age\":26,\"cities\":[\"San Fransisco\",\"New York\",\"Durham\"]}"
           }

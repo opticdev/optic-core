@@ -23,8 +23,8 @@ class JsonLikeAndSpecTraverser(resolvers: ShapesResolvers, spec: RfcState, visit
     val bodyJson = body.get
     if (bodyJson.isArray) {
       visitors.arrayVisitor.visit(bodyJson, bodyTrail, trailOrigin, trailChoices, (choicesForArrayItems) => {
-        bodyJson.items.zipWithIndex.foreach(entry => {
-          val (item, index) = entry
+        bodyJson.distinctItemsByIndex.foreach(entry => {
+          val (index, item) = entry
           val itemTrail: JsonTrail = bodyTrail.withChild(JsonArrayItem(index))
 
           val newTrailOrigin = choicesForArrayItems.headOption match {
