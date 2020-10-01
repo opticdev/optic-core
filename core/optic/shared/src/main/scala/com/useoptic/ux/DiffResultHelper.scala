@@ -76,7 +76,8 @@ object DiffResultHelper {
         case (diff, interactionPointers) => getLocationForDiff(diff, rfcState).map(location => {
           EndpointDiffs(location.method, location.pathId,  Map(diff -> interactionPointers), diffs.filterKeys(_.normalize() == diff), true)
         })
-      }.groupBy(i => (i.pathId, i.method)).map {
+      }.filterNot(i => i.pathId == "root")
+        .groupBy(i => (i.pathId, i.method)).map {
         case ((path, method), diffs) => {
           val diffsForThisOne = diffs.flatMap(_.diffs).toMap
           val isADocumentedEndpoint = allEndpoints.exists(i => i.pathId == path && i.method == method)
