@@ -37,11 +37,9 @@ object LearnAPIHelper {
 
   }
 
-  @JSExport
   @JSExportAll
   case class ShapeBuilderResult(region: String, statusCode: Int, contentType: String, rootShapeId: ShapeId, commands: Vector[RfcCommand])
 
-  @JSExport
   @JSExportAll
   class ShapeBuilderMap(val pathId: String, val method: String) {
 
