@@ -36,16 +36,7 @@ object DiffResultHelper {
       case endpoint if !endpoint.isDocumentedEndpoint => NewEndpoint("", endpoint.method, Some(endpoint.pathId), endpoint.count)
     }
 
-    if (urls.size > 250) {
-      import com.useoptic.utilities.DistinctBy._
-      //known paths should of course get preference
-      val knownPaths = urls.filter(_.pathId.isDefined).distinctByIfDefined(i => (Some(i.pathId, i.method)))
-      val urlsToShow = random.shuffle(urls).take(250 - knownPaths.length)
-      SplitUndocumentedUrls( (knownPaths ++ urlsToShow).toVector.sortBy(_.count).reverse, undocumented, urls.size, urls.map(_.path).distinct)
-    } else {
-      SplitUndocumentedUrls(urls.sortBy(_.count).reverse, undocumented, urls.size, urls.map(_.path).distinct)
-    }
-
+    SplitUndocumentedUrls(urls.sortBy(_.count).reverse, undocumented, urls.size, urls.map(_.path).distinct)
   }
 
   def diffsForPathAndMethod(allEndpointDiffs: Seq[EndpointDiffs], pathId: PathComponentId, method: String, ignoredDiffs: Seq[DiffResult]): Option[EndpointDiffs] = {
@@ -85,7 +76,8 @@ object DiffResultHelper {
         case (diff, interactionPointers) => getLocationForDiff(diff, rfcState).map(location => {
           EndpointDiffs(location.method, location.pathId,  Map(diff -> interactionPointers), diffs.filterKeys(_.normalize() == diff), true)
         })
-      }.groupBy(i => (i.pathId, i.method)).map {
+      }.filterNot(i => i.pathId == "root")
+        .groupBy(i => (i.pathId, i.method)).map {
         case ((path, method), diffs) => {
           val diffsForThisOne = diffs.flatMap(_.diffs).toMap
           val isADocumentedEndpoint = allEndpoints.exists(i => i.pathId == path && i.method == method)
@@ -440,6 +432,7 @@ case class PreviewShapeAndCommands(shape: Option[ShapeOnlyRenderHelper], suggest
 
 @JSExportAll
 case class SplitUndocumentedUrls(urls: Seq[NewEndpoint], undocumented: Seq[NewEndpoint], totalCount: Int, allPaths: Seq[String]) {
+  //undocumented (matches, but no bodies) is a deprecated notion
   def showing: Int = urls.length
-  def total: Int = undocumented.length + urls.length
+  def total: Int = urls.length
 }
