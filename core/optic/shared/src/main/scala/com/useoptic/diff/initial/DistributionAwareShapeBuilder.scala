@@ -11,6 +11,7 @@ import com.useoptic.dsa.{OpticDomainIds, SequentialIdGenerator}
 import com.useoptic.types.capture.JsonLike
 import com.useoptic.ux.{ColoredName, ShapeNameRenderer}
 
+import scala.scalajs.js.annotation.{JSExport, JSExportAll}
 import scala.util.Random
 
 object DistributionAwareShapeBuilder {
@@ -126,6 +127,7 @@ class StreamingShapeBuilder()(implicit ids: OpticDomainIds, shapeBuildingStrateg
 
   def process(jsonLike: JsonLike) = jsonLikeTraverser.traverse(Some(jsonLike), JsonTrail(Seq.empty))
 
+  @JSExport
   def toCommands: (String, ImmutableCommandStream) = {
     implicit val commands = new MutableCommandStream
     val rootShape = toShapes(aggregator)
