@@ -30,7 +30,7 @@ object EventSerializationJs {
     val json = convertJsToJson(events).right.get
     EventSerialization.fromJson(json).get
   }
-  
+
   def toJson(events: Vector[RfcEvent]): js.Any = {
     import io.circe.scalajs.convertJsonToJs
     convertJsonToJs(EventSerialization.toJson(events))
