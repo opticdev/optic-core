@@ -10,7 +10,8 @@ import com.useoptic.serialization.{CommandSerialization, EventSerialization}
 import scala.scalajs.js.annotation.{JSExport, JSExportAll}
 import scala.util.Try
 
-class RfcService(eventStore: EventStore[RfcEvent])(implicit ids: OpticDomainIds) extends EventSourcedService[RfcCommand, RfcCommandContext, RfcState] {
+@JSExportAll
+class RfcService(val eventStore: EventStore[RfcEvent])(implicit ids: OpticDomainIds) extends EventSourcedService[RfcCommand, RfcCommandContext, RfcState] {
   private val repository = new EventSourcedRepository[RfcState, RfcEvent](RfcAggregate, eventStore)
 
   def handleCommand(id: AggregateId, command: RfcCommand, context: RfcCommandContext): Unit = {
