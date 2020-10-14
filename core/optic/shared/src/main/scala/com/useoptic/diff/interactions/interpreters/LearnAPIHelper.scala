@@ -23,34 +23,38 @@ object LearnAPIHelper {
 
   def learnBody(interaction: HttpInteraction, shapeBuilderMap: ShapeBuilderMap): Unit = {
 
-    val requestContentTypeOptional = ContentTypeHelpers.contentType(interaction.request)
-    if (requestContentTypeOptional.isDefined) {
-      val shapeBuilder = shapeBuilderMap.getRequestOrPutDefault(requestContentTypeOptional.get)
-      BodyUtilities.parseBody(interaction.request.body).foreach(shapeBuilder.process)
+    {
+      val requestContentTypeOptional = ContentTypeHelpers.contentType(interaction.request)
+      val shapeBuilder = shapeBuilderMap.getRequestOrPutDefault(requestContentTypeOptional)
+      if (requestContentTypeOptional.isDefined) {
+        BodyUtilities.parseBody(interaction.request.body).foreach(shapeBuilder.process)
+      }
     }
 
-    val responseContentTypeOptional = ContentTypeHelpers.contentType(interaction.response)
-    if (responseContentTypeOptional.isDefined) {
-      val shapeBuilder = shapeBuilderMap.getResponseOrPutDefault(interaction.response.statusCode, responseContentTypeOptional.get)
-      BodyUtilities.parseBody(interaction.response.body).foreach(shapeBuilder.process)
+    {
+      val responseContentTypeOptional = ContentTypeHelpers.contentType(interaction.response)
+      val shapeBuilder = shapeBuilderMap.getResponseOrPutDefault(interaction.response.statusCode, responseContentTypeOptional)
+      if (responseContentTypeOptional.isDefined) {
+        BodyUtilities.parseBody(interaction.response.body).foreach(shapeBuilder.process)
+      }
     }
 
   }
 
   @JSExportAll
-  case class ShapeBuilderResult(region: String, statusCode: Int, contentType: String, rootShapeId: ShapeId, commands: Vector[RfcCommand])
+  case class ShapeBuilderResult(region: String, statusCode: Int, contentType: Option[String], rootShapeId: ShapeId, commands: Vector[RfcCommand])
 
   @JSExportAll
   class ShapeBuilderMap(val pathId: String, val method: String) {
 
-    private val requestInteractionMap = scala.collection.mutable.Map[(String), StreamingShapeBuilder]()
-    private val responseInteractionMap = scala.collection.mutable.Map[(Int, String), StreamingShapeBuilder]()
+    private val requestInteractionMap = scala.collection.mutable.Map[(Option[String]), StreamingShapeBuilder]()
+    private val responseInteractionMap = scala.collection.mutable.Map[(Int, Option[String]), StreamingShapeBuilder]()
 
-    def getRequestOrPutDefault(contentType: String): StreamingShapeBuilder = {
+    def getRequestOrPutDefault(contentType: Option[String]): StreamingShapeBuilder = {
       requestInteractionMap.getOrElseUpdate((contentType), DistributionAwareShapeBuilder.streaming)
     }
 
-    def getResponseOrPutDefault(statusCode: Int, contentType: String): StreamingShapeBuilder = {
+    def getResponseOrPutDefault(statusCode: Int, contentType: Option[String]): StreamingShapeBuilder = {
       responseInteractionMap.getOrElseUpdate((statusCode, contentType), DistributionAwareShapeBuilder.streaming)
     }
 
@@ -58,14 +62,21 @@ object LearnAPIHelper {
       requestInteractionMap.collect {
         case ((contentType), shapeBuilder) => {
           val requestId = ids.newRequestId
-          val (rootShapeId, shapeCommands) = shapeBuilder.toCommands
-          val flattenedShapeCommands = shapeCommands.flatten
+
+          val optionShape = shapeBuilder.toCommandsOptional
+          val (rootShapeId, flattenedShapeCommands) = if (optionShape.isDefined) {
+            val (rootShapeId, shapeCommands) = optionShape.get
+            (rootShapeId, shapeCommands.flatten)
+          } else {
+            ("!!empty-body!!", Vector.empty)
+          }
+
           val baseCommands = Vector(
             RequestsCommands.AddRequest(requestId, pathId, method),
           )
-          val commands = baseCommands ++ flattenedShapeCommands ++ Vector(
-            RequestsCommands.SetRequestBodyShape(requestId, ShapedBodyDescriptor(contentType, rootShapeId, isRemoved = false))
-          )
+          val commands = baseCommands ++ (if (contentType.isDefined) (flattenedShapeCommands ++ Vector(
+            RequestsCommands.SetRequestBodyShape(requestId, ShapedBodyDescriptor(contentType.get, rootShapeId, isRemoved = false))
+          )) else Vector.empty)
 
           ShapeBuilderResult("request", 0, contentType, rootShapeId, commands)
         }
@@ -75,17 +86,24 @@ object LearnAPIHelper {
     def responseRegions: Vector[ShapeBuilderResult] = {
       responseInteractionMap.collect {
         case ((statusCode, contentType), shapeBuilder) => {
-          val (rootShapeId, shapeCommands) = shapeBuilder.toCommands
-          val flattenedShapeCommands = shapeCommands.flatten
+
+          val optionShape = shapeBuilder.toCommandsOptional
+          val (rootShapeId, flattenedShapeCommands) = if (optionShape.isDefined) {
+            val (rootShapeId, shapeCommands) = optionShape.get
+            (rootShapeId, shapeCommands.flatten)
+          } else {
+            ("!!empty-body!!", Vector.empty)
+          }
+
           val responseId = ids.newResponseId
 
           val baseCommands = Vector(
             RequestsCommands.AddResponseByPathAndMethod(responseId, pathId, method, statusCode),
           )
 
-          val commands = baseCommands ++ flattenedShapeCommands ++ Vector(
-            RequestsCommands.SetResponseBodyShape(responseId, ShapedBodyDescriptor(contentType, rootShapeId, isRemoved = false))
-          )
+          val commands = baseCommands ++ (if (contentType.isDefined) (flattenedShapeCommands ++ Vector(
+            RequestsCommands.SetResponseBodyShape(responseId, ShapedBodyDescriptor(contentType.get, rootShapeId, isRemoved = false))
+          )) else Vector.empty)
 
           ShapeBuilderResult("response", statusCode, contentType, rootShapeId, commands)
         }

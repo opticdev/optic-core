@@ -134,6 +134,14 @@ class StreamingShapeBuilder()(implicit ids: OpticDomainIds, shapeBuildingStrateg
     buildCommandsFor(rootShape, None)
     (rootShape.id, commands.toImmutable)
   }
+  def toCommandsOptional: Option[(String, ImmutableCommandStream)] = {
+    implicit val commands = new MutableCommandStream
+    if (aggregator.hasRoot) {
+      val rootShape = toShapes(aggregator)
+      buildCommandsFor(rootShape, None)
+      Some(rootShape.id, commands.toImmutable)
+    } else None
+  }
 }
 
 //// Shapes to Make
@@ -278,6 +286,7 @@ class TrailValueMap(strategy: ShapeBuildingStrategy)(implicit ids: OpticDomainId
   }
 
   def getRoot: ValueAffordanceMap = _internal(JsonTrail(Seq.empty))
+  def hasRoot: Boolean = _internal.contains(JsonTrail(Seq.empty))
 
   def hasTrail(trail: JsonTrail) = _internal.contains(trail)
 
