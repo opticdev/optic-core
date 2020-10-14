@@ -15,7 +15,7 @@ class JsonLikeTraverser(spec: RfcState, visitors: JsonLikeVisitors) {
       val bodyJson = body.get
       if (bodyJson.isArray) {
         visitors.arrayVisitor.visit(bodyJson, bodyTrail)
-        bodyJson.items.zipWithIndex.foreach{ case (item, index) => {
+        bodyJson.distinctItemsByIndex.foreach{ case (index, item) => {
           val itemTrail = bodyTrail.withChild(JsonArrayItem(index))
           traverse(Some(item), itemTrail)
         }}
