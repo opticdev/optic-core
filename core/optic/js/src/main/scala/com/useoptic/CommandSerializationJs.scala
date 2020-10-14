@@ -28,6 +28,10 @@ object CommandSerializationJs {
     convertJsonToJs(toJson(vector))
   }
 
+  def toJs(vector: Vector[RfcCommand]): js.Any = {
+    convertJsonToJs(toJson(vector))
+  }
+
   def toJson(command: RfcCommand): Json = {
     command match {
       case shapesCommand: ShapesCommand => shapesCommand.asJson
