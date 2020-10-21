@@ -9,7 +9,6 @@ abstract class GenericJsonVisitor {
 }
 
 class JsonLikeTraverser(spec: RfcState, visitors: JsonLikeVisitors) {
-
   def traverse(body: Option[JsonLike], bodyTrail: JsonTrail): Unit = {
     if (body.isDefined) {
       val bodyJson = body.get
@@ -17,6 +16,36 @@ class JsonLikeTraverser(spec: RfcState, visitors: JsonLikeVisitors) {
         visitors.arrayVisitor.visit(bodyJson, bodyTrail)
         bodyJson.distinctItemsByIndex.foreach{ case (index, item) => {
           val itemTrail = bodyTrail.withChild(JsonArrayItem(index))
+          traverse(Some(item), itemTrail)
+        }}
+      } else if (bodyJson.isObject) {
+        visitors.objectVisitor.visit(bodyJson, bodyTrail)
+        bodyJson.fields.foreach{ case (key, value) => {
+          val fieldTrail = bodyTrail.withChild(JsonObjectKey(key))
+          traverse(Some(value), fieldTrail)
+        }}
+      } else {
+        visitors.primitiveVisitor.visit(bodyJson, bodyTrail)
+      }
+    }
+  }
+}
+
+
+class FocusedJsonLikeTraverser(baseTrail: JsonTrail, visitors: JsonLikeVisitors) {
+  def shouldVisit(trail: JsonTrail): Boolean = {
+    val maxLength = Set(trail.path.size, baseTrail.path.size).max
+    JsonTrail(baseTrail.path.take(maxLength)).compareLoose(
+      JsonTrail(trail.path.take(maxLength))
+    )
+  }
+  def traverse(body: Option[JsonLike], bodyTrail: JsonTrail): Unit = {
+    if (body.isDefined && shouldVisit(bodyTrail)) {
+      val bodyJson = body.get
+      if (bodyJson.isArray) {
+        visitors.arrayVisitor.visit(bodyJson, bodyTrail)
+        bodyJson.distinctItemsByIndex.foreach{ case (index, item) => {
+          val itemTrail = bodyTrail.withChild(JsonArrayItem(0)) // normalized by default
           traverse(Some(item), itemTrail)
         }}
       } else if (bodyJson.isObject) {

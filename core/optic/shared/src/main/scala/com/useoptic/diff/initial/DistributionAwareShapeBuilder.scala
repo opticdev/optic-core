@@ -6,6 +6,7 @@ import com.useoptic.contexts.shapes.ShapesHelper._
 import com.useoptic.diff.initial.DistributionAwareShapeBuilder.{buildCommandsFor, toShapes}
 import com.useoptic.diff.shapes.JsonTrailPathComponent.{JsonArrayItem, JsonObjectKey}
 import com.useoptic.diff.shapes._
+import com.useoptic.diff.shapes.resolvers.JsonLikeResolvers
 import com.useoptic.diff.{ImmutableCommandStream, MutableCommandStream}
 import com.useoptic.dsa.{OpticDomainIds, SequentialIdGenerator}
 import com.useoptic.types.capture.JsonLike
@@ -144,6 +145,24 @@ class StreamingShapeBuilder()(implicit ids: OpticDomainIds, shapeBuildingStrateg
   }
 }
 
+class FocusedStreamingShapeBuilder(trail: JsonTrail)(implicit ids: OpticDomainIds, shapeBuildingStrategy: ShapeBuildingStrategy) {
+
+  private val aggregator = new TrailValueMap(shapeBuildingStrategy)
+  private val visitor = new ShapeBuilderVisitor(aggregator)
+  private val jsonLikeTraverser = new FocusedJsonLikeTraverser(trail, visitor)
+  private var interactionCounter = AffordanceInteractionPointers()
+
+  def process(jsonLike: JsonLike, interactionPointer: String) = {
+    jsonLikeTraverser.traverse(Some(jsonLike), JsonTrail(Seq.empty))
+
+    val valueAtTrail = JsonLikeResolvers.tryResolveJsonTrail(trail, Some(jsonLike))
+    interactionCounter = interactionCounter.handleJsonLike(valueAtTrail, interactionPointer)
+  }
+
+  def serialize = ValueAffordanceSerializationWithCounter(aggregator.serialize, interactionCounter)
+
+}
+
 //// Shapes to Make
 sealed trait ShapesToMake {
   def id: String
@@ -169,7 +188,6 @@ object ShapeBuildingStrategy {
 
 class TrailValueMap(strategy: ShapeBuildingStrategy)(implicit ids: OpticDomainIds) {
 
-
   class ValueAffordanceMap(var trail: JsonTrail) {
     var wasString: Boolean = false
     var wasNumber: Boolean = false
@@ -178,7 +196,12 @@ class TrailValueMap(strategy: ShapeBuildingStrategy)(implicit ids: OpticDomainId
     var wasArray: Boolean = false
     var wasObject: Boolean = false
 
-    private var fieldSet: Set[Set[String]] = Set.empty
+    var fieldSet: Set[Set[String]] = Set.empty
+
+    def serialize: ValueAffordanceSerialization = ValueAffordanceSerialization(
+      trail,
+      wasString, wasNumber, wasBoolean, wasNull, wasArray, wasObject, fieldSet
+    )
 
     def touchObject(fields: Set[String]) = {
       wasObject = true
@@ -256,10 +279,30 @@ class TrailValueMap(strategy: ShapeBuildingStrategy)(implicit ids: OpticDomainId
 
   private val _internal = scala.collection.mutable.Map[JsonTrail, ValueAffordanceMap]()
 
+  def serialize: Vector[ValueAffordanceSerialization] = _internal.values.map(_.serialize).toVector
+  def deserialize(vector: Vector[ValueAffordanceSerialization]): Unit = {
+    vector.foreach{
+      case item: ValueAffordanceSerialization => {
+        val affordances = new ValueAffordanceMap(item.trail)
+        affordances.wasString = item.wasString
+        affordances.wasNumber = item.wasNumber
+        affordances.wasNull = item.wasNull
+        affordances.wasBoolean = item.wasBoolean
+        affordances.wasArray = item.wasArray
+        affordances.wasObject = item.wasObject
+        affordances.fieldSet = item.fieldSet
+
+        _internal.put(
+          item.trail,
+          affordances
+        )
+    }}
+  }
+
   def putValue(trail: JsonTrail, value: JsonLike): Unit = {
 
     if (_internal.get(trail).isDefined && strategy.learnFromFirstOccurrenceOnly) {
-      return Unit
+      return
     } else {
 
       val affordanceMap = _internal.getOrElseUpdate(trail, new ValueAffordanceMap(trail))
