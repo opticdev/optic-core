@@ -35,7 +35,7 @@ object SimpleDiffJsonSerializer {
     x.asJson
   }
   implicit val simpleDiffResultDecoder: Decoder[InteractionDiffResult] = x => {
-    Right(x.as[InteractionDiffResult])
+    x.as[InteractionDiffResult]
   }
 
   def fromJs(x: js.Any): InteractionDiffResult = {
