@@ -12,6 +12,7 @@ import io.circe.Json
 
 import scala.scalajs.js.annotation.{JSExport, JSExportAll}
 
+
 case class ExpectedHelper(allowedCoreShapes: Seq[String],
                           lastField: Option[FieldId],
                           lastObject: Option[ShapeId],
@@ -27,7 +28,7 @@ case class ExpectedHelper(allowedCoreShapes: Seq[String],
 @JSExportAll
 object ExpectedHelper {
 
-  def expectedForDiffStrings(diffsRaw: Seq[String], rfcState: RfcState): Json = {
+  def expectedForDiffStrings(diffsRaw: String, rfcState: RfcState): Json = {
     import io.circe._, io.circe.parser._
     import io.circe.generic.auto._
     import io.circe.syntax._
@@ -72,12 +73,10 @@ object ExpectedHelper {
       shapeName)
   }
 
-  def parseDiffs(diffsRaw: Seq[String]): Seq[InteractionDiffResult] = {
+  def parseDiffs(diffsRaw: String): Seq[InteractionDiffResult] = {
     import io.circe._, io.circe.parser._
     import io.circe.generic.auto._
     import io.circe.syntax._
-
-    diffsRaw.map(diff =>
-      parse(diff).right.get.as[InteractionDiffResult].right.get)
+    parse(diffsRaw).right.get.as[Seq[InteractionDiffResult]].right.get
   }
 }
