@@ -42,6 +42,10 @@ object SimpleDiffJsonSerializer {
     convertJsToJson(x).right.get.as[InteractionDiffResult].right.get
   }
 
+  def fromJson(x: Json): InteractionDiffResult = {
+    x.as[InteractionDiffResult].right.get
+  }
+
   def toJs(diff: InteractionDiffResult): js.Any = {
     convertJsonToJs(diff.asJson)
   }
@@ -69,7 +73,7 @@ object DiffWithPointersJsonDeserializer {
     Right(x.as[Seq[(InteractionDiffResult, Seq[String])]].right.get.toMap)
   }
 
-  def fromJs(x: js.Any) = {
+  def fromJs(x: js.Any): InteractionPointersGroupedByDiff = {
     fromJson(convertJsToJson(x).right.get)
   }
 
