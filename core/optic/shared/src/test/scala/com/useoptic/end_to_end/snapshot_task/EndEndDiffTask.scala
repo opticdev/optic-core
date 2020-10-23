@@ -4,7 +4,9 @@ import com.useoptic.contexts.rfc.Commands.RfcCommand
 import com.useoptic.contexts.rfc.Events.RfcEvent
 import com.useoptic.contexts.rfc.{RfcCommandContext, RfcService, RfcServiceJSFacade}
 import com.useoptic.diff.helpers.DiffHelpers
-import com.useoptic.diff.interactions.{InteractionDiffResult}
+import com.useoptic.diff.initial.FocusedStreamingShapeBuilder
+import com.useoptic.diff.interactions.InteractionDiffResult
+import com.useoptic.diff.interactions.interpreters.distribution_aware.LearnJsonTrailAffordances
 import com.useoptic.diff.interactions.interpreters.{DefaultInterpreters, DiffDescription, DiffDescriptionInterpreters}
 import com.useoptic.diff.shapes.resolvers.ShapesResolvers
 import com.useoptic.dsa.OpticIds
@@ -62,6 +64,10 @@ class EndEndDiffTask
 
     DiffOutput(diffs.map(i => {
       val (diff, interactions) = i
+
+      val learner = LearnJsonTrailAffordances.newLearner("", "", diff)
+      interactions.foreach(i => learner.learnBody(i, i.uuid))
+      println(learner)
 
       val interpret = new DiffDescriptionInterpreters(rfcState)
       val description = interpret.interpret(diff, interactions.head)
