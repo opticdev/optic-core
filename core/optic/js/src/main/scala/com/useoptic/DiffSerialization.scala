@@ -39,7 +39,7 @@ object SimpleDiffJsonSerializer {
   }
 
   def fromJs(x: js.Any): InteractionDiffResult = {
-    fromJs(x)
+    convertJsToJson(x).right.get.as[InteractionDiffResult].right.get
   }
 
   def toJs(diff: InteractionDiffResult): js.Any = {
