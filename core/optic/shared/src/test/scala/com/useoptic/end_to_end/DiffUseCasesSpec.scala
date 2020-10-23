@@ -28,7 +28,7 @@ class DiffUseCasesSpec extends EndEndDiffTask with JsonFileFixture {
   }))
 
 
-  when("a known field is missing", () => EndEndDiffTask.Input(baselineEvents._1, Vector(
+  whenOnly("a known field is missing", () => EndEndDiffTask.Input(baselineEvents._1, Vector(
       personInteraction.forkResponseBody(json => {
         val obj = json.asObject.get.remove("firstName")
         Json.fromJsonObject(obj)
