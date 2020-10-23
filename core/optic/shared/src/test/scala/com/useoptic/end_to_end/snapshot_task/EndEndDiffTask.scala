@@ -7,7 +7,7 @@ import com.useoptic.diff.helpers.DiffHelpers
 import com.useoptic.diff.initial.FocusedStreamingShapeBuilder
 import com.useoptic.diff.interactions.InteractionDiffResult
 import com.useoptic.diff.interactions.interpreters.distribution_aware.LearnJsonTrailAffordances
-import com.useoptic.diff.interactions.interpreters.{DefaultInterpreters, DiffDescription, DiffDescriptionInterpreters}
+import com.useoptic.diff.interactions.interpreters.{DefaultInterpreters, DiffDescription, DiffDescriptionInterpreters, ExpectedHelper}
 import com.useoptic.diff.shapes.resolvers.ShapesResolvers
 import com.useoptic.dsa.OpticIds
 import com.useoptic.end_to_end.snapshot_task.EndEndDiffTask.{DiffOutput, DiffWithDescriptionAndUX, Input, SuggestionSlim}
@@ -67,7 +67,9 @@ class EndEndDiffTask
 
       val learner = LearnJsonTrailAffordances.newLearner("", "", diff)
       interactions.foreach(i => learner.learnBody(i, i.uuid))
-      println(learner)
+//      println(learner)
+
+//      println(ExpectedHelper.expectedForDiff(Seq(diff), rfcState))
 
       val interpret = new DiffDescriptionInterpreters(rfcState)
       val description = interpret.interpret(diff, interactions.head)
