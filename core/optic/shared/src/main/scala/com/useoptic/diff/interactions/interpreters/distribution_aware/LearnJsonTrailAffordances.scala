@@ -15,6 +15,17 @@ import scala.scalajs.js.annotation.{JSExport, JSExportAll}
 object LearnJsonTrailAffordances {
   def newLearner(pathId: PathComponentId, method: String, diff: InteractionDiffResult) =
     new LearnJsonTrailAffordances(pathId, method, diff)
+  def newLearner(pathId: PathComponentId, method: String, diff: String) = {
+
+    import io.circe._, io.circe.parser._
+    import io.circe.generic.auto._
+    import io.circe.syntax._
+
+    new LearnJsonTrailAffordances(
+      pathId,
+      method,
+      parse(diff).right.get.as[InteractionDiffResult].right.get)
+  }
 }
 
 @JSExportAll
