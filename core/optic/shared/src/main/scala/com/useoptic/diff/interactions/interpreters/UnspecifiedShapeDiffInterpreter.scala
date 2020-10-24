@@ -56,7 +56,7 @@ class UnspecifiedShapeDiffInterpreter(
       interactionTrail: InteractionTrail,
       shapeDiff: UnspecifiedShape,
       interaction: HttpInteraction
-  ) = {
+  ): Seq[InteractiveDiffInterpretation] = {
     val choices = resolvers.listTrailChoices(shapeDiff.shapeTrail, Map.empty)
     choices.foreach(Logger.log)
     val choiceWithUnspecifiedShape = choices.find(choice => {
