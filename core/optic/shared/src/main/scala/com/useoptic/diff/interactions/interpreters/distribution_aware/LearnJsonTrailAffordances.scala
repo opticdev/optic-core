@@ -4,6 +4,7 @@ import com.useoptic.contexts.requests.Commands.PathComponentId
 import com.useoptic.diff.MutableCommandStream
 import com.useoptic.diff.initial.{DistributionAwareShapeBuilder, FocusedStreamingShapeBuilder, ShapeBuildingStrategy, TrailValueMap, ValueAffordanceSerialization}
 import com.useoptic.diff.interactions.{BodyUtilities, InteractionDiffResult, RequestSpecTrailHelpers}
+import com.useoptic.diff.shapes.JsonTrail
 import com.useoptic.dsa
 import com.useoptic.dsa.OpticIds
 import com.useoptic.serialization.CommandSerialization
@@ -31,22 +32,26 @@ object LearnJsonTrailAffordances {
       parse(diff).right.get.as[InteractionDiffResult].right.get)
   }
 
-  def toCommands(jsonString: String, deterministicIds: Boolean = false): LearnedCommands = {
+  def toCommandsJson(valueAffordances: String, jsonTrailRaw: String, deterministicIds: Boolean = false): Option[Json] = {
     import io.circe._, io.circe.parser._
     import io.circe.generic.auto._
     import io.circe.syntax._
+
+    val jsonTrail = parse(jsonTrailRaw).right.get.as[JsonTrail].right.get
+
     implicit val ids = if (deterministicIds) OpticIds.newDeterministicIdGenerator else OpticIds.newRandomIdGenerator
-    val results = parse(jsonString).right.get.as[Vector[ValueAffordanceSerialization]].right.get
+    val results = parse(valueAffordances).right.get.as[Vector[ValueAffordanceSerialization]].right.get
     val trailmap = new TrailValueMap(ShapeBuildingStrategy.inferPolymorphism)(ids)
     trailmap.deserialize(results)
-    val rootShape = DistributionAwareShapeBuilder.toShapes(trailmap)
 
-    implicit val commands = new MutableCommandStream
-    DistributionAwareShapeBuilder.buildCommandsFor(rootShape, None)
-    LearnedCommands (rootShape.id, CommandSerialization.toJson(commands.toImmutable.flatten))
-
+    trailmap.getJsonTrail(jsonTrail).map(affordance => {
+      val rootShape = affordance.toShape
+      implicit val commands = new MutableCommandStream
+      DistributionAwareShapeBuilder.buildCommandsFor(rootShape, None)
+      LearnedCommands (rootShape.id, CommandSerialization.toJson(commands.toImmutable.flatten))
+    }).map(_.asJson)
   }
-
+  
 }
 
 @JSExportAll

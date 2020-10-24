@@ -41,9 +41,6 @@ class FocusedJsonLikeTraverser(baseTrail: JsonTrail, visitors: JsonLikeVisitors)
   }
   def traverse(body: Option[JsonLike], bodyTrail: JsonTrail): Unit = {
     val s = shouldVisit(bodyTrail)
-    println(bodyTrail)
-    println(baseTrail)
-    println(s)
     if (body.isDefined && shouldVisit(bodyTrail)) {
       val bodyJson = body.get
       if (bodyJson.isArray) {

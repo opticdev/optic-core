@@ -329,6 +329,7 @@ class TrailValueMap(strategy: ShapeBuildingStrategy)(implicit ids: OpticDomainId
   }
 
   def getRoot: ValueAffordanceMap = _internal(JsonTrail(Seq.empty))
+  def getJsonTrail(trail: JsonTrail): Option[ValueAffordanceMap] = _internal.get(trail)
   def hasRoot: Boolean = _internal.contains(JsonTrail(Seq.empty))
 
   def hasTrail(trail: JsonTrail) = _internal.contains(trail)
