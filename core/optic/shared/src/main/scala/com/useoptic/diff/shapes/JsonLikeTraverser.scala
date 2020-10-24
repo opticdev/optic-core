@@ -34,12 +34,16 @@ class JsonLikeTraverser(spec: RfcState, visitors: JsonLikeVisitors) {
 
 class FocusedJsonLikeTraverser(baseTrail: JsonTrail, visitors: JsonLikeVisitors) {
   def shouldVisit(trail: JsonTrail): Boolean = {
-    val maxLength = Set(trail.path.size, baseTrail.path.size).max
-    JsonTrail(baseTrail.path.take(maxLength)).compareLoose(
-      JsonTrail(trail.path.take(maxLength))
+    val minLength = Set(trail.path.size, baseTrail.path.size).min
+    JsonTrail(baseTrail.path.take(minLength)).compareLoose(
+      JsonTrail(trail.path.take(minLength))
     )
   }
   def traverse(body: Option[JsonLike], bodyTrail: JsonTrail): Unit = {
+    val s = shouldVisit(bodyTrail)
+    println(bodyTrail)
+    println(baseTrail)
+    println(s)
     if (body.isDefined && shouldVisit(bodyTrail)) {
       val bodyJson = body.get
       if (bodyJson.isArray) {
