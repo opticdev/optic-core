@@ -3,6 +3,7 @@ package com.useoptic.diff.interactions.interpreters
 import com.useoptic.contexts.requests.Resolvers
 import com.useoptic.contexts.rfc.{RfcService, RfcState}
 import com.useoptic.contexts.shapes.Commands.{FieldId, ShapeId}
+import com.useoptic.contexts.shapes.ShapesHelper.OptionalKind
 import com.useoptic.diff.initial.ShapeResolver
 import com.useoptic.diff.interactions.{BodyUtilities, ContentTypeHelpers, InteractionDiffResult}
 import com.useoptic.diff.shapes.{ListItemTrail, ListTrail, NullableItemTrail, NullableTrail, ObjectFieldTrail, ObjectTrail, OneOfItemTrail, OneOfTrail, OptionalItemTrail, OptionalTrail, UnknownTrail}
@@ -15,6 +16,7 @@ import scala.scalajs.js.annotation.{JSExport, JSExportAll}
 
 case class ExpectedHelper(allowedCoreShapes: Seq[String],
                           lastField: Option[FieldId],
+                          fieldIsOptional: Option[Boolean], // defined if field, true, if optional
                           lastObject: Option[ShapeId],
                           lastListItem: Option[ListItemTrail],
                           lastOneOf: Option[OneOfTrail],
@@ -49,6 +51,15 @@ object ExpectedHelper {
     val lastObject = shapeTrail.lastObject()
     val lastListItem = shapeTrail.lastListItem()
 
+
+    val fieldIsOptional: Option[Boolean] = {
+      if (lastField.isDefined) {
+        val coreShapeKind = resolver.resolveTrailToCoreShape(shapeTrail, Map.empty).coreShapeKind
+        Some(coreShapeKind == OptionalKind)
+      } else None
+    }
+
+
     val lastOneOfItemTrail: Option[OneOfItemTrail] = shapeTrail.path.lastOption collect  { case a: OneOfItemTrail => a}
     val lastOneOfTrail: Option[OneOfTrail] = shapeTrail.path.lastOption collect  { case a: OneOfTrail => a}
     val lastUnknownTrail: Option[UnknownTrail] = shapeTrail.path.lastOption collect  { case a: UnknownTrail => a}
@@ -63,6 +74,7 @@ object ExpectedHelper {
 
     ExpectedHelper(coreShapeKinds,
       lastField,
+      fieldIsOptional,
       lastObject,
       lastListItem,
       lastOneOfTrail,
