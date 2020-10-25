@@ -1,6 +1,7 @@
 package com.useoptic.diff.interactions.interpreters.distribution_aware
 
 import com.useoptic.contexts.requests.Commands.PathComponentId
+import com.useoptic.contexts.rfc.{RfcCommandContext, RfcService, RfcServiceJSFacade}
 import com.useoptic.diff.MutableCommandStream
 import com.useoptic.diff.initial.{DistributionAwareShapeBuilder, FocusedStreamingShapeBuilder, ShapeBuildingStrategy, TrailValueMap, ValueAffordanceSerialization}
 import com.useoptic.diff.interactions.{BodyUtilities, InteractionDiffResult, RequestSpecTrailHelpers}
@@ -9,6 +10,7 @@ import com.useoptic.dsa
 import com.useoptic.dsa.OpticIds
 import com.useoptic.serialization.CommandSerialization
 import com.useoptic.types.capture.HttpInteraction
+import com.useoptic.ux.ShapeNameRenderer
 import io.circe.Json
 import io.circe.parser.parse
 
@@ -48,10 +50,25 @@ object LearnJsonTrailAffordances {
       val rootShape = affordance.toShape
       implicit val commands = new MutableCommandStream
       DistributionAwareShapeBuilder.buildCommandsFor(rootShape, None)
-      LearnedCommands (rootShape.id, CommandSerialization.toJson(commands.toImmutable.flatten))
+
+      val finalCommands = commands.toImmutable.flatten
+
+
+
+      val eventStore = RfcServiceJSFacade.makeEventStore()
+      val simulatedId = "simulated-id"
+      val rfcService = new RfcService(eventStore)
+      rfcService.handleCommandSequence(simulatedId, finalCommands, RfcCommandContext("", "", ""))
+
+      val currentState = rfcService.currentState(simulatedId)
+
+      val namer = new ShapeNameRenderer(currentState)
+      val flatName = namer.nameForShapeId(rootShape.id).get.map(_.text).mkString(" ").trim()
+
+      LearnedCommands (rootShape.id, flatName, CommandSerialization.toJson(finalCommands))
     }).map(_.asJson)
   }
-  
+
 }
 
 @JSExportAll
@@ -89,4 +106,4 @@ class LearnJsonTrailAffordances(val pathId: PathComponentId, val method: String,
 
 
 @JSExportAll
-case class LearnedCommands(rootShapeId: String, commands: Json)
+case class LearnedCommands(rootShapeId: String, name: String, commands: Json)
