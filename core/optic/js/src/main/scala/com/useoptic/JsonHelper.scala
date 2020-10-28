@@ -1,8 +1,9 @@
 package com.useoptic
 
+import com.useoptic.diff.interactions.BodyUtilities
 import com.useoptic.logging.Logger
 import com.useoptic.serialization.InteractionSerialization
-import com.useoptic.types.capture.{HttpInteraction}
+import com.useoptic.types.capture.HttpInteraction
 import io.circe.{Decoder, Json}
 
 import scala.scalajs.js
@@ -70,5 +71,16 @@ object JsonHelper {
     import io.circe.scalajs.convertJsToJson
 
     InteractionSerialization.fromJson(convertJsToJson(x).right.get)
+  }
+
+  def fromInteractionBodyToJs(x: js.Any): js.Any = {
+    import io.circe.scalajs.convertJsToJson
+
+    val body = InteractionSerialization.bodyFromJson(convertJsToJson(x).right.get)
+
+    val parsedJson = BodyUtilities.parseJsonBody(body)
+    val rawBody = body.value.asText.map(Json.fromString)
+
+    convertJsonToJs(Json.fromJsonObject(Map("asJson" -> parsedJson.getOrElse(Json.Null), "asText" -> rawBody.getOrElse(Json.Null)).asJsonObject))
   }
 }
