@@ -46,7 +46,7 @@ class FocusedJsonLikeTraverser(baseTrail: JsonTrail, visitors: Set[JsonLikeVisit
       if (bodyJson.isArray) {
         visitors.foreach(_.arrayVisitor.visit(bodyJson, bodyTrail))
         bodyJson.distinctItemsByIndex.foreach{ case (index, item) => {
-          val itemTrail = bodyTrail.withChild(JsonArrayItem(0)) // normalized by default
+          val itemTrail = bodyTrail.withChild(JsonArrayItem(index))
           traverse(Some(item), itemTrail)
         }}
       } else if (bodyJson.isObject) {
