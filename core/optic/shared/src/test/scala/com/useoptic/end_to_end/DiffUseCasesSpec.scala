@@ -35,7 +35,7 @@ class DiffUseCasesSpec extends EndEndDiffTask with JsonFileFixture {
       })
     )))
 
-    whenOnly("a known field is provided the wrong shape", () => EndEndDiffTask.Input(baselineEvents._1, Vector(
+    when("a known field is provided the wrong shape", () => EndEndDiffTask.Input(baselineEvents._1, Vector(
       personInteraction.forkResponseBody(json => {
         Json.fromJsonObject(json.asObject.get.add("age", Json.fromString("not a number")))
       })

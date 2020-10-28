@@ -148,15 +148,16 @@ class StreamingShapeBuilder()(implicit ids: OpticDomainIds, shapeBuildingStrateg
 class FocusedStreamingShapeBuilder(trail: JsonTrail)(implicit ids: OpticDomainIds, shapeBuildingStrategy: ShapeBuildingStrategy) {
 
   private val aggregator = new TrailValueMap(shapeBuildingStrategy)
-  private val visitor = new ShapeBuilderVisitor(aggregator)
-  private val jsonLikeTraverser = new FocusedJsonLikeTraverser(trail, visitor)
+  val allAffordanceVisitor = new ShapeBuilderVisitor(aggregator)
   private var interactionCounter = AffordanceInteractionPointers()
 
   def process(jsonLike: JsonLike, interactionPointer: String) = {
+    val normalizedTrailsVisitor = new DenormalizedTrailCollector(trail)
+    val jsonLikeTraverser = new FocusedJsonLikeTraverser(trail, Set(allAffordanceVisitor, normalizedTrailsVisitor))
     jsonLikeTraverser.traverse(Some(jsonLike), JsonTrail(Seq.empty))
 
     val valueAtTrail = JsonLikeResolvers.tryResolveJsonTrail(trail, Some(jsonLike))
-    interactionCounter = interactionCounter.handleJsonLike(valueAtTrail, interactionPointer)
+    interactionCounter = interactionCounter.handleJsonLike(valueAtTrail, normalizedTrailsVisitor, interactionPointer)
   }
 
   def serialize = ValueAffordanceSerializationWithCounter(aggregator.serialize, interactionCounter)
@@ -279,6 +280,7 @@ class TrailValueMap(strategy: ShapeBuildingStrategy)(implicit ids: OpticDomainId
 
   private val _internal = scala.collection.mutable.Map[JsonTrail, ValueAffordanceMap]()
 
+  def toMap = _internal.toMap
   def serialize: Vector[ValueAffordanceSerialization] = _internal.values.map(_.serialize).toVector
   def deserialize(vector: Vector[ValueAffordanceSerialization]): Unit = {
     vector.foreach{
@@ -352,5 +354,54 @@ class ShapeBuilderVisitor(aggregator: TrailValueMap) extends JsonLikeVisitors {
   }
   override val primitiveVisitor: PrimitiveVisitor = new PrimitiveVisitor {
     override def visit(value: JsonLike, bodyTrail: JsonTrail): Unit = aggregator.putValue(normalizeTrail(bodyTrail), value)
+  }
+}
+
+class DenormalizedTrailCollector(jsonTrail: JsonTrail)(implicit id: OpticDomainIds) extends JsonLikeVisitors {
+
+  private val aggregator = new TrailValueMap(ShapeBuildingStrategy.inferPolymorphism)
+
+  def handle(value: JsonLike, bodyTrail: JsonTrail) = {
+    if (jsonTrail.compareLoose(bodyTrail)) {
+      aggregator.putValue(bodyTrail, value)
+    }
+  }
+
+  val lastFieldOption = jsonTrail.path.lastOption.collect {
+    case a: JsonObjectKey => a
+  }
+
+  private lazy val asMapLazy = aggregator.toMap
+
+  private val _missing = scala.collection.mutable.ListBuffer[JsonTrail]()
+
+  def wasStringTrails: Vector[JsonTrail] = asMapLazy.collect {case (trail, affordances) if affordances.wasString => trail }.toVector.distinct
+  def wasNumberTrails: Vector[JsonTrail] = asMapLazy.collect {case (trail, affordances) if affordances.wasNumber => trail }.toVector.distinct
+  def wasBooleanTrails: Vector[JsonTrail] = asMapLazy.collect {case (trail, affordances) if affordances.wasBoolean => trail }.toVector.distinct
+  def wasNullTrails: Vector[JsonTrail] = asMapLazy.collect {case (trail, affordances) if affordances.wasNull => trail }.toVector.distinct
+  def wasArrayTrails: Vector[JsonTrail] = asMapLazy.collect {case (trail, affordances) if affordances.wasArray => trail }.toVector.distinct
+  def wasObjectTrails: Vector[JsonTrail] = asMapLazy.collect {case (trail, affordances) if affordances.wasObject => trail }.toVector.distinct
+  def wasMissingTrails: Vector[JsonTrail] = _missing.toVector
+
+  override val objectVisitor: ObjectVisitor = new ObjectVisitor {
+    override def visit(value: JsonLike, bodyTrail: JsonTrail): Unit = {
+
+      if (lastFieldOption.isDefined) { // it is a field
+        val expectedTrail = bodyTrail.withChild(lastFieldOption.get)
+        if (expectedTrail.compareLoose(jsonTrail)) {  // if it's here, it would match the focus
+          val missing = value.asJson.asObject.exists(obj => !obj.contains(lastFieldOption.get.key))
+          if (missing) {
+            _missing.append(expectedTrail)
+          }
+        }
+      }
+      handle(value, bodyTrail)
+    }
+  }
+  override val arrayVisitor: ArrayVisitor =new ArrayVisitor {
+    override def visit(value: JsonLike, bodyTrail: JsonTrail): Unit = handle(value, bodyTrail)
+  }
+  override val primitiveVisitor: PrimitiveVisitor = new PrimitiveVisitor {
+    override def visit(value: JsonLike, bodyTrail: JsonTrail): Unit = handle(value, bodyTrail)
   }
 }

@@ -32,7 +32,7 @@ class JsonLikeTraverser(spec: RfcState, visitors: JsonLikeVisitors) {
 }
 
 
-class FocusedJsonLikeTraverser(baseTrail: JsonTrail, visitors: JsonLikeVisitors) {
+class FocusedJsonLikeTraverser(baseTrail: JsonTrail, visitors: Set[JsonLikeVisitors]) {
   def shouldVisit(trail: JsonTrail): Boolean = {
     val minLength = Set(trail.path.size, baseTrail.path.size).min
     JsonTrail(baseTrail.path.take(minLength)).compareLoose(
@@ -44,19 +44,19 @@ class FocusedJsonLikeTraverser(baseTrail: JsonTrail, visitors: JsonLikeVisitors)
     if (body.isDefined && shouldVisit(bodyTrail)) {
       val bodyJson = body.get
       if (bodyJson.isArray) {
-        visitors.arrayVisitor.visit(bodyJson, bodyTrail)
+        visitors.foreach(_.arrayVisitor.visit(bodyJson, bodyTrail))
         bodyJson.distinctItemsByIndex.foreach{ case (index, item) => {
           val itemTrail = bodyTrail.withChild(JsonArrayItem(0)) // normalized by default
           traverse(Some(item), itemTrail)
         }}
       } else if (bodyJson.isObject) {
-        visitors.objectVisitor.visit(bodyJson, bodyTrail)
+        visitors.foreach(_.objectVisitor.visit(bodyJson, bodyTrail))
         bodyJson.fields.foreach{ case (key, value) => {
           val fieldTrail = bodyTrail.withChild(JsonObjectKey(key))
           traverse(Some(value), fieldTrail)
         }}
       } else {
-        visitors.primitiveVisitor.visit(bodyJson, bodyTrail)
+        visitors.foreach(_.primitiveVisitor.visit(bodyJson, bodyTrail))
       }
     }
   }
