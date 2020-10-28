@@ -154,7 +154,7 @@ class FocusedStreamingShapeBuilder(trail: JsonTrail)(implicit ids: OpticDomainId
   def process(jsonLike: JsonLike, interactionPointer: String) = {
     val normalizedTrailsVisitor = new DenormalizedTrailCollector(trail)
     val jsonLikeTraverser = new FocusedJsonLikeTraverser(trail, Set(allAffordanceVisitor, normalizedTrailsVisitor))
-    jsonLikeTraverser.traverse(Some(jsonLike), JsonTrail(Seq.empty))
+    jsonLikeTraverser.traverse(Some(jsonLike), JsonTrail(Seq.empty), 60)
 
     val valueAtTrail = JsonLikeResolvers.tryResolveJsonTrail(trail, Some(jsonLike))
     interactionCounter = interactionCounter.handleJsonLike(valueAtTrail, normalizedTrailsVisitor, interactionPointer)

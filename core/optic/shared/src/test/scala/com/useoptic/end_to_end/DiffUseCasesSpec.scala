@@ -248,6 +248,12 @@ class DiffUseCasesSpec extends EndEndDiffTask with JsonFileFixture {
     }))
   }))
 
+//  whenOnly("array with object listitem has missing fields", () => EndEndDiffTask.Input(baselineObjectArrayEvents._1, {
+//    Vector(objectArray.forkResponseBody(j => {
+//      json"""[{"name": "joe", "age": "thirty", "colors": ["red", "green", "yellow"]}, {"name": "joe", "age": "thirty"}, {"name": "joe", "age": "thirty"}]"""
+//    }))
+//  }))
+
 
   when("array with object listitem is provided with one matching, no diff", () => EndEndDiffTask.Input(baselineObjectArrayEvents._1, {
     Vector(objectArray.forkResponseBody(j => {
