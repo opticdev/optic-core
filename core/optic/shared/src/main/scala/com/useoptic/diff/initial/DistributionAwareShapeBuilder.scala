@@ -161,6 +161,7 @@ class FocusedStreamingShapeBuilder(trail: JsonTrail)(implicit ids: OpticDomainId
   }
 
   def serialize = ValueAffordanceSerializationWithCounter(aggregator.serialize, interactionCounter)
+  def getInteractionCounter = interactionCounter
 
 }
 

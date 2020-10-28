@@ -67,7 +67,9 @@ class EndEndDiffTask
 
       val learner = LearnJsonTrailAffordances.newLearner("", "", diff)
       interactions.foreach(i => learner.learnBody(i, i.uuid))
-      println(learner)
+//      println(learner)
+//      val a = learner.shapeBuilder.getInteractionCounter
+//      println(a)
 
 //      println(ExpectedHelper.expectedForDiff(Seq(diff), rfcState))
 
