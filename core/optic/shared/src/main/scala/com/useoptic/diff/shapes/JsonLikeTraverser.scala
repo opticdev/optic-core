@@ -39,16 +39,28 @@ class FocusedJsonLikeTraverser(baseTrail: JsonTrail, visitors: Set[JsonLikeVisit
       JsonTrail(trail.path.take(minLength))
     )
   }
-  def traverse(body: Option[JsonLike], bodyTrail: JsonTrail): Unit = {
-    val s = shouldVisit(bodyTrail)
+  def traverse(body: Option[JsonLike], bodyTrail: JsonTrail, takeNArrayItems: Int = 0): Unit = {
     if (body.isDefined && shouldVisit(bodyTrail)) {
       val bodyJson = body.get
       if (bodyJson.isArray) {
         visitors.foreach(_.arrayVisitor.visit(bodyJson, bodyTrail))
-        bodyJson.distinctItemsByIndex.foreach{ case (index, item) => {
+
+        //guarantees all unique get taken
+        val unique = bodyJson.distinctItemsByIndex
+        unique.foreach{ case (index, item) => {
           val itemTrail = bodyTrail.withChild(JsonArrayItem(index))
           traverse(Some(item), itemTrail)
         }}
+
+        if (takeNArrayItems > 0) {
+          // also take first n items (helps on the UI)
+          bodyJson.items.zipWithIndex.take(takeNArrayItems).filterNot(i => unique.exists(un => un._1 == i._2))
+            .foreach { case (item, index) => {
+              val itemTrail = bodyTrail.withChild(JsonArrayItem(index))
+              traverse(Some(item), itemTrail)
+          }}
+        }
+
       } else if (bodyJson.isObject) {
         visitors.foreach(_.objectVisitor.visit(bodyJson, bodyTrail))
         bodyJson.fields.foreach{ case (key, value) => {
