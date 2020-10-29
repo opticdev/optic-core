@@ -49,26 +49,27 @@ case class AffordanceInteractionPointers(wasString: Set[String] = Set.empty,
 
   def handleJsonLike(jsonLike: Option[JsonLike], normalizedTrailVisitor: DenormalizedTrailCollector, interactionId: String): AffordanceInteractionPointers = {
     var current = this
-    if (jsonLike.isDefined) {
-      if (jsonLike.get.isString) {
-        current = current.touchString(interactionId, normalizedTrailVisitor.wasStringTrails)
-      }
-      if (jsonLike.get.isNumber) {
-        current = current.touchNumber(interactionId, normalizedTrailVisitor.wasNumberTrails)
-      }
-      if (jsonLike.get.isBoolean) {
-        current = current.touchBoolean(interactionId, normalizedTrailVisitor.wasBooleanTrails)
-      }
-      if (jsonLike.get.isNull) {
-        current = current.touchNull(interactionId, normalizedTrailVisitor.wasNullTrails)
-      }
-      if (jsonLike.get.isArray) {
-        current = current.touchArray(interactionId, normalizedTrailVisitor.wasArrayTrails)
-      }
-      if (jsonLike.get.isObject) {
-        current = current.touchObject(interactionId, normalizedTrailVisitor.wasObjectTrails)
-      }
-    } else {
+
+    if (normalizedTrailVisitor.wasStringTrails.nonEmpty) {
+      current = current.touchString(interactionId, normalizedTrailVisitor.wasStringTrails)
+    }
+    if (normalizedTrailVisitor.wasNumberTrails.nonEmpty) {
+      current = current.touchNumber(interactionId, normalizedTrailVisitor.wasNumberTrails)
+    }
+    if (normalizedTrailVisitor.wasBooleanTrails.nonEmpty) {
+      current = current.touchBoolean(interactionId, normalizedTrailVisitor.wasBooleanTrails)
+    }
+    if (normalizedTrailVisitor.wasNullTrails.nonEmpty) {
+      current = current.touchNull(interactionId, normalizedTrailVisitor.wasNullTrails)
+    }
+    if (normalizedTrailVisitor.wasArrayTrails.nonEmpty) {
+      current = current.touchArray(interactionId, normalizedTrailVisitor.wasArrayTrails)
+    }
+    if (normalizedTrailVisitor.wasObjectTrails.nonEmpty) {
+      current = current.touchObject(interactionId, normalizedTrailVisitor.wasObjectTrails)
+    }
+
+    if (jsonLike.isEmpty) {
       current = current.touchMissing(interactionId, normalizedTrailVisitor.wasMissingTrails)
     }
     current
