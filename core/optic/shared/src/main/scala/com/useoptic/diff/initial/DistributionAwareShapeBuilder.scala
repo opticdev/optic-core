@@ -360,10 +360,12 @@ class ShapeBuilderVisitor(aggregator: TrailValueMap) extends JsonLikeVisitors {
 
 class DenormalizedTrailCollector(jsonTrail: JsonTrail)(implicit id: OpticDomainIds) extends JsonLikeVisitors {
 
+  val normalizedTarget = jsonTrail.withNormalizedJsonTrail
+
   private val aggregator = new TrailValueMap(ShapeBuildingStrategy.inferPolymorphism)
 
   def handle(value: JsonLike, bodyTrail: JsonTrail) = {
-    if (jsonTrail.compareLoose(bodyTrail)) {
+    if (normalizedTarget == bodyTrail.withNormalizedJsonTrail) {
       aggregator.putValue(bodyTrail, value)
     }
   }
@@ -389,7 +391,7 @@ class DenormalizedTrailCollector(jsonTrail: JsonTrail)(implicit id: OpticDomainI
 
       if (lastFieldOption.isDefined) { // it is a field
         val expectedTrail = bodyTrail.withChild(lastFieldOption.get)
-        if (expectedTrail.compareLoose(jsonTrail)) {  // if it's here, it would match the focus
+        if (expectedTrail.withNormalizedJsonTrail == normalizedTarget) {  // if it's here, it would match the focus
           val missing = value.asJson.asObject.exists(obj => !obj.contains(lastFieldOption.get.key))
           if (missing) {
             _missing.append(expectedTrail)
