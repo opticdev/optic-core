@@ -51,25 +51,25 @@ case class AffordanceInteractionPointers(wasString: Set[String] = Set.empty,
     var current = this
     if (jsonLike.isDefined) {
       if (jsonLike.get.isString) {
-        current = touchString(interactionId, normalizedTrailVisitor.wasStringTrails)
+        current = current.touchString(interactionId, normalizedTrailVisitor.wasStringTrails)
       }
       if (jsonLike.get.isNumber) {
-        current = touchNumber(interactionId, normalizedTrailVisitor.wasNumberTrails)
+        current = current.touchNumber(interactionId, normalizedTrailVisitor.wasNumberTrails)
       }
       if (jsonLike.get.isBoolean) {
-        current = touchBoolean(interactionId, normalizedTrailVisitor.wasBooleanTrails)
+        current = current.touchBoolean(interactionId, normalizedTrailVisitor.wasBooleanTrails)
       }
       if (jsonLike.get.isNull) {
-        current = touchNull(interactionId, normalizedTrailVisitor.wasNullTrails)
+        current = current.touchNull(interactionId, normalizedTrailVisitor.wasNullTrails)
       }
       if (jsonLike.get.isArray) {
-        current = touchArray(interactionId, normalizedTrailVisitor.wasArrayTrails)
+        current = current.touchArray(interactionId, normalizedTrailVisitor.wasArrayTrails)
       }
       if (jsonLike.get.isObject) {
-        current = touchObject(interactionId, normalizedTrailVisitor.wasObjectTrails)
+        current = current.touchObject(interactionId, normalizedTrailVisitor.wasObjectTrails)
       }
     } else {
-      current = touchMissing(interactionId, normalizedTrailVisitor.wasMissingTrails)
+      current = current.touchMissing(interactionId, normalizedTrailVisitor.wasMissingTrails)
     }
     current
   }
