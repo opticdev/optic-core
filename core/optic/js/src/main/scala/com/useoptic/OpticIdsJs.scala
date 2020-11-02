@@ -8,8 +8,8 @@ import scala.scalajs.js.annotation.{JSExport, JSExportAll}
 
 @JSExport
 @JSExportAll
-class OpticIdsJs() {
-  private def ids = OpticIds.newRandomIdGenerator
+class OpticIdsJs(random: Boolean = true, prefix: String = "incrementing-id") {
+  private def ids = if (random) OpticIds.newRandomIdGenerator else OpticIds.newPrefixedDeterministicIdGenerator(prefix)
 
   def newShapeId(): ShapeId = ids.newShapeId
   def newPathId(): PathComponentId = ids.newPathId
@@ -18,4 +18,12 @@ class OpticIdsJs() {
   def newShapeParameterId(): ShapeParameterId = ids.newShapeParameterId
   def newRequestParameterId(): RequestParameterId = ids.newRequestParameterId
   def newFieldId(): FieldId = ids.newFieldId
+}
+
+
+@JSExport
+@JSExportAll
+object OpticIdsJsHelper {
+  def random = new OpticIdsJs(true)
+  def deterministic = new OpticIdsJs(false)
 }

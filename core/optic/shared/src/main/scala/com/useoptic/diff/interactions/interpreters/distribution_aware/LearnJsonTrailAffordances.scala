@@ -6,13 +6,11 @@ import com.useoptic.diff.MutableCommandStream
 import com.useoptic.diff.initial.{DistributionAwareShapeBuilder, FocusedStreamingShapeBuilder, ShapeBuildingStrategy, TrailValueMap, ValueAffordanceSerialization}
 import com.useoptic.diff.interactions.{BodyUtilities, InteractionDiffResult, RequestSpecTrailHelpers}
 import com.useoptic.diff.shapes.JsonTrail
-import com.useoptic.dsa
-import com.useoptic.dsa.OpticIds
+import com.useoptic.dsa.{OpticDomainIds, OpticIds}
 import com.useoptic.serialization.CommandSerialization
 import com.useoptic.types.capture.HttpInteraction
 import com.useoptic.ux.ShapeNameRenderer
 import io.circe.Json
-import io.circe.parser.parse
 
 import scala.scalajs.js.annotation.{JSExport, JSExportAll}
 
@@ -34,14 +32,14 @@ object LearnJsonTrailAffordances {
       parse(diff).right.get.as[InteractionDiffResult].right.get)
   }
 
-  def toCommandsJson(valueAffordances: String, jsonTrailRaw: String, deterministicIds: Boolean = false): Option[Json] = {
+  def toCommandsJson(valueAffordances: String, jsonTrailRaw: String, clientProvidedIdGenerator: OpticDomainIds): Option[Json] = {
     import io.circe._, io.circe.parser._
     import io.circe.generic.auto._
     import io.circe.syntax._
 
     val jsonTrail = parse(jsonTrailRaw).right.get.as[JsonTrail].right.get
 
-    implicit val ids = if (deterministicIds) OpticIds.newDeterministicIdGenerator else OpticIds.newRandomIdGenerator
+    implicit val ids = clientProvidedIdGenerator
     val results = parse(valueAffordances).right.get.as[Vector[ValueAffordanceSerialization]].right.get
     val trailmap = new TrailValueMap(ShapeBuildingStrategy.inferPolymorphism)(ids)
     trailmap.deserialize(results)
@@ -52,7 +50,6 @@ object LearnJsonTrailAffordances {
       DistributionAwareShapeBuilder.buildCommandsFor(rootShape, None)
 
       val finalCommands = commands.toImmutable.flatten
-
 
 
       val eventStore = RfcServiceJSFacade.makeEventStore()
