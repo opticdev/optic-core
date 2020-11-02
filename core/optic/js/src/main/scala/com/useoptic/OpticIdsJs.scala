@@ -9,7 +9,7 @@ import scala.scalajs.js.annotation.{JSExport, JSExportAll}
 @JSExport
 @JSExportAll
 class OpticIdsJs(random: Boolean = true, prefix: String = "incrementing-id") {
-  private def ids = if (random) OpticIds.newRandomIdGenerator else OpticIds.newPrefixedDeterministicIdGenerator(prefix)
+  private val ids = if (random) OpticIds.newRandomIdGenerator else OpticIds.newPrefixedDeterministicIdGenerator(prefix)
 
   def newShapeId(): ShapeId = ids.newShapeId
   def newPathId(): PathComponentId = ids.newPathId
