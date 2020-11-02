@@ -17,6 +17,7 @@ import scala.scalajs.js.annotation.{JSExport, JSExportAll}
 case class ExpectedHelper(allowedCoreShapes: Seq[String],
                           lastField: Option[FieldId],
                           lastFieldKey: Option[String],
+                          lastFieldShapeId: Option[String],
                           fieldIsOptional: Option[Boolean], // defined if field, true, if optional
                           lastObject: Option[ShapeId],
                           lastListItem: Option[ListItemTrail],
@@ -51,6 +52,7 @@ object ExpectedHelper {
     val lastField = shapeTrail.lastField()
 
     val lastFieldKey = lastField.map(fieldId => resolver.getField(fieldId)).map(_.descriptor.name)
+    val lastFieldShapeId = lastField.map(fieldId => resolver.getField(fieldId)).map(_.descriptor.shapeId)
 
     val lastObject = shapeTrail.lastObject()
     val lastListItem = shapeTrail.lastListItem()
@@ -79,6 +81,7 @@ object ExpectedHelper {
     ExpectedHelper(coreShapeKinds,
       lastField,
       lastFieldKey,
+      lastFieldShapeId,
       fieldIsOptional,
       lastObject,
       lastListItem,
