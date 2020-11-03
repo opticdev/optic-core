@@ -3,11 +3,12 @@ package com.useoptic.diff.interactions.interpreters
 import com.useoptic.contexts.requests.Resolvers
 import com.useoptic.contexts.rfc.{RfcService, RfcState}
 import com.useoptic.contexts.shapes.Commands.{FieldId, ShapeId}
-import com.useoptic.contexts.shapes.ShapesHelper.OptionalKind
+import com.useoptic.contexts.shapes.ShapesHelper.{ListKind, ObjectKind, OptionalKind}
 import com.useoptic.diff.initial.ShapeResolver
 import com.useoptic.diff.interactions.{BodyUtilities, ContentTypeHelpers, InteractionDiffResult}
 import com.useoptic.diff.shapes.{ListItemTrail, ListTrail, NullableItemTrail, NullableTrail, ObjectFieldTrail, ObjectTrail, OneOfItemTrail, OneOfTrail, OptionalItemTrail, OptionalTrail, UnknownTrail}
 import com.useoptic.diff.shapes.resolvers.ShapesResolvers
+import com.useoptic.logging.Logger
 import com.useoptic.ux.ShapeNameRenderer
 import io.circe.Json
 
@@ -21,7 +22,7 @@ case class ExpectedHelper(allowedCoreShapes: Seq[String],
                           lastFieldShapeId: Option[String],
                           fieldIsOptional: Option[Boolean], // defined if field, true, if optional
                           lastObject: Option[ShapeId],
-                          lastListItem: Option[ListItemTrail],
+                          lastListItem: Option[ShapeId],
                           lastOneOf: Option[OneOfTrail],
                           lastOneOfItem: Option[OneOfItemTrail],
                           lastUnknownTrail: Option[UnknownTrail],
@@ -57,8 +58,20 @@ object ExpectedHelper {
     val lastFieldKey = lastField.map(fieldId => resolver.getField(fieldId)).map(_.descriptor.name)
     val lastFieldShapeId = lastField.map(fieldId => resolver.getField(fieldId)).map(_.descriptor.shapeId)
 
-    val lastObject = shapeTrail.lastObject()
-    val lastListItem = shapeTrail.lastListItem()
+
+    val choices = resolver.listTrailChoices(diffs.head.shapeDiffResultOption.get.shapeTrail, Map.empty)
+    
+    val lastObject = {
+      choices.collectFirst{
+          case c if c.coreShapeKind == ObjectKind => c.shapeId
+      }
+    }
+
+    val lastListItem = {
+      choices.collectFirst{
+        case c if c.coreShapeKind == ListKind => c.shapeId
+      }
+    }
 
 
     val fieldIsOptional: Option[Boolean] = {
