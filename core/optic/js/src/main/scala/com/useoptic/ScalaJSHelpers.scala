@@ -38,6 +38,11 @@ object ScalaJSHelpers {
     undefOr.toOption
   }
 
+  def toSome[A](undefOr: UndefOr[A]): Some[A] = {
+    require(undefOr.nonEmpty, "toSome requires defined value")
+    Some(undefOr.get)
+  }
+
   def headOrUndefined[A](seq: Seq[A]): UndefOr[A] = {
     seq.headOption.orUndefined
   }

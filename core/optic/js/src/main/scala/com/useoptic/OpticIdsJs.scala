@@ -2,13 +2,13 @@ package com.useoptic
 
 import com.useoptic.contexts.requests.Commands.{PathComponentId, RequestId, RequestParameterId, ResponseId}
 import com.useoptic.contexts.shapes.Commands.{FieldId, ShapeId, ShapeParameterId}
-import com.useoptic.dsa.OpticIds
+import com.useoptic.dsa.{OpticDomainIds, OpticIds}
 
 import scala.scalajs.js.annotation.{JSExport, JSExportAll}
 
 @JSExport
 @JSExportAll
-class OpticIdsJs(random: Boolean = true, prefix: String = "incrementing-id") {
+class OpticIdsJs(random: Boolean = true, prefix: String = "incrementing-id") extends OpticDomainIds{
   private val ids = if (random) OpticIds.newRandomIdGenerator else OpticIds.newPrefixedDeterministicIdGenerator(prefix)
 
   def newShapeId(): ShapeId = ids.newShapeId
