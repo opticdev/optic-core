@@ -36,7 +36,7 @@ class BuildShapeTask
   override def transform(input: BuildShapeTask.Input): BuildShapeTask.Output = {
     implicit val ids = OpticIds.newDeterministicIdGenerator
     implicit val shapeBuildingStrategy = ShapeBuildingStrategy.learnASingleInteraction
-    val shape = DistributionAwareShapeBuilder.aggregateTrailsAndValues(input.inputJsons.flatMap(JsonLikeFrom.json)).getRoot.toShape
+    val shape = DistributionAwareShapeBuilder.aggregateTrailsAndValues(input.inputJsons.flatMap(JsonLikeFrom.json)).getRoot.toShape(None)
 
     implicit val commands = new MutableCommandStream
     DistributionAwareShapeBuilder.buildCommandsFor(shape, None)
