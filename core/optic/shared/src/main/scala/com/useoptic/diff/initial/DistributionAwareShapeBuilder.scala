@@ -117,7 +117,7 @@ object DistributionAwareShapeBuilder {
     aggregator
   }
 
-  def toShapes(trailValues: TrailValueMap): ShapesToMake = trailValues.getRoot.toShape
+  def toShapes(trailValues: TrailValueMap): ShapesToMake = trailValues.getRoot.toShape()
 }
 
 class StreamingShapeBuilder()(implicit ids: OpticDomainIds, shapeBuildingStrategy: ShapeBuildingStrategy) {
@@ -218,18 +218,26 @@ class TrailValueMap(strategy: ShapeBuildingStrategy)(implicit ids: OpticDomainId
         !wasArray &&
         !wasObject
 
-    def toShape: ShapesToMake = {
+    def toShape(excludeAllKindsExcept: Option[CoreShapeKind] = None): ShapesToMake = {
+
+      val excludeString = excludeAllKindsExcept.exists(i => i != StringKind)
+      val excludeNumber = excludeAllKindsExcept.exists(i => i != NumberKind)
+      val excludeBoolean = excludeAllKindsExcept.exists(i => i != BooleanKind)
+      val excludeArray = excludeAllKindsExcept.exists(i => i != ListKind)
+      val excludeObject = excludeAllKindsExcept.exists(i => i != ObjectKind)
+      val excludeNull = excludeAllKindsExcept.exists(i => i != NullableKind)
+
       val kindsSet: Set[Option[ShapesToMake]] = Set(
-        if (wasString) Some(PrimitiveKind(StringKind, trail, ids.newShapeId)) else None,
-        if (wasNumber) Some(PrimitiveKind(NumberKind, trail, ids.newShapeId)) else None,
-        if (wasBoolean) Some(PrimitiveKind(BooleanKind, trail, ids.newShapeId)) else None,
-        if (wasArray) Some({
+        if (wasString && !excludeString) Some(PrimitiveKind(StringKind, trail, ids.newShapeId)) else None,
+        if (wasNumber  && !excludeNumber) Some(PrimitiveKind(NumberKind, trail, ids.newShapeId)) else None,
+        if (wasBoolean  && !excludeBoolean) Some(PrimitiveKind(BooleanKind, trail, ids.newShapeId)) else None,
+        if (wasArray  && !excludeArray) Some({
           val itemTrail = trail.withChild(JsonArrayItem(0))
           val inner = _internal.getOrElseUpdate(itemTrail, new ValueAffordanceMap(itemTrail))
-          inner.toShape
-          ListOfShape(inner.toShape, trail, ids.newShapeId)
+          inner.toShape()
+          ListOfShape(inner.toShape(), trail, ids.newShapeId)
         }) else None,
-        if (wasObject) Some({
+        if (wasObject && !excludeObject) Some({
           val unionOfKeys = fieldSet.flatten
 
           val optionalKeys = unionOfKeys.collect {
@@ -241,7 +249,7 @@ class TrailValueMap(strategy: ShapeBuildingStrategy)(implicit ids: OpticDomainId
             val inner = _internal.getOrElseUpdate(fieldTrail, new ValueAffordanceMap(fieldTrail))
 
             val isOptional = optionalKeys.contains(key)
-            val innerShape = inner.toShape
+            val innerShape = inner.toShape()
 
             val fieldShape = if (isOptional) {
               OptionalShape(innerShape, fieldTrail, ids.newShapeId)
@@ -270,7 +278,7 @@ class TrailValueMap(strategy: ShapeBuildingStrategy)(implicit ids: OpticDomainId
         Unknown(trail, ids.newShapeId)
       }
 
-      if (wasNull) {
+      if (wasNull && !excludeNull) {
         NullableShape(finalShape, trail, ids.newShapeId)
       } else {
         finalShape

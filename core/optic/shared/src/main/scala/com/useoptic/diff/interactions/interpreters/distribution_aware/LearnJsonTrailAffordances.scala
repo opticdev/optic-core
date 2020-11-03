@@ -2,6 +2,9 @@ package com.useoptic.diff.interactions.interpreters.distribution_aware
 
 import com.useoptic.contexts.requests.Commands.PathComponentId
 import com.useoptic.contexts.rfc.{RfcCommandContext, RfcService, RfcServiceJSFacade}
+import com.useoptic.contexts.shapes.Commands.ShapeId
+import com.useoptic.contexts.shapes.ShapesHelper
+import com.useoptic.contexts.shapes.ShapesHelper.CoreShapeKind
 import com.useoptic.diff.MutableCommandStream
 import com.useoptic.diff.initial.{DistributionAwareShapeBuilder, FocusedStreamingShapeBuilder, ShapeBuildingStrategy, TrailValueMap, ValueAffordanceSerialization}
 import com.useoptic.diff.interactions.{BodyUtilities, InteractionDiffResult, RequestSpecTrailHelpers}
@@ -32,10 +35,13 @@ object LearnJsonTrailAffordances {
       parse(diff).right.get.as[InteractionDiffResult].right.get)
   }
 
-  def toCommandsJson(valueAffordances: String, jsonTrailRaw: String, clientProvidedIdGenerator: OpticDomainIds): Option[Json] = {
+  def toCommandsJson(valueAffordances: String, jsonTrailRaw: String, clientProvidedIdGenerator: OpticDomainIds, learnOnlyKind: Option[ShapeId]): Option[Json] = {
     import io.circe._, io.circe.parser._
     import io.circe.generic.auto._
     import io.circe.syntax._
+
+    val limitToCoreShapeOption: Option[CoreShapeKind] =
+      learnOnlyKind.flatMap(shapeId => ShapesHelper.allCoreShapes.find(i => i.baseShapeId == shapeId))
 
     val jsonTrail = parse(jsonTrailRaw).right.get.as[JsonTrail].right.get
 
@@ -45,7 +51,9 @@ object LearnJsonTrailAffordances {
     trailmap.deserialize(results)
 
     trailmap.getJsonTrail(jsonTrail).map(affordance => {
-      val rootShape = affordance.toShape
+      val rootShape = affordance.toShape(limitToCoreShapeOption)
+
+
       implicit val commands = new MutableCommandStream
       DistributionAwareShapeBuilder.buildCommandsFor(rootShape, None)
 
