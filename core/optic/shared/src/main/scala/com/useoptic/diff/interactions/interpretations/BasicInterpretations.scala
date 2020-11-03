@@ -214,26 +214,4 @@ class BasicInterpretations(rfcState: RfcState)(implicit ids: OpticDomainIds) {
       ChangeType.Update
     )
   }
-
-  //@GOTCHA: this is not a backwards-compatible change
-  def AddFieldToShape(interactionTrail: InteractionTrail, requestsTrail: RequestSpecTrail, shapeTrail: ShapeTrail, jsonTrail: JsonTrail, interaction: HttpInteraction) = {
-    val resolved = JsonLikeResolvers.tryResolveJsonLike(interactionTrail, jsonTrail, interaction)
-
-    //@TODO: inject real shapesState? for now this will always create a new shape
-    val (inlineShapeId, newCommands, name) = DistributionAwareShapeBuilder.toCommandsWithName(Vector(resolved.get))
-    val fieldId = ids.newFieldId
-    val shapeId = shapeTrail.lastObject().get
-    val fieldName = jsonTrail.path.last.asInstanceOf[JsonObjectKey].key
-    val additionalCommands = Seq(
-      ShapesCommands.AddField(fieldId, shapeId, fieldName, FieldShapeFromShape(fieldId, inlineShapeId))
-    )
-
-    val commands = newCommands.flatten ++ additionalCommands
-
-    InteractiveDiffInterpretation(
-      ObjectSuggestionTemplates.addField(fieldName, name),
-      commands,
-      ChangeType.Addition
-    )
-  }
 }
