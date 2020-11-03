@@ -1,6 +1,6 @@
 {
   "name": "@useoptic/domain-utilities",
-  "version": "10.0.37",
+  "version": "10.0.38",
   "scripts": {
     "ws:clean": "rm -rf build/*",
     "ws:build": "yarn run tsc -b --verbose",
@@ -14,8 +14,8 @@
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "dependencies": {
-    "@useoptic/domain": "10.0.37",
-    "@useoptic/domain-types": "10.0.37"
+    "@useoptic/domain": "10.0.38",
+    "@useoptic/domain-types": "10.0.38"
   },
   "devDependencies": {},
   "files": [

@@ -15,6 +15,7 @@ import scala.scalajs.js.annotation.{JSExport, JSExportAll}
 
 
 case class ExpectedHelper(allowedCoreShapes: Seq[String],
+                          allowedCoreShapeKindsByShapeId: Map[String, String],
                           lastField: Option[FieldId],
                           lastFieldKey: Option[String],
                           lastFieldShapeId: Option[String],
@@ -43,9 +44,11 @@ object ExpectedHelper {
 
     val resolver = ShapesResolvers.newResolver(rfcState)
 
-    val coreShapeKinds = diffs.flatMap(i => {
+    val coreShapeKindsByShapeId = diffs.flatMap(i => {
       resolver.listTrailChoices(i.shapeDiffResultOption.get.shapeTrail, Map.empty)
-    }).map(i => i.coreShapeKind).distinct.map(_.baseShapeId)
+    }).map(i => i.coreShapeKind.baseShapeId.toString -> i.shapeId).toMap
+
+    val coreShapeKinds = coreShapeKindsByShapeId.keys.toSeq
 
     val shapeTrail = diffs.head.shapeDiffResultOption.get.shapeTrail
 
@@ -79,6 +82,7 @@ object ExpectedHelper {
     })
 
     ExpectedHelper(coreShapeKinds,
+      coreShapeKindsByShapeId,
       lastField,
       lastFieldKey,
       lastFieldShapeId,

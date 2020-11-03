@@ -1,6 +1,6 @@
 {
   "name": "@useoptic/domain",
-  "version": "10.0.37",
+  "version": "10.0.38",
   "scripts": {
     "ws:test": "echo domain",
     "ws:build": "yarn run tsc -b --verbose && yarn run ws:copy-files",
