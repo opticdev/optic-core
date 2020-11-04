@@ -1,14 +1,10 @@
 package com.useoptic.diff.interactions.interpreters
 
-import com.useoptic.contexts.requests.Resolvers
-import com.useoptic.contexts.rfc.{RfcService, RfcState}
+import com.useoptic.contexts.rfc.{ RfcState}
 import com.useoptic.contexts.shapes.Commands.{FieldId, ShapeId}
 import com.useoptic.contexts.shapes.ShapesHelper.{ListKind, ObjectKind, OptionalKind}
-import com.useoptic.diff.initial.ShapeResolver
-import com.useoptic.diff.interactions.{BodyUtilities, ContentTypeHelpers, InteractionDiffResult}
-import com.useoptic.diff.shapes.{ListItemTrail, ListTrail, NullableItemTrail, NullableTrail, ObjectFieldTrail, ObjectTrail, OneOfItemTrail, OneOfTrail, OptionalItemTrail, OptionalTrail, UnknownTrail}
+import com.useoptic.diff.shapes.{ListItemTrail, ListTrail, NullableItemTrail, NullableTrail, ObjectFieldTrail, ObjectTrail, OneOfItemTrail, OneOfTrail, OptionalItemTrail, OptionalTrail, ShapeTrail, UnknownTrail}
 import com.useoptic.diff.shapes.resolvers.ShapesResolvers
-import com.useoptic.logging.Logger
 import com.useoptic.ux.ShapeNameRenderer
 import io.circe.Json
 
@@ -34,24 +30,24 @@ case class ExpectedHelper(allowedCoreShapes: Seq[String],
 @JSExportAll
 object ExpectedHelper {
 
-  def expectedForDiffStrings(diffsRaw: String, rfcState: RfcState): Json = {
+  def expectedForDiffStrings(shapeTrailRaw: String, rfcState: RfcState): Json = {
     import io.circe._, io.circe.parser._
     import io.circe.generic.auto._
     import io.circe.syntax._
-    expectedForDiff(parseDiffs(diffsRaw), rfcState).asJson
+    expectedForDiff(parseShapeTrail(shapeTrailRaw), rfcState).asJson
   }
 
-  def expectedForDiff(diffs: Seq[InteractionDiffResult], rfcState: RfcState): ExpectedHelper = {
+  def expectedForDiff(normalizedShapeTrail: ShapeTrail, rfcState: RfcState): ExpectedHelper = {
 
     val resolver = ShapesResolvers.newResolver(rfcState)
+    val choices = resolver.listTrailChoices(normalizedShapeTrail, Map.empty)
 
-    val coreShapeKindsByShapeId = diffs.flatMap(i => {
-      resolver.listTrailChoices(i.shapeDiffResultOption.get.shapeTrail, Map.empty)
-    }).map(i => i.coreShapeKind.baseShapeId.toString -> i.shapeId).toMap
+    val coreShapeKindsByShapeId = choices
+        .map(i => i.coreShapeKind.baseShapeId.toString -> i.shapeId).toMap
 
     val coreShapeKinds = coreShapeKindsByShapeId.keys.toSeq
 
-    val shapeTrail = diffs.head.shapeDiffResultOption.get.shapeTrail
+    val shapeTrail = normalizedShapeTrail
 
     val lastField = shapeTrail.lastField()
 
@@ -59,8 +55,6 @@ object ExpectedHelper {
     val lastFieldShapeId = lastField.map(fieldId => resolver.getField(fieldId)).map(_.descriptor.shapeId)
 
 
-    val choices = resolver.listTrailChoices(diffs.head.shapeDiffResultOption.get.shapeTrail, Map.empty)
-    
     val lastObject = {
       choices.collectFirst{
           case c if c.coreShapeKind == ObjectKind => c.shapeId
@@ -110,10 +104,10 @@ object ExpectedHelper {
       shapeName)
   }
 
-  def parseDiffs(diffsRaw: String): Seq[InteractionDiffResult] = {
+  def parseShapeTrail(shapeTrail: String): ShapeTrail = {
     import io.circe._, io.circe.parser._
     import io.circe.generic.auto._
     import io.circe.syntax._
-    parse(diffsRaw).right.get.as[Seq[InteractionDiffResult]].right.get
+    parse(shapeTrail).right.get.as[ShapeTrail].right.get
   }
 }
