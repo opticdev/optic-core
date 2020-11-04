@@ -18,6 +18,7 @@ case class ExpectedHelper(allowedCoreShapes: Seq[String],
                           lastFieldShapeId: Option[String],
                           fieldIsOptional: Option[Boolean], // defined if field, true, if optional
                           lastObject: Option[ShapeId],
+                          lastList: Option[ShapeId],
                           lastListItem: Option[ShapeId],
                           lastOneOf: Option[OneOfTrail],
                           lastOneOfItem: Option[OneOfItemTrail],
@@ -61,11 +62,9 @@ object ExpectedHelper {
       }
     }
 
-    val lastListItem = {
-      choices.collectFirst{
-        case c if c.coreShapeKind == ListKind => c.shapeId
-      }
-    }
+    val lastListItemTrail = shapeTrail.lastListItem()
+    val lastListItem = lastListItemTrail.map(_.itemShapeId)
+    val lastList = lastListItemTrail.map(_.listShapeId)
 
 
     val fieldIsOptional: Option[Boolean] = {
@@ -95,6 +94,7 @@ object ExpectedHelper {
       lastFieldShapeId,
       fieldIsOptional,
       lastObject,
+      lastList,
       lastListItem,
       lastOneOfTrail,
       lastOneOfItemTrail,
