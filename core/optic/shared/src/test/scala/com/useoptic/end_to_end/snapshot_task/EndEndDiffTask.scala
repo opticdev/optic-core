@@ -71,7 +71,9 @@ class EndEndDiffTask
 //      val a = learner.shapeBuilder.getInteractionCounter
 //      println(a)
 
-//      println(ExpectedHelper.expectedForDiff(Seq(diff), rfcState))
+      val a = ExpectedHelper.expectedForDiff(diff.shapeDiffResultOption.get.shapeTrail, rfcState)
+
+      null
 
       val interpret = new DiffDescriptionInterpreters(rfcState)
       val description = interpret.interpret(diff, interactions.head)
