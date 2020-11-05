@@ -25,6 +25,7 @@ case class ExpectedHelper(allowedCoreShapes: Seq[String],
                           lastUnknownTrail: Option[UnknownTrail],
                           lastNullable: Option[NullableTrail],
                           lastOptionalItemTrail: Option[OptionalItemTrail],
+                          rootShapeId: Option[String],
                           shapeName: Option[String])
 
 @JSExport
@@ -82,10 +83,13 @@ object ExpectedHelper {
     val lastOptionalItemTrail: Option[OptionalItemTrail] = shapeTrail.path.lastOption collect  { case a: OptionalItemTrail => a}
 
 
-    val shapeName = shapeTrail.path.lastOption.map(i => i.namedShape).filterNot(i => i == "").flatMap(i => {
-      val name = new ShapeNameRenderer(ShapesResolvers.newResolver(rfcState), rfcState).nameForShapeId(i)
+    val includeRootShapeInName =
+      shapeTrail.path.lastOption.map(i => i.namedShape).filterNot(i => i == "").getOrElse(shapeTrail.rootShapeId)
+    val shapeName = {
+      val name = new ShapeNameRenderer(ShapesResolvers.newResolver(rfcState), rfcState).nameForShapeId(includeRootShapeInName)
       name.map(i => i.map(n => n.text).mkString(" "))
-    })
+    }
+    val rootShapeId = if (shapeTrail.path.isEmpty) Some(shapeTrail.rootShapeId) else None
 
     ExpectedHelper(coreShapeKinds,
       coreShapeKindsByShapeId,
@@ -101,6 +105,7 @@ object ExpectedHelper {
       lastUnknownTrail,
       lastNullable,
       lastOptionalItemTrail,
+      rootShapeId,
       shapeName)
   }
 
