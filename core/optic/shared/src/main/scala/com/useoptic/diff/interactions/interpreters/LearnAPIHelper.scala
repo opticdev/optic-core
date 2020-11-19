@@ -5,7 +5,7 @@ import com.useoptic.contexts.rfc.Commands.RfcCommand
 import com.useoptic.contexts.shapes.Commands.ShapeId
 import com.useoptic.diff.initial.{DistributionAwareShapeBuilder, ShapeBuildingStrategy, StreamingShapeBuilder}
 import com.useoptic.diff.interactions.{BodyUtilities, ContentTypeHelpers, InteractionDiffResult, UnmatchedRequestBodyContentType, UnmatchedResponseBodyContentType, UnmatchedResponseStatusCode}
-import com.useoptic.dsa.OpticIds
+import com.useoptic.dsa.{OpticDomainIds, OpticIds}
 import com.useoptic.contexts.requests.{RequestsServiceHelper, Commands => RequestsCommands}
 import com.useoptic.types.capture.HttpInteraction
 
@@ -14,12 +14,15 @@ import scala.scalajs.js.annotation.{JSExport, JSExportAll}
 @JSExport
 @JSExportAll
 object LearnAPIHelper {
-  private implicit val ids = OpticIds.generator
+  private implicit var ids = OpticIds.generator
   private implicit val shapeBuilderStrategy = ShapeBuildingStrategy.inferPolymorphism
 
 
   def newShapeBuilder: StreamingShapeBuilder = DistributionAwareShapeBuilder.streaming
-  def newShapeBuilderMap(pathId: String, method: String): ShapeBuilderMap = new ShapeBuilderMap(pathId: String, method: String)
+  def newShapeBuilderMap(pathId: String, method: String, opticIds: OpticDomainIds = OpticIds.generator): ShapeBuilderMap = {
+    ids = opticIds // hacky, fine since we're deprecating this soon
+    new ShapeBuilderMap(pathId: String, method: String)
+  }
 
   def learnBody(interaction: HttpInteraction, shapeBuilderMap: ShapeBuilderMap): Unit = {
 
