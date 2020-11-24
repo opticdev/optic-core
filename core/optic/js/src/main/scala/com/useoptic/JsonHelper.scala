@@ -82,6 +82,6 @@ object JsonHelper {
     val rawBody = body.value.asText.map(Json.fromString)
 
 
-    convertJsonToJs(Json.fromJsonObject(Map("asJson" -> parsedJson.getOrElse(Json.Null), "asText" -> rawBody.getOrElse(Json.Null), "noBody" -> body.isEmpty).asJsonObject))
+    convertJsonToJs(Json.fromJsonObject(Map("asJson" -> parsedJson.getOrElse(Json.Null), "asText" -> rawBody.getOrElse(Json.Null), "noBody" -> Json.fromBoolean( body.isEmpty )).asJsonObject))
   }
 }
