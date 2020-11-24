@@ -78,9 +78,10 @@ object JsonHelper {
 
     val body = InteractionSerialization.bodyFromJson(convertJsToJson(x).right.get)
 
-    val parsedJson = BodyUtilities.parseJsonBody(body)
+    val parsedJson = if (body.value.shapeHashV1Base64.isDefined || body.value.asJsonString.isDefined) BodyUtilities.parseJsonBody(body) else None
     val rawBody = body.value.asText.map(Json.fromString)
 
-    convertJsonToJs(Json.fromJsonObject(Map("asJson" -> parsedJson.getOrElse(Json.Null), "asText" -> rawBody.getOrElse(Json.Null)).asJsonObject))
+
+    convertJsonToJs(Json.fromJsonObject(Map("asJson" -> parsedJson.getOrElse(Json.Null), "asText" -> rawBody.getOrElse(Json.Null), "noBody" -> body.isEmpty).asJsonObject))
   }
 }
