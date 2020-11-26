@@ -1,6 +1,6 @@
 package com.useoptic.diff.interactions.interpreters
 
-import com.useoptic.contexts.rfc.{ RfcState}
+import com.useoptic.contexts.rfc.RfcState
 import com.useoptic.contexts.shapes.Commands.{FieldId, ShapeId}
 import com.useoptic.contexts.shapes.ShapesHelper.{ListKind, ObjectKind, OptionalKind}
 import com.useoptic.diff.shapes.{ListItemTrail, ListTrail, NullableItemTrail, NullableTrail, ObjectFieldTrail, ObjectTrail, OneOfItemTrail, OneOfTrail, OptionalItemTrail, OptionalTrail, ShapeTrail, UnknownTrail}
@@ -9,6 +9,7 @@ import com.useoptic.ux.ShapeNameRenderer
 import io.circe.Json
 
 import scala.scalajs.js.annotation.{JSExport, JSExportAll}
+import scala.util.Try
 
 
 case class ExpectedHelper(allowedCoreShapes: Seq[String],
@@ -95,10 +96,11 @@ object ExpectedHelper {
 
     val includeRootShapeInName =
       shapeTrail.path.lastOption.map(i => i.namedShape).filterNot(i => i == "").getOrElse(shapeTrail.rootShapeId)
-    val shapeName = {
-      val name = new ShapeNameRenderer(ShapesResolvers.newResolver(rfcState), rfcState).nameForShapeId(includeRootShapeInName)
+    val shapeName = Try { // fix for pesky scala js issue
+      val name = new ShapeNameRenderer(rfcState).nameForShapeId(includeRootShapeInName)
       name.map(i => i.map(n => n.text).mkString(" "))
-    }
+    }.toOption.flatten
+
     println("q")
     val rootShapeId = if (shapeTrail.path.isEmpty) Some(shapeTrail.rootShapeId) else None
     println("r")
