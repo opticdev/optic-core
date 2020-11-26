@@ -36,44 +36,53 @@ object ExpectedHelper {
     import io.circe._, io.circe.parser._
     import io.circe.generic.auto._
     import io.circe.syntax._
+    println("pre-parsed")
     expectedForDiff(parseShapeTrail(shapeTrailRaw), rfcState).asJson
   }
 
   def expectedForDiff(normalizedShapeTrail: ShapeTrail, rfcState: RfcState): ExpectedHelper = {
 
+    println("a")
     val resolver = ShapesResolvers.newResolver(rfcState)
+    println("b")
     val choices = resolver.listTrailChoices(normalizedShapeTrail, Map.empty)
-
+    println("c")
     val coreShapeKindsByShapeId = choices
         .map(i => i.coreShapeKind.baseShapeId.toString -> i.shapeId).toMap
-
+    println("d")
     val coreShapeKinds = coreShapeKindsByShapeId.keys.toSeq
-
+    println("e")
     val shapeTrail = normalizedShapeTrail
-
+    println("f")
     val lastField = shapeTrail.lastField()
-
+    println("g")
     val lastFieldKey = lastField.map(fieldId => resolver.getField(fieldId)).map(_.descriptor.name)
+    println("h")
     val lastFieldShapeId = lastField.map(fieldId => resolver.getField(fieldId)).map(_.descriptor.shapeId)
-
-
+    println("i")
     val lastObject = {
       choices.collectFirst{
           case c if c.coreShapeKind == ObjectKind => c.shapeId
       }
     }
+    println("j")
 
     val lastListItemTrail = shapeTrail.lastListItem()
+    println("k")
     val lastListItem = lastListItemTrail.map(_.itemShapeId)
+    println("l")
     val lastList = lastListItemTrail.map(_.listShapeId)
+    println("m")
 
 
+    println("n")
     val fieldIsOptional: Option[Boolean] = {
       if (lastField.isDefined) {
         val coreShapeKind = resolver.resolveTrailToCoreShape(shapeTrail, Map.empty).coreShapeKind
         Some(coreShapeKind == OptionalKind)
       } else None
     }
+    println("o")
 
 
     val lastOneOfItemTrail: Option[OneOfItemTrail] = shapeTrail.path.lastOption collect  { case a: OneOfItemTrail => a}
@@ -82,6 +91,7 @@ object ExpectedHelper {
     val lastNullable: Option[NullableTrail] = shapeTrail.path.lastOption collect  { case a: NullableTrail => a}
     val lastOptionalItemTrail: Option[OptionalItemTrail] = shapeTrail.path.lastOption collect  { case a: OptionalItemTrail => a}
 
+    println("p")
 
     val includeRootShapeInName =
       shapeTrail.path.lastOption.map(i => i.namedShape).filterNot(i => i == "").getOrElse(shapeTrail.rootShapeId)
@@ -89,8 +99,9 @@ object ExpectedHelper {
       val name = new ShapeNameRenderer(ShapesResolvers.newResolver(rfcState), rfcState).nameForShapeId(includeRootShapeInName)
       name.map(i => i.map(n => n.text).mkString(" "))
     }
+    println("q")
     val rootShapeId = if (shapeTrail.path.isEmpty) Some(shapeTrail.rootShapeId) else None
-
+    println("r")
     ExpectedHelper(coreShapeKinds,
       coreShapeKindsByShapeId,
       lastField,
