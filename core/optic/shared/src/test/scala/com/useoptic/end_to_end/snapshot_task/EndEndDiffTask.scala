@@ -65,15 +65,13 @@ class EndEndDiffTask
     DiffOutput(diffs.map(i => {
       val (diff, interactions) = i
 
-      val learner = LearnJsonTrailAffordances.newLearner("", "", diff)
-      interactions.foreach(i => learner.learnBody(i, i.uuid))
-//      println(learner)
-//      val a = learner.shapeBuilder.getInteractionCounter
-//      println(a)
-
-      val a = ExpectedHelper.expectedForDiff(diff.shapeDiffResultOption.get.shapeTrail, rfcState)
-
-      null
+//      val learner = LearnJsonTrailAffordances.newLearner("", "", Map("diffHash" -> diff))
+//      interactions.foreach(i => learner.learnBody(i, i.uuid))
+//      println(learner.serialize())
+//
+//      val a = ExpectedHelper.expectedForDiff(diff.shapeDiffResultOption.get.shapeTrail, rfcState)
+//
+//      null
 
       val interpret = new DiffDescriptionInterpreters(rfcState)
       val description = interpret.interpret(diff, interactions.head)
