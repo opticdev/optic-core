@@ -21,18 +21,16 @@ import scala.scalajs.js.annotation.{JSExport, JSExportAll}
 @JSExportAll
 @JSExport
 object LearnJsonTrailAffordances {
-  def newLearner(pathId: PathComponentId, method: String, diff: InteractionDiffResult) =
-    new LearnJsonTrailAffordances(pathId, method, diff)
-  def newLearner(pathId: PathComponentId, method: String, diff: String) = {
-
+  def newLearner(pathId: PathComponentId, method: String, diffs: Map[String, InteractionDiffResult]) =
+    new LearnJsonTrailAffordances(pathId, method, diffs)
+  def newLearner(pathId: PathComponentId, method: String, diffs: String) = {
     import io.circe._, io.circe.parser._
     import io.circe.generic.auto._
     import io.circe.syntax._
-
     new LearnJsonTrailAffordances(
       pathId,
       method,
-      parse(diff).right.get.as[InteractionDiffResult].right.get)
+      parse(diffs).right.get.as[Map[String,InteractionDiffResult]].right.get)
   }
 
   def toCommandsJson(valueAffordances: String, jsonTrailRaw: String, clientProvidedIdGenerator: OpticDomainIds, learnOnlyKind: Option[ShapeId]): Option[Json] = {
@@ -77,34 +75,37 @@ object LearnJsonTrailAffordances {
 }
 
 @JSExportAll
-class LearnJsonTrailAffordances(val pathId: PathComponentId, val method: String, diff: InteractionDiffResult) {
+class LearnJsonTrailAffordances(val pathId: PathComponentId, val method: String, diffs: Map[String, InteractionDiffResult]) {
 
-  require(diff.shapeDiffResultOption.isDefined, "Only Shape Diffs can have their values learned")
+  require(diffs.forall(i => i._2.shapeDiffResultOption.isDefined), "Only Shape Diffs can have their values learned")
 
   private implicit val ids = OpticIds.generator
   private implicit val shapeBuilderStrategy = ShapeBuildingStrategy.inferPolymorphism
 
-  val shapeBuilder: FocusedStreamingShapeBuilder = new FocusedStreamingShapeBuilder(diff.shapeDiffResultOption.get.jsonTrail)
+  val shapeBuilders = diffs.map(i => (i, new FocusedStreamingShapeBuilder(i._2.shapeDiffResultOption.get.jsonTrail)))
 
   def learnBody(interaction: HttpInteraction, interactionPointer: String): Unit = {
+    shapeBuilders.foreach {case ((_, diff), shapeBuilder) => {
+      val inRequest = RequestSpecTrailHelpers.requestId(diff.requestsTrail).isDefined
+      val inResponse = RequestSpecTrailHelpers.responseId(diff.requestsTrail).isDefined
 
-    val inRequest = RequestSpecTrailHelpers.requestId(diff.requestsTrail).isDefined
-    val inResponse = RequestSpecTrailHelpers.responseId(diff.requestsTrail).isDefined
+      if (inRequest) {
+        BodyUtilities.parseBody(interaction.request.body).foreach(i => shapeBuilder.process(i, interactionPointer))
+      }
 
-    if (inRequest) {
-      BodyUtilities.parseBody(interaction.request.body).foreach(i => shapeBuilder.process(i, interactionPointer))
-    }
-
-    if (inResponse) {
-      BodyUtilities.parseBody(interaction.response.body).foreach(i => shapeBuilder.process(i, interactionPointer))
-    }
-
+      if (inResponse) {
+        BodyUtilities.parseBody(interaction.response.body).foreach(i => shapeBuilder.process(i, interactionPointer))
+      }
+    }}
   }
 
   def serialize(): Json = {
     import io.circe.generic.auto._
     import io.circe.syntax._
-    shapeBuilder.serialize.asJson
+
+    Json.fromFields(shapeBuilders.map {case ((diffHash, diff), shapeBuilder) => {
+      diffHash -> shapeBuilder.serialize.asJson
+    }})
   }
 
 }
