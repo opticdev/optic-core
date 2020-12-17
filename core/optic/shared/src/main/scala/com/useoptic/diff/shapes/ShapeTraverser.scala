@@ -48,7 +48,9 @@ class ShapeTraverser(resolvers: ShapesResolvers, spec: RfcState, visitors: Shape
           val itemTrail = shapeTrail.withChild(ListItemTrail(listShape.shapeId, resolvedItem.get.shapeId))
           val coreShape = resolvers.resolveTrailToCoreShape(itemTrail, Map.empty) //@TODO: check bindings
           visitors.primitiveVisitor.visit(coreShape, itemTrail)
-          traverse(resolvedItem.get.shapeId, itemTrail)
+          if (listShape.shapeId != resolvedItem.get.shapeId) {
+            traverse(resolvedItem.get.shapeId, itemTrail)
+          }
         }
         case OneOfKind.baseShapeId => {
           val oneOfShape = resolved.shapeEntity
@@ -81,6 +83,7 @@ class ShapeTraverser(resolvers: ShapesResolvers, spec: RfcState, visitors: Shape
           visitors.optionalVisitor.begin(shapeTrail, optionalShape, innerShapeOption)
           innerShapeOption.foreach(innerShape => traverse(innerShape.shapeId, shapeTrail.withChild(OptionalItemTrail(resolved.shapeEntity.shapeId, innerShape.shapeId))))
         }
+
         case NullableKind.baseShapeId => {
           val nullableShape = resolved.shapeEntity
           val innerShapeOption = resolvers.resolveParameterToShape(resolved.shapeEntity.shapeId, NullableKind.innerParam, resolved.bindings)
