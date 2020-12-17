@@ -48,7 +48,19 @@ object ExpectedHelper {
         .map(i => i.coreShapeKind.baseShapeId.toString -> i.shapeId).toMap
     val coreShapeKinds = coreShapeKindsByShapeId.keys.toSeq
     val shapeTrail = normalizedShapeTrail
-    val lastField = shapeTrail.lastField()
+
+    val lastField: Option[FieldId] = {
+      val fieldTrail = shapeTrail.path.reverse.collectFirst {
+        case a: ObjectFieldTrail => a
+        case b: ListItemTrail => b
+      }
+      if (fieldTrail.exists(_.isInstanceOf[ObjectFieldTrail])) {
+        Some(fieldTrail.get.asInstanceOf[ObjectFieldTrail].fieldId)
+      } else {
+        None
+      }
+    }
+
     val lastFieldKey = lastField.map(fieldId => resolver.getField(fieldId)).map(_.descriptor.name)
     val lastFieldShapeId = lastField.map(fieldId => resolver.getField(fieldId)).map(_.descriptor.shapeId)
     val lastObject = {
@@ -77,8 +89,6 @@ object ExpectedHelper {
     val lastOptionalItemTrail: Option[OptionalItemTrail] = shapeTrail.path.lastOption collect  { case a: OptionalItemTrail => a}
 
 
-    val includeRootShapeInName =
-      shapeTrail.path.lastOption.map(i => i.namedShape).filterNot(i => i == "").getOrElse(shapeTrail.rootShapeId)
     val shapeName = Some("deprecatedSHAPE_NAME")
 
     val rootShapeId = if (shapeTrail.path.isEmpty) Some(shapeTrail.rootShapeId) else None
