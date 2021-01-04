@@ -10,8 +10,14 @@ import scala.util.Try
 
 class ShapeTraverser(resolvers: ShapesResolvers, spec: RfcState, visitors: ShapeVisitors) {
 
+  val visitedIds = scala.collection.mutable.ListBuffer[String]()
+
   def traverse(shapeId: ShapeId, shapeTrail: ShapeTrail): Unit = {
     val shapeEntityOption = Try(spec.shapesState.flattenedShape(shapeId)).toOption
+
+    if (!visitedIds.contains(shapeId)) {
+      visitedIds.append(shapeId)
+    } else return
 
     if (shapeEntityOption.isDefined) {
       val shapeEntity = shapeEntityOption.get
@@ -81,7 +87,9 @@ class ShapeTraverser(resolvers: ShapesResolvers, spec: RfcState, visitors: Shape
             .map(i => resolvers.resolveToBaseShape(i.shapeId))
 
           visitors.optionalVisitor.begin(shapeTrail, optionalShape, innerShapeOption)
-          innerShapeOption.foreach(innerShape => traverse(innerShape.shapeId, shapeTrail.withChild(OptionalItemTrail(resolved.shapeEntity.shapeId, innerShape.shapeId))))
+          innerShapeOption.foreach(innerShape => {
+            traverse(innerShape.shapeId, shapeTrail.withChild(OptionalItemTrail(resolved.shapeEntity.shapeId, innerShape.shapeId)))
+          })
         }
 
         case NullableKind.baseShapeId => {
