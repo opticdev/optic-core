@@ -1,7 +1,7 @@
 package com.useoptic.diff.interactions.interpreters
 
 import com.useoptic.contexts.rfc.RfcState
-import com.useoptic.contexts.shapes.Commands.{FieldId, ShapeId}
+import com.useoptic.contexts.shapes.Commands.{FieldId, FieldShapeFromShape, ShapeId}
 import com.useoptic.contexts.shapes.ShapesHelper.{ListKind, ObjectKind, OptionalKind}
 import com.useoptic.diff.shapes.{ListItemTrail, ListTrail, NullableItemTrail, NullableTrail, ObjectFieldTrail, ObjectTrail, OneOfItemTrail, OneOfTrail, OptionalItemTrail, OptionalTrail, ShapeTrail, UnknownTrail}
 import com.useoptic.diff.shapes.resolvers.ShapesResolvers
@@ -62,7 +62,11 @@ object ExpectedHelper {
     }
 
     val lastFieldKey = lastField.map(fieldId => resolver.getField(fieldId)).map(_.descriptor.name)
-    val lastFieldShapeId = lastField.map(fieldId => resolver.getField(fieldId)).map(_.descriptor.shapeId)
+
+    val lastFieldShapeId = lastField.map(fieldId => resolver.getField(fieldId)).map(_.descriptor.shapeDescriptor match {
+      case a: FieldShapeFromShape => a.shapeId
+    })
+
     val lastObject = {
       choices.collectFirst{
           case c if c.coreShapeKind == ObjectKind => c.shapeId

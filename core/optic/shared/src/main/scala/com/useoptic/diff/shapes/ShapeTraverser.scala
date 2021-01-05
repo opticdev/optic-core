@@ -9,7 +9,7 @@ import com.useoptic.diff.shapes.resolvers.ShapesResolvers.ResolvedTrail
 import scala.util.Try
 
 class ShapeTraverser(resolvers: ShapesResolvers, spec: RfcState, visitors: ShapeVisitors) {
-  
+
   def traverse(shapeId: ShapeId, shapeTrail: ShapeTrail): Unit = {
     val shapeEntityOption = Try(spec.shapesState.flattenedShape(shapeId)).toOption
     if (shapeEntityOption.isDefined) {
