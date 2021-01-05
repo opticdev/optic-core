@@ -9,16 +9,9 @@ import com.useoptic.diff.shapes.resolvers.ShapesResolvers.ResolvedTrail
 import scala.util.Try
 
 class ShapeTraverser(resolvers: ShapesResolvers, spec: RfcState, visitors: ShapeVisitors) {
-
-  val visitedIds = scala.collection.mutable.ListBuffer[String]()
-
+  
   def traverse(shapeId: ShapeId, shapeTrail: ShapeTrail): Unit = {
     val shapeEntityOption = Try(spec.shapesState.flattenedShape(shapeId)).toOption
-
-    if (!visitedIds.contains(shapeId)) {
-      visitedIds.append(shapeId)
-    } else return
-
     if (shapeEntityOption.isDefined) {
       val shapeEntity = shapeEntityOption.get
       val resolved = resolvers.resolveTrailToCoreShape(shapeTrail, Map.empty) //@TODO: check bindings
