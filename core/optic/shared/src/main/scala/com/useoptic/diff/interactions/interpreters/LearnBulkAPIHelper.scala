@@ -22,7 +22,6 @@ object LearnBulkAPIHelper {
   def newLearner(rfcState: RfcState, json: Json, opticIds: OpticDomainIds = OpticIds.generator) = new LearnBulkAPIHelper(rfcState, json, opticIds)
 }
 
-@JSExport
 @JSExportAll
 class LearnBulkAPIHelper(rfcState: RfcState, json: Json, opticIds: OpticDomainIds = OpticIds.generator) {
 
