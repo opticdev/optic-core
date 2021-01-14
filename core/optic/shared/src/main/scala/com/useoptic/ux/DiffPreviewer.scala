@@ -110,14 +110,6 @@ class DiffPreviewer(resolvers: ShapesResolvers, spec: RfcState) {
 
 class ExampleRenderVisitorNew(resolvers: ShapesResolvers, spec: RfcState, diffs: Set[ShapeDiffResult], relatedDiffs: Map[ShapeDiffResult, Set[JsonTrail]]) extends JsonLikeAndSpecVisitors with ExampleRenderVisitorHelper {
 
-  def diffsByTrail(bodyTrail: JsonTrail): Set[DiffResult] = {
-    val matching = diffs.collect {
-      case sd: ShapeDiffResult if sd.jsonTrail == bodyTrail => sd
-    }
-    //add back in groupings
-    matching.toSet ++ Set(relatedDiffs.filter(i => diffs.contains(i._1)).find(i => i._2.contains(bodyTrail)).map(i => i._1)).flatten
-  }
-
   override val objectVisitor: JlasObjectVisitor = new JlasObjectVisitor {
     val diffVisitor = new JsonLikeAndSpecDiffObjectVisitor(resolvers, spec, (_) => Unit, (_) => Unit)
 
@@ -146,7 +138,7 @@ class ExampleRenderVisitorNew(resolvers: ShapesResolvers, spec: RfcState, diffs:
             val fieldTrail = jsonTrail.withChild(JsonObjectKey(fieldName))
             if (!observedFields.contains(fieldName)) {
               pushField(
-                MissingExampleField(fieldTrail.toString, fieldName, fieldId, fieldShape.shapeId, diffs = diffsByTrail(fieldTrail))
+                MissingExampleField(fieldTrail.toString, fieldName, fieldId, fieldShape.shapeId, diffs = Set.empty)
               )
               Some(fieldTrail.toString)
             } else None
@@ -158,7 +150,7 @@ class ExampleRenderVisitorNew(resolvers: ShapesResolvers, spec: RfcState, diffs:
               val fieldTrail = jsonTrail.withChild(JsonObjectKey(fieldName))
               val jsonValue = observedFields(fieldName)
               pushField(
-                KnownExampleField(fieldTrail.toString, fieldName, field.fieldId, fieldShape.shapeId, jsonValue.asJson, diffs = diffsByTrail(fieldTrail))
+                KnownExampleField(fieldTrail.toString, fieldName, field.fieldId, fieldShape.shapeId, jsonValue.asJson, diffs = Set.empty)
               )
               Some(fieldTrail.toString)
             } else None
@@ -171,7 +163,7 @@ class ExampleRenderVisitorNew(resolvers: ShapesResolvers, spec: RfcState, diffs:
               val extraFieldId = fieldTrail.toString
 
               pushField(
-                UnexpectedExampleField(fieldTrail.toString, key, value.asJson, diffs = diffsByTrail(fieldTrail))
+                UnexpectedExampleField(fieldTrail.toString, key, value.asJson, diffs = Set.empty)
               )
 
               Some(extraFieldId)
@@ -185,7 +177,7 @@ class ExampleRenderVisitorNew(resolvers: ShapesResolvers, spec: RfcState, diffs:
             knownFieldsIds.toSeq,
             missingFieldIds.toSeq,
             extraFieldIds.toSeq,
-            diffs = diffsByTrail(jsonTrail)
+            diffs = Set.empty
           ))
 
         } else {
@@ -233,7 +225,7 @@ class ExampleRenderVisitorNew(resolvers: ShapesResolvers, spec: RfcState, diffs:
                 itemTrail.toString,
                 index.intValue(),
                 i.asJson,
-                diffs = diffsByTrail(itemTrail)
+                diffs = Set.empty
               ))
               itemTrail.toString
             }
@@ -244,7 +236,7 @@ class ExampleRenderVisitorNew(resolvers: ShapesResolvers, spec: RfcState, diffs:
             Some(expected.shapeEntity.shapeId),
             Some(resolvedListItem.shapeId),
             ids,
-            diffs = diffsByTrail(jsonTrail)
+            diffs = Set.empty
           ))
 
         } else {
@@ -334,7 +326,7 @@ class ExampleRenderVisitorNew(resolvers: ShapesResolvers, spec: RfcState, diffs:
               baseShapeId,
               Some(shape.shapeId),
               json.asJson,
-              diffs = diffsByTrail(jsonTrail)
+              diffs = Set.empty
             ))
           })
       } else {
@@ -344,7 +336,7 @@ class ExampleRenderVisitorNew(resolvers: ShapesResolvers, spec: RfcState, diffs:
           baseShapeId,
           None,
           json.asJson,
-          diffs = diffsByTrail(jsonTrail)
+          diffs = Set.empty
         ))
       }
     }
@@ -352,14 +344,6 @@ class ExampleRenderVisitorNew(resolvers: ShapesResolvers, spec: RfcState, diffs:
 }
 
 class ShapeRenderVisitor(resolvers: ShapesResolvers, spec: RfcState, diffs: Set[ShapeDiffResult]) extends ShapeVisitors with SpecRenderVisitorHelper {
-
-  def diffsByTrail(shapeTrail: ShapeTrail): Set[DiffResult] = {
-//    diffs.collect {
-//      case sd: ShapeDiffResult if sd.shapeTrail == shapeTrail => sd
-//    }
-    Set.empty
-  }
-
 
   override val objectVisitor: ObjectShapeVisitor = new ObjectShapeVisitor {
     override def begin(objectResolved: ResolvedTrail, shapeTrail: ShapeTrail, exampleJson: Option[JsonLike]): Unit = {
@@ -373,9 +357,7 @@ class ShapeRenderVisitor(resolvers: ShapesResolvers, spec: RfcState, diffs: Set[
           val fieldShape = resolvers.resolveFieldToShape(fieldId, objectResolved.bindings).get
           Some(
             SpecField(field.descriptor.name, field.fieldId, fieldShape.shapeEntity.shapeId,
-              diffsByTrail(
-                shapeTrail.withChild(ObjectFieldTrail(field.fieldId, fieldShape.shapeEntity.shapeId))
-              ))
+              Set.empty)
           )
         }
       })
@@ -384,7 +366,7 @@ class ShapeRenderVisitor(resolvers: ShapesResolvers, spec: RfcState, diffs: Set[
         SpecObject(
           objectResolved.shapeEntity.shapeId,
           expectedFields,
-          diffsByTrail(shapeTrail)
+          Set.empty
         )
       )
 
@@ -398,7 +380,7 @@ class ShapeRenderVisitor(resolvers: ShapesResolvers, spec: RfcState, diffs: Set[
       //        key,
       //        Some(fieldShapeTrail.shapeEntity.shapeId),
       //        example,
-      //        diffs = diffsByTrail(fieldTrail)
+      //        diffs = Set.empty
       //      ))
     }
 
@@ -416,7 +398,7 @@ class ShapeRenderVisitor(resolvers: ShapesResolvers, spec: RfcState, diffs: Set[
           listShape.shapeId,
           itemShape.shapeId,
           PrettyShapeName.list(Some(baseItem.shapeId), Some(baseItem.shapeId)),
-          diffsByTrail(shapeTrail.withChild(ListItemTrail(listShape.shapeId, itemShape.shapeId)))
+          Set.empty
         )
       )
     }
@@ -444,7 +426,7 @@ class ShapeRenderVisitor(resolvers: ShapesResolvers, spec: RfcState, diffs: Set[
         objectResolved.shapeEntity.shapeId,
         objectResolved.coreShapeKind.baseShapeId,
         name = name,
-        diffs = diffsByTrail(shapeTrail)
+        diffs = Set.empty
       ))
     }
   }
@@ -454,7 +436,7 @@ class ShapeRenderVisitor(resolvers: ShapesResolvers, spec: RfcState, diffs: Set[
         oneOfShape.shapeId,
         PrettyShapeName.oneOf(branches),
         branches,
-        diffs = diffsByTrail(shapeTrail),
+        diffs = Set.empty
       ))
 
     }
@@ -472,7 +454,7 @@ class ShapeRenderVisitor(resolvers: ShapesResolvers, spec: RfcState, diffs: Set[
           OptionalKind.baseShapeId,
           PrettyShapeName.optional(innerShape.map(_.shapeId)),
           innerShape.get.shapeId,
-          diffs = diffsByTrail(shapeTrail)
+          diffs = Set.empty
         )
       )
     }
@@ -485,7 +467,7 @@ class ShapeRenderVisitor(resolvers: ShapesResolvers, spec: RfcState, diffs: Set[
           NullableKind.baseShapeId,
           PrettyShapeName.nullable(innerShape.map(_.shapeId)),
           innerShape.get.shapeId,
-          diffs = diffsByTrail(shapeTrail)
+          diffs = Set.empty
         )
       )
     }
