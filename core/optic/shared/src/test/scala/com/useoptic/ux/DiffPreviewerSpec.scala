@@ -53,22 +53,7 @@ class DiffPreviewerSpec extends FunSpec with JsonFileFixture {
 
 
   import RenderTester._
-
-  describe("diff render") {
-    it("can render a basic preview") {
-      val basicPreview = diffPreview(ShapeExamples.todoShape, JsonExamples.basicTodoWithDescription)
-      val rootshape = basicPreview.get.getRootShape.get
-
-      assert(rootshape.baseShapeId == ObjectKind.baseShapeId)
-      assert(rootshape.fields.size == 3)
-      assert(rootshape.field("isDone").specShape.isDefined)
-      assert(rootshape.items.isEmpty)
-
-      assert(rootshape.fields.exists(_.diffs.nonEmpty))
-    }
-
-  }
-
+  
   it("shape only render") {
     val shapeOnly = shapeOnlyPreview(ShapeExamples.todoShape).getRootShape.get
     assert(shapeOnly.asInstanceOf[RenderSpecObject].fields.size == 2)
