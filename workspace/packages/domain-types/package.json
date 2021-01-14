@@ -1,6 +1,6 @@
 {
   "name": "@useoptic/domain-types",
-  "version": "10.0.63",
+  "version": "10.0.64",
   "scripts": {
     "ws:clean": "rm -rf build/*",
     "ws:build": "yarn run tsc -b --verbose && yarn run ws:copy-files",
