@@ -18,7 +18,7 @@ object Events {
 
   sealed trait SpecEvolutionEvent extends RfcEvent
 
-  case class BatchCommitStarted(batchId: String, commitMessage: String, eventContext: Option[EventContext] = None) extends SpecEvolutionEvent
+  case class BatchCommitStarted(batchId: String, commitMessage: String, eventContext: Option[EventContext] = None, parentId: Option[String] = None) extends SpecEvolutionEvent
 
   case class BatchCommitEnded(batchId: String, eventContext: Option[EventContext] = None) extends SpecEvolutionEvent
 
