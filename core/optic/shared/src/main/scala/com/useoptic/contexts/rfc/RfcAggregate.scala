@@ -60,7 +60,7 @@ object RfcAggregate extends EventSourcedAggregate[RfcState, RfcCommand, RfcComma
     case (cc: RfcCommandContext, specEvolutionCommand: SpecEvolutionCommand) => {
       val eventContext: Option[EventContext] = Some(Events.fromCommandContext(cc))
       specEvolutionCommand match {
-        case c: Commands.StartBatchCommit => persist(BatchCommitStarted(c.batchId, c.commitMessage, eventContext))
+        case c: Commands.StartBatchCommit => persist(BatchCommitStarted(c.batchId, c.commitMessage, c.batchId, eventContext))
         case c: Commands.EndBatchCommit => persist(BatchCommitEnded(c.batchId, eventContext))
       }
     }

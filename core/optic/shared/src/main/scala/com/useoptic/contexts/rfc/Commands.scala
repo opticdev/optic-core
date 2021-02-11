@@ -14,7 +14,7 @@ object Commands {
 
   case class MarkSetupStageComplete(step: String) extends APISetupCommand
 
-  case class StartBatchCommit(batchId: String, commitMessage: String) extends SpecEvolutionCommand
+  case class StartBatchCommit(batchId: String, commitMessage: String, parentId: Option[String] = None) extends SpecEvolutionCommand
 
   case class EndBatchCommit(batchId: String) extends SpecEvolutionCommand
 
